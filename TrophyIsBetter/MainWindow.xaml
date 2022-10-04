@@ -1,0 +1,113 @@
+﻿<Window x:Class="TrophyIsBetter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:TrophyIsBetter"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{materialDesign:MaterialDesignFont}"
+        Title="TrophyIsBetter" Height="750" Width="1250">
+
+  <DockPanel x:Name="MainPanel">
+
+    <!--#region ToolBar Panel-->
+
+    <StackPanel x:Name="ToolBarPanel"
+                DockPanel.Dock="Top">
+
+      <Menu x:Name="Menu">
+        <MenuItem Header="File"
+                  Icon="{materialDesign:PackIcon File}">
+          <MenuItem Header="_Open File"
+                    Icon="{materialDesign:PackIcon FileImport}"
+                    Click="OpenFile_Click"/>
+          <MenuItem Header="_Save File"
+                    Icon="{materialDesign:PackIcon ContentSave}" />
+          <MenuItem Header="_Close File"
+                    Icon="{materialDesign:PackIcon FileExport}" />
+          <Separator/>
+          <MenuItem Header="_Close"
+                    Icon="{materialDesign:PackIcon ExitToApp}" />
+        </MenuItem>
+
+        <MenuItem Header="Advanced"
+                  Icon="{materialDesign:PackIcon Tools}">
+          <MenuItem Header="_Instant Platinum"
+                    Icon="{materialDesign:PackIcon Trophy}" />
+          <MenuItem Header="_Clear Unsynchronised"
+                    Icon="{materialDesign:PackIcon TrophyBroken}" />
+          <MenuItem Header="_Copy From PSNTrophyLeaders"
+                    Icon="{materialDesign:PackIcon CloudDownload}" />
+          <Separator/>
+          <MenuItem Header="_Set Random Start Time"
+                    Icon="{materialDesign:PackIcon ClockTimeThree}" />
+        </MenuItem>
+      </Menu>
+
+    </StackPanel>
+
+    <!--#endregion ToolBar-->
+
+    <!--#region Trophy List-->
+
+    <DataGrid x:Name="TrophyList"
+              ItemsSource="{Binding TrophyCollection}"
+              AutoGenerateColumns="False"
+              CanUserAddRows="False">
+      <DataGrid.Columns>
+
+        <DataGridTemplateColumn Header="Icon"
+                                Width="SizeToCells"
+                                IsReadOnly="True">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Image Source="{Binding Icon}"
+                     Width="50"/>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+
+        <DataGridTextColumn Header="Name"
+                            Binding="{Binding Name, Mode=OneWay}" />
+
+        <DataGridTextColumn Header="Description"
+                            Binding="{Binding Description, Mode=OneWay}"
+                            Width="*" />
+
+        <DataGridTextColumn Header="Type"
+                            Binding="{Binding Type, Mode=OneWay}" />
+
+        <DataGridCheckBoxColumn Header="Hidden"
+                                Binding="{Binding Hidden, Mode=OneWay}"
+                                IsReadOnly="True" />
+
+        <DataGridCheckBoxColumn Header="Achieved"
+                                Binding="{Binding Achieved, Mode=OneWay}"
+                                IsReadOnly="True" />
+
+        <DataGridCheckBoxColumn Header="Synced"
+                                Binding="{Binding Synced, Mode=OneWay}"
+                                IsReadOnly="True" />
+
+        <DataGridTextColumn Header="Timestamp"
+                            Binding="{Binding Timestamp,
+                                              Mode=OneWay,
+                                              StringFormat='yyyy-MM-dd HH:mm:ss'}"
+                            Width="155"/>
+
+        <DataGridTextColumn Header="Group"
+                            Binding="{Binding Group, Mode=OneWay}"
+                            Width="100"/>
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <!--#endregion Trophy List-->
+  </DockPanel>
+</Window>
