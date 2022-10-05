@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 
 namespace TrophyParser
 {
@@ -65,33 +66,6 @@ namespace TrophyParser
 
     #endregion
     #region TROPUSR
-
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct Header
-    { // Header data for TROPUSR
-
-      public ulong Magic;
-
-      public int _count;
-      public int Count
-      {
-        get
-        {
-          return _count.ChangeEndian();
-        }
-      }
-
-      /// byte[36]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 36, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding;
-
-      public void Output()
-      {
-        Console.WriteLine("\nHeader");
-        Console.WriteLine("Counter: {0}", Count);
-        Console.WriteLine("Padding:{0}", padding.ToHexString());
-      }
-    } // Header
 
     [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct TypeRecord
@@ -512,6 +486,48 @@ namespace TrophyParser
       [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 48, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       public byte[] padding2;
     } // AchievedStats
+
+    #endregion
+
+    #region General
+
+    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct Header
+    { // Header data for TROPUSR and TROPTRNS
+
+      public ulong Magic;
+
+      public int _unknownCount;
+      public int UnknownCount
+      {
+        get
+        {
+          return _unknownCount.ChangeEndian();
+        }
+      }
+
+      /// byte[36]
+      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 36, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      public byte[] padding;
+
+      public Header(string path, BigEndianBinaryReader TROPTRNSReader)
+      {
+        Header header = TROPTRNSReader.ReadBytes(Marshal.SizeOf(typeof(Header))).ToStruct<Header>();
+        if (header.Magic != 0x0000000100ad548f81)
+          throw new InvalidFileException(path);
+
+        Magic = header.Magic;
+        _unknownCount = header._unknownCount;
+        padding = header.padding;
+      }
+
+      public void Output()
+      {
+        Console.WriteLine("\nHeader");
+        Console.WriteLine("UnknownCounter: {0}", UnknownCount);
+        Console.WriteLine("Padding:{0}", padding.ToHexString());
+      }
+    } // Header
 
     #endregion
   }
