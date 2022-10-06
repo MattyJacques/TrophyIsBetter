@@ -6,7 +6,9 @@ string tempPath = Utility.File.CopyTrophyDirToTemp("C:\\Users\\Matty\\Desktop\\N
 Utility.PfdTool.DecryptTrophyData(tempPath);
 TROPCONF conf = new(tempPath);
 TROPUSR usr = new(tempPath);
+TROPTRNS trns = new(tempPath);
 
 conf.PrintState();
 usr.PrintState();
+trns.PrintState();
 Utility.File.DeleteDirectory(tempPath);

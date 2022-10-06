@@ -1,15 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Utility
 {
   public class File
   {
     #region Public Methods
+
+    public static string GetFullPath(string directory, string fileName)
+    {
+      if (directory == null || directory.Trim() == string.Empty)
+        throw new Exception("Path cannot be null!");
+
+      string filePath = Path.Combine(directory, fileName);
+      if (!System.IO.File.Exists(filePath))
+        throw new FileNotFoundException("File not found", fileName);
+
+      return filePath;
+    } // GetFullPath
 
     public static string CopyTrophyDirToTemp(string trophyDir)
     {

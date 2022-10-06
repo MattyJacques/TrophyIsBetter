@@ -32,7 +32,7 @@ namespace TrophyParser
 
     public TROPCONF(string path)
     {
-      byte[] fileData = File.ReadAllBytes(GetFullPath(path));
+      byte[] fileData = File.ReadAllBytes(Utility.File.GetFullPath(path, TROPCONF_FILE_NAME));
       ArraySegment<byte> data = new(fileData, START_BYTE, fileData.Length - START_BYTE);
 
       XmlDocument xmlDoc = new();
@@ -71,18 +71,6 @@ namespace TrophyParser
 
     #endregion
     #region Private Methods
-
-    private static string GetFullPath(string directory)
-    {
-      if (directory == null || directory.Trim() == string.Empty)
-        throw new Exception("Path cannot be null!");
-
-      string filePath = Path.Combine(directory, TROPCONF_FILE_NAME);
-      if (!File.Exists(filePath))
-        throw new FileNotFoundException("File not found", TROPCONF_FILE_NAME);
-
-      return filePath;
-    } // GetFullPath
 
     private static List<Trophy> ParseTrophies(XmlDocument? xmlDoc)
     {

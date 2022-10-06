@@ -488,7 +488,177 @@ namespace TrophyParser
     } // AchievedStats
 
     #endregion
+    #region TROPTRNS
 
+    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct TrophyInitTime
+    {
+      public int u1;
+      public int u2;
+      public int u3;
+      public int u4;
+
+      /// byte[16]
+      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      public byte[] padding;
+
+      /// byte[16]
+      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      public byte[] _initTime;
+
+      /// byte[112]
+      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 112, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      public byte[] padding2;
+    } // TrophyInitTime
+
+    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct TrophyInfo
+    {
+
+      /// int
+      private int _id;
+      public int ID
+      {
+        get
+        {
+          return _id.ChangeEndian();
+        }
+        set
+        {
+          _id = value.ChangeEndian();
+        }
+      }
+
+      /// byte[4]
+      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      private byte[] _doesExist;
+      public bool DoesExist
+      {
+        set
+        {
+          _doesExist[3] = (byte)((value) ? 2 : 0);
+        }
+        get
+        {
+          return (_doesExist[3] == 2) ? true : false;
+        }
+      }
+
+
+      /// byte[4]
+      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      private byte[] _isSynced;
+      public bool IsSynced
+      {
+        set
+        {
+          _isSynced[3] = (byte)((value) ? 1 : 0);
+        }
+        get
+        {
+          return (_isSynced[3] == 0) ? false : true;
+        }
+      }
+
+      /// int
+      public int _unknownInt1;
+
+      /// byte[16]
+      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      public byte[] padding;
+
+
+      /// int
+      private int _trophyID;
+      public int TrophyID
+      {
+        get
+        {
+          return _trophyID.ChangeEndian();
+        }
+        set
+        {
+          _trophyID = value.ChangeEndian();
+        }
+      }
+
+      /// int
+      private int _trophyType;
+      public int TrophyType
+      {
+        get
+        {
+          return _trophyType.ChangeEndian();
+        }
+        set
+        {
+          _trophyType = value.ChangeEndian();
+        }
+      }
+
+
+      /// int
+      public int _unknownInt2;
+
+      /// int
+      public int _unknownInt3;
+
+      /// byte[16]
+      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      private byte[] _getTime;
+      public DateTime Time
+      {
+        get
+        {
+          DateTime dt = new(BitConverter.ToInt64(_getTime, 0).ChangeEndian() * 10);
+          return dt.AddHours(TimeZoneInfo.Local.BaseUtcOffset.Hours);
+        }
+        set
+        {
+          if (value.Ticks == 0)
+          {
+            Array.Clear(_getTime, 0, 16);
+          }
+          else
+          {
+            long tmp = value.AddHours(-TimeZoneInfo.Local.BaseUtcOffset.Hours).Ticks;
+            Array.Copy(BitConverter.GetBytes((tmp / 10).ChangeEndian()), 0, _getTime, 0, 8);
+            Array.Copy(BitConverter.GetBytes((tmp / 10).ChangeEndian()), 0, _getTime, 8, 8);
+          }
+        }
+      }
+
+      /// byte[96]
+      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 96, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      public byte[] padding2;
+
+      public override string ToString()
+      {
+        StringBuilder sb = new StringBuilder();
+        sb.Append("[ID:").Append(ID).Append(", ");
+        sb.Append("GetState:").Append(DoesExist).Append(']');
+        return sb.ToString();
+      }
+
+      public TrophyInfo(int id, int TrophyType, DateTime dt)
+      {
+        _id = 0;
+        _doesExist = new byte[4];
+        _getTime = new byte[16];
+        _isSynced = new byte[4];
+        _trophyID = id.ChangeEndian();
+        _trophyType = TrophyType.ChangeEndian();
+        _unknownInt1 = 0;
+        _unknownInt2 = 0x00100000;
+        _unknownInt3 = 0;
+        padding = new byte[16];
+        padding2 = new byte[96];
+        Time = dt;
+        //DoesExist = true;
+      }
+    } // TrophyInfo
+
+    #endregion
     #region General
 
     [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
@@ -509,17 +679,6 @@ namespace TrophyParser
       /// byte[36]
       [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 36, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       public byte[] padding;
-
-      public Header(string path, BigEndianBinaryReader TROPTRNSReader)
-      {
-        Header header = TROPTRNSReader.ReadBytes(Marshal.SizeOf(typeof(Header))).ToStruct<Header>();
-        if (header.Magic != 0x0000000100ad548f81)
-          throw new InvalidFileException(path);
-
-        Magic = header.Magic;
-        _unknownCount = header._unknownCount;
-        padding = header.padding;
-      }
 
       public void Output()
       {

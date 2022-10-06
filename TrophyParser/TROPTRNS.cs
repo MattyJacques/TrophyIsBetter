@@ -1,0 +1,120 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using static TrophyParser.Structs;
+
+namespace TrophyParser
+{
+  public class TROPTRNS
+  {
+    #region Const Members
+
+    private const string TROPTRNS_FILE_NAME = "TROPTRNS.DAT";
+
+    #endregion
+    #region Public Members
+
+    #endregion
+    #region Private Members
+
+    private Header _header;
+    private Dictionary<int, TypeRecord> _typeRecords;
+    private string _accountID;
+    private string _trophyID;
+    private int _earnedCount;
+    private int _syncedCount;
+    private TrophyInitTime _trophyInitTime;
+    private List<TrophyInfo> _trophyInfos = new();
+    private int _u1;
+
+    #endregion
+    #region Public Constructors
+
+    public TROPTRNS(string path)
+    {
+      string filePath = Utility.File.GetFullPath(path, TROPTRNS_FILE_NAME);
+
+      using (var fileStream = new FileStream(filePath, FileMode.Open))
+      using (var TROPTRNSReader = new BigEndianBinaryReader(fileStream))
+      {
+        _header = DataParsing.ParseHeader(filePath, TROPTRNSReader);
+        _typeRecords = DataParsing.ParseTypeRecords(_header, TROPTRNSReader);
+
+        // Type 2
+        TypeRecord accountIDRecord = _typeRecords[2];
+        TROPTRNSReader.BaseStream.Position = accountIDRecord.Offset + 32; // Skip blank lines
+        _accountID = Encoding.UTF8.GetString(TROPTRNSReader.ReadBytes(16));
+
+        // Type 3
+        TypeRecord trophy_id_Record = _typeRecords[3];
+        TROPTRNSReader.BaseStream.Position = trophy_id_Record.Offset + 16; // Skip blank lines
+        _trophyID = Encoding.UTF8.GetString(TROPTRNSReader.ReadBytes(16)).Trim('\0');
+        _u1 = TROPTRNSReader.ReadInt32(); // always 00000090
+        _earnedCount = TROPTRNSReader.ReadInt32();
+        _syncedCount = TROPTRNSReader.ReadInt32();
+
+        // Type 4
+        ParseTrophyInfo(TROPTRNSReader);
+      }
+    }
+
+    #endregion
+    #region Public Methods
+
+    public void PrintState()
+    {
+      Console.WriteLine("\n----- TROPTRNS Data -----");
+
+      Console.WriteLine("Account ID: {0}", _accountID);
+      Console.WriteLine("Trophy ID: {0}", _trophyID);
+
+      Console.WriteLine("Earned Trophys: {0} Synced Trophys: {1} ", _earnedCount, _syncedCount);
+
+      _header.Output();
+
+      Console.WriteLine("\nType Records");
+      foreach (KeyValuePair<int, TypeRecord> record in _typeRecords)
+      {
+        Console.WriteLine(record.Value);
+      }
+
+      Console.WriteLine("\nTrophy Info");
+      for (int i = 0; i < _trophyInfos.Count; i++)
+      {
+        Console.WriteLine("ID: {0}, Trophy ID: {1}, Type: {2}, Exists: {3}, Timestamp: {4}, Synced: {5}",
+            _trophyInfos[i].ID, _trophyInfos[i].TrophyID,
+            _trophyInfos[i].TrophyType, _trophyInfos[i].DoesExist, _trophyInfos[i].Time,
+            _trophyInfos[i].IsSynced
+           );
+      }
+    } // PrintState
+
+    #endregion
+    #region Private Methods
+
+    private void ParseTrophyInfo(BigEndianBinaryReader reader)
+    {
+      TypeRecord TrophyInfoRecord = _typeRecords[4];
+      reader.BaseStream.Position = TrophyInfoRecord.Offset;
+      int type = reader.ReadInt32();
+      int blocksize = reader.ReadInt32();
+      int sequenceNumber = reader.ReadInt32(); // if have more than same type block, it will be used
+      int unknown = reader.ReadInt32();
+      byte[] blockdata = reader.ReadBytes(blocksize);
+      _trophyInitTime = blockdata.ToStruct<TrophyInitTime>();
+
+
+      for (int i = 0; i < (_earnedCount - 1); i++)
+      {
+        reader.BaseStream.Position += 16;
+        TrophyInfo ti = reader.ReadBytes(blocksize).ToStruct<TrophyInfo>();
+        _trophyInfos.Add(ti);
+      }
+    } // ParseTrophyInfo
+
+    #endregion
+  } // TROPTRNS
+} // TrophyParser
