@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Xml;
 using static TrophyParser.Structs;
 
@@ -20,22 +23,23 @@ namespace TrophyParser
     #endregion
     #region Private Members
 
-    private readonly string? _version;
-    private readonly string? _npcommid;
-    private readonly string? _trophyset_version;
-    private readonly string? _parental_level;
-    private readonly string? _title_name;
-    private readonly string? _title_detail;
+    private readonly string _version;
+    private readonly string _npcommid;
+    private readonly string _trophyset_version;
+    private readonly string _parental_level;
+    private readonly string _title_name;
+    private readonly string _title_detail;
 
     #endregion
     #region Public Constructors
 
     public TROPCONF(string path)
     {
-      byte[] fileData = File.ReadAllBytes(Utility.File.GetFullPath(path, TROPCONF_FILE_NAME));
-      ArraySegment<byte> data = new(fileData, START_BYTE, fileData.Length - START_BYTE);
+      byte[] data = File.ReadAllBytes(Utility.File.GetFullPath(path, TROPCONF_FILE_NAME));
+      //ArraySegment<byte> data = new ArraySegment<byte>(fileData, START_BYTE, fileData.Length - START_BYTE);
+      data = data.SubArray(START_BYTE, data.Length - START_BYTE);
 
-      XmlDocument xmlDoc = new();
+      XmlDocument xmlDoc = new XmlDocument();
       xmlDoc.LoadXml(Encoding.UTF8.GetString(data).Trim('\0'));
 
       _version = xmlDoc?.DocumentElement?.Attributes["version"]?.Value;
@@ -72,10 +76,10 @@ namespace TrophyParser
     #endregion
     #region Private Methods
 
-    private static List<Trophy> ParseTrophies(XmlDocument? xmlDoc)
+    private static List<Trophy> ParseTrophies(XmlDocument xmlDoc)
     {
-      XmlNodeList? trophiesXML = xmlDoc?.GetElementsByTagName("trophy");
-      List<Trophy> trophyList = new();
+      XmlNodeList trophiesXML = xmlDoc?.GetElementsByTagName("trophy");
+      List<Trophy> trophyList = new List<Trophy>();
       if (trophiesXML != null)
       {
         foreach (XmlNode trophy in trophiesXML)
@@ -84,7 +88,7 @@ namespace TrophyParser
           _ = int.TryParse(trophy?.Attributes?["pid"]?.Value, out int pid);
           _ = int.TryParse(trophy?.Attributes?["gid"]?.Value, out int gid);
 
-          Trophy item = new(
+          Trophy item = new Trophy(
             id,
             trophy?.Attributes?["hidden"]?.Value,
             trophy?.Attributes?["ttype"]?.Value,

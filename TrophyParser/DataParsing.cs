@@ -1,4 +1,4 @@
-﻿using System.Reflection.PortableExecutable;
+﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using static TrophyParser.Structs;
 
@@ -17,7 +17,7 @@ namespace TrophyParser
 
     public static Dictionary<int, TypeRecord> ParseTypeRecords(Header header, BigEndianBinaryReader reader)
     {
-      Dictionary<int, TypeRecord> typeRecords = new();
+      Dictionary<int, TypeRecord> typeRecords = new Dictionary<int, TypeRecord>();
       for (int i = 0; i < header.UnknownCount; i++)
       {
         TypeRecord TypeRecordTmp = reader.ReadBytes(Marshal.SizeOf(typeof(TypeRecord))).ToStruct<TypeRecord>();

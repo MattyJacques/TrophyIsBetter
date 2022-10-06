@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace TrophyParser
@@ -32,23 +33,23 @@ namespace TrophyParser
     public struct Trophy
     { // Trophy model for TROPCONF
 
-      public int? id;
-      public string? hidden;
-      public string? rank;
-      public int? pid;
-      public string? name;
-      public string? detail;
-      public int? gid;
+      public int id;
+      public string hidden;
+      public string rank;
+      public int pid;
+      public string name;
+      public string detail;
+      public int gid;
 
-      public Trophy(int? id, string? hidden, string? rank, int? pid, string? name, string? detail, int? gid)
+      public Trophy(int id, string hidden, string rank, int pid, string name, string detail, int gid)
       {
-        this.id = id ?? -1;
-        this.hidden = hidden ?? "";
-        this.rank = rank ?? "";
-        this.pid = pid ?? -1;
-        this.name = name ?? "";
-        this.detail = detail ?? "";
-        this.gid = gid ?? -1;
+        this.id = id;
+        this.hidden = hidden;
+        this.rank = rank;
+        this.pid = pid;
+        this.name = name;
+        this.detail = detail;
+        this.gid = gid;
 
       }
       public override string ToString()
@@ -204,7 +205,7 @@ namespace TrophyParser
       {
         get
         {
-          DateTime realDateTime = new(BitConverter.ToInt64(_dateAdded, 0).ChangeEndian() * 10);
+          DateTime realDateTime = new DateTime(BitConverter.ToInt64(_dateAdded, 0).ChangeEndian() * 10);
           if (realDateTime.Ticks == 0)
           {
             return realDateTime;
@@ -236,7 +237,7 @@ namespace TrophyParser
       {
         get
         {
-          DateTime realDateTime = new(BitConverter.ToInt64(_lastUpdated, 0).ChangeEndian() * 10);
+          DateTime realDateTime = new DateTime(BitConverter.ToInt64(_lastUpdated, 0).ChangeEndian() * 10);
           if (realDateTime.Ticks == 0)
           {
             return realDateTime;
@@ -272,7 +273,7 @@ namespace TrophyParser
       {
         get
         {
-          DateTime realDateTime = new(BitConverter.ToInt64(_lastAchievedTrophyTime, 0).ChangeEndian() * 10);
+          DateTime realDateTime = new DateTime(BitConverter.ToInt64(_lastAchievedTrophyTime, 0).ChangeEndian() * 10);
           if (realDateTime.Ticks == 0)
           {
             return realDateTime;
@@ -512,7 +513,7 @@ namespace TrophyParser
     } // TrophyInitTime
 
     [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct TrophyInfo
+    public struct EarnedInfo
     {
 
       /// int
@@ -610,7 +611,7 @@ namespace TrophyParser
       {
         get
         {
-          DateTime dt = new(BitConverter.ToInt64(_getTime, 0).ChangeEndian() * 10);
+          DateTime dt = new DateTime(BitConverter.ToInt64(_getTime, 0).ChangeEndian() * 10);
           return dt.AddHours(TimeZoneInfo.Local.BaseUtcOffset.Hours);
         }
         set
@@ -640,7 +641,7 @@ namespace TrophyParser
         return sb.ToString();
       }
 
-      public TrophyInfo(int id, int TrophyType, DateTime dt)
+      public EarnedInfo(int id, int TrophyType, DateTime dt)
       {
         _id = 0;
         _doesExist = new byte[4];
@@ -654,9 +655,8 @@ namespace TrophyParser
         padding = new byte[16];
         padding2 = new byte[96];
         Time = dt;
-        //DoesExist = true;
       }
-    } // TrophyInfo
+    } // EarnedInfo
 
     #endregion
     #region General

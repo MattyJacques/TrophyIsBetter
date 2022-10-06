@@ -1,4 +1,6 @@
-﻿namespace TrophyParser
+﻿using System;
+
+namespace TrophyParser
 {
   class InvalidFileException : Exception
   {

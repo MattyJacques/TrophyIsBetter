@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -27,7 +28,7 @@ namespace TrophyParser
     private int _earnedCount;
     private int _syncedCount;
     private TrophyInitTime _trophyInitTime;
-    private List<TrophyInfo> _trophyInfos = new();
+    private List<EarnedInfo> _timestamps = new List<EarnedInfo>();
     private int _u1;
 
     #endregion
@@ -81,13 +82,13 @@ namespace TrophyParser
         Console.WriteLine(record.Value);
       }
 
-      Console.WriteLine("\nTrophy Info");
-      for (int i = 0; i < _trophyInfos.Count; i++)
+      Console.WriteLine("\nTimestamps");
+      for (int i = 0; i < _timestamps.Count; i++)
       {
         Console.WriteLine("ID: {0}, Trophy ID: {1}, Type: {2}, Exists: {3}, Timestamp: {4}, Synced: {5}",
-            _trophyInfos[i].ID, _trophyInfos[i].TrophyID,
-            _trophyInfos[i].TrophyType, _trophyInfos[i].DoesExist, _trophyInfos[i].Time,
-            _trophyInfos[i].IsSynced
+            _timestamps[i].ID, _timestamps[i].TrophyID,
+            _timestamps[i].TrophyType, _timestamps[i].DoesExist, _timestamps[i].Time,
+            _timestamps[i].IsSynced
            );
       }
     } // PrintState
@@ -110,8 +111,8 @@ namespace TrophyParser
       for (int i = 0; i < (_earnedCount - 1); i++)
       {
         reader.BaseStream.Position += 16;
-        TrophyInfo ti = reader.ReadBytes(blocksize).ToStruct<TrophyInfo>();
-        _trophyInfos.Add(ti);
+        EarnedInfo ti = reader.ReadBytes(blocksize).ToStruct<EarnedInfo>();
+        _timestamps.Add(ti);
       }
     } // ParseTrophyInfo
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -26,8 +27,8 @@ namespace TrophyParser
     private string _listID;
     private int _trophyCount;
     private ListInfo _listInfo;
-    private List<TrophyType> _types = new();
-    private List<Timestamp> _timestamps = new();
+    private List<TrophyType> _types = new List<TrophyType>();
+    private List<Timestamp> _timestamps = new List<Timestamp>();
     private Header _header;
     private Dictionary<int, TypeRecord> _typeRecords;
     private AchievedStats _achievedStats;
