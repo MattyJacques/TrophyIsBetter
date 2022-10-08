@@ -18,6 +18,8 @@ namespace TrophyParser
     #endregion
     #region Public Members
 
+    public bool IsSynced { get { return _timestamps.Count == 0; } }
+
     #endregion
     #region Private Members
 

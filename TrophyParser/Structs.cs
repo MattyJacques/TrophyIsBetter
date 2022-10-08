@@ -33,34 +33,34 @@ namespace TrophyParser
     public struct Trophy
     { // Trophy model for TROPCONF
 
-      public int id;
-      public string hidden;
-      public string rank;
-      public int pid;
-      public string name;
-      public string detail;
-      public int gid;
+      public int ID;
+      public string Hidden;
+      public string Rank;
+      public int Pid;
+      public string Name;
+      public string Detail;
+      public int Gid;
 
       public Trophy(int id, string hidden, string rank, int pid, string name, string detail, int gid)
       {
-        this.id = id;
-        this.hidden = hidden;
-        this.rank = rank;
-        this.pid = pid;
-        this.name = name;
-        this.detail = detail;
-        this.gid = gid;
+        ID = id;
+        Hidden = hidden;
+        Rank = rank;
+        Pid = pid;
+        Name = name;
+        Detail = detail;
+        Gid = gid;
 
       }
       public override string ToString()
       {
         StringBuilder builder = new StringBuilder();
-        builder.Append('[').Append(id).Append(',');
-        builder.Append(hidden).Append(',');
-        builder.Append(rank).Append(',');
-        builder.Append(pid).Append(',');
-        builder.Append(name).Append(',');
-        builder.Append(detail).Append(']');
+        builder.Append('[').Append(ID).Append(',');
+        builder.Append(Hidden).Append(',');
+        builder.Append(Rank).Append(',');
+        builder.Append(Pid).Append(',');
+        builder.Append(Name).Append(',');
+        builder.Append(Detail).Append(']');
         return builder.ToString();
       }
     } // Trophy

@@ -20,6 +20,24 @@ namespace TrophyParser
     #endregion
     #region Public Members
 
+    public int EarnedCount { get { return _listInfo.AchievedCount; } }
+    public DateTime LastTimestamp { get { return _listInfo.LastAchievedTrophyTime; } }
+    public DateTime LastSyncedTimestamp
+    {
+      get
+      {
+        DateTime result = new DateTime(2008, 1, 1);
+        foreach (Timestamp timestamp in _timestamps)
+        {
+          if (timestamp.IsSync && DateTime.Compare(timestamp.Time, result) > 0)
+          {
+            result = timestamp.Time;
+          }
+        }
+        return result;
+      }
+    }
+
     #endregion
     #region Private Members
 

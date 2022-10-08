@@ -16,7 +16,7 @@ namespace Utility
       RunTool(" -d \"" + directory + "\" TROPTRNS.DAT");
     } // DecryptTrophies
 
-    public static void EncryptTrophyData(string directory, string profile)
+    public static void EncryptTrophyData(string directory, string profile = "Default Profile")
     {
       // resign param.sfo
       if (profile != "Default Profile")
