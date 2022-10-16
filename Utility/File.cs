@@ -62,7 +62,7 @@ namespace Utility
       }
     } // DeleteDirectory
 
-    #endregion
+    #endregion Public Methods
     #region Private Methods
 
     private static string GetTempDirectory()
@@ -76,6 +76,6 @@ namespace Utility
       return tempDirectory;
     } // GetTemporaryDirectory
 
-    #endregion
-  }
-}
+    #endregion Private Methods
+  } // File
+} // Utility
