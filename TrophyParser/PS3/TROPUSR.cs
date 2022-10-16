@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using static TrophyParser.Structs;
-using static TrophyParser.TROPUSR;
+using static TrophyParser.PS3.Structs;
 
-namespace TrophyParser
+namespace TrophyParser.PS3
 {
   public class TROPUSR
   {
@@ -17,28 +12,7 @@ namespace TrophyParser
 
     private const string TROPUSR_FILE_NAME = "TROPUSR.DAT";
 
-    #endregion
-    #region Public Members
-
-    public int EarnedCount { get { return _listInfo.AchievedCount; } }
-    public DateTime LastTimestamp { get { return _listInfo.LastAchievedTrophyTime; } }
-    public DateTime LastSyncedTimestamp
-    {
-      get
-      {
-        DateTime result = new DateTime(2008, 1, 1);
-        foreach (Timestamp timestamp in _timestamps)
-        {
-          if (timestamp.IsSync && DateTime.Compare(timestamp.Time, result) > 0)
-          {
-            result = timestamp.Time;
-          }
-        }
-        return result;
-      }
-    }
-
-    #endregion
+    #endregion Const Members
     #region Private Members
 
     private string _accountID;
@@ -53,8 +27,8 @@ namespace TrophyParser
     private uint[] _completionRate = new uint[4];
     byte[] _unknownHash;
 
-    #endregion
-    #region Public Constructors
+    #endregion Private Members
+    #region Constructors
 
     public TROPUSR(string path)
     {
@@ -68,7 +42,7 @@ namespace TrophyParser
 
         do
         {
-          // 1 unknow 2 account_id 3 trophy_id and hash(?) 4 trophy info
+          // 1 unknown 2 account_id 3 trophy_id and hash(?) 4 trophy info
           // 
           int type = TROPUSRReader.ReadInt32();
           int blocksize = TROPUSRReader.ReadInt32();
@@ -120,9 +94,30 @@ namespace TrophyParser
 
         _listInfo.LastUpdated = DateTime.Now;
       }
-    }
+    } // Constructor
 
-    #endregion
+    #endregion Constructors
+    #region Public Properties
+
+    public int EarnedCount { get { return _listInfo.AchievedCount; } }
+    public DateTime LastTimestamp { get { return _listInfo.LastAchievedTrophyTime; } }
+    public DateTime LastSyncedTimestamp
+    {
+      get
+      {
+        DateTime result = new DateTime(2008, 1, 1);
+        foreach (Timestamp timestamp in _timestamps)
+        {
+          if (timestamp.IsSync && DateTime.Compare(timestamp.Time, result) > 0)
+          {
+            result = timestamp.Time;
+          }
+        }
+        return result;
+      }
+    } // LastSyncedTimestamp
+
+    #endregion Public Properties
     #region Public Methods
 
     public void PrintState()
@@ -151,11 +146,11 @@ namespace TrophyParser
         Console.WriteLine("ID: {0}, Type: {1}, Earned: {2}, Timestamp: {3}", _types[i].ID,
             _types[i].Type, _timestamps[i].IsEarned, _timestamps[i].Time);
       }
-    }
+    } // PrintState
 
-    #endregion
+    #endregion Public Methods
     #region Private Methods
 
-    #endregion
+    #endregion Private Methods
   } // TROPUSR
 } // TrophyParser

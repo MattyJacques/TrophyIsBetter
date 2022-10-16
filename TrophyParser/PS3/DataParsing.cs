@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using static TrophyParser.Structs;
+using static TrophyParser.PS3.Structs;
 
-namespace TrophyParser
+namespace TrophyParser.PS3
 {
   internal class DataParsing
   {

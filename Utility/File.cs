@@ -23,11 +23,11 @@ namespace Utility
     {
       DirectoryInfo dir = new DirectoryInfo(trophyDir);
       string pathTemp = Path.Combine(GetTempDirectory(), dir.Name);
-      DirectoryCopy(trophyDir, pathTemp, true);
+      CopyDirectory(trophyDir, pathTemp, true);
       return pathTemp;
     } // CopyTrophyDirToTemp
 
-    public static void DirectoryCopy(string source, string target, bool overwrite)
+    public static void CopyDirectory(string source, string target, bool overwrite)
     {
       DirectoryInfo dir = new DirectoryInfo(source);
       if (!dir.Exists)
@@ -50,7 +50,7 @@ namespace Utility
       foreach (DirectoryInfo subDir in dirs)
       {
         string tempPath = Path.Combine(target, subDir.Name);
-        DirectoryCopy(subDir.FullName, tempPath, overwrite);
+        CopyDirectory(subDir.FullName, tempPath, overwrite);
       }
     } // DirectoryCopy
 
