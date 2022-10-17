@@ -1,7 +1,7 @@
 ﻿namespace TrophyParser.Interfaces
 {
-    public class ITrophyList
-    {
+  public class ITrophyList
+  {
 
-    } // ITrophyList
+  } // ITrophyList
 } // TrophyParser.Interfaces
