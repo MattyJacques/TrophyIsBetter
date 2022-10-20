@@ -12,10 +12,17 @@ namespace TrophyIsBetter.Models
   {
     #region Private Const Members
 
+#if DEBUG
+    private static readonly string APP_DATA_DIR_NAME = "TrophyIsBetter - Debug";
+#else
+    private static readonly string APP_DATA_DIR_NAME = "TrophyIsBetter";
+#endif
+
+
     private static readonly Regex TROPHY_FOLDER_REGEX = new Regex("NPWR[\\d]{5}_00$");
     private static readonly string APP_DATA_PATH =
       Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                   "TrophyIsBetter");
+                   APP_DATA_DIR_NAME);
     private static readonly string TROPHY_DATA_PATH = Path.Combine(APP_DATA_PATH, "Trophies");
     private static readonly string BACKUP_DATA_PATH = Path.Combine(APP_DATA_PATH, "Backup");
 
