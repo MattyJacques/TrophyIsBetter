@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Windows.Documents;
+using System.Windows.Shapes;
 using TrophyIsBetter.Interfaces;
 using TrophyParser;
 using TrophyParser.PS3;
@@ -7,7 +10,7 @@ using TrophyParser.Vita;
 
 namespace TrophyIsBetter.Models
 {
-  public class GameListEntry : IGameListEntryModel
+  public class Game : IGameModel
   {
     #region Private Members
 
@@ -17,7 +20,7 @@ namespace TrophyIsBetter.Models
     #endregion Private Members
     #region Constructors
 
-    public GameListEntry(string path)
+    public Game(string path)
     {
       _path = path;
 
@@ -43,9 +46,13 @@ namespace TrophyIsBetter.Models
     public string Progress => _trophyList.Progress;
     public DateTime? LastTimestamp => _trophyList.LastTimestamp;
     public DateTime? SyncTime => _trophyList.LastSyncedTimestamp;
+    public List<Trophy> Trophies => ConvertTrophyData(_trophyList.Trophies);
     public string Path => _path;
 
     #endregion Public Properties
+    #region Public Methods
+
+    #endregion Public Methods
     #region Private Methods
 
     private string GetPlatform()
@@ -65,6 +72,31 @@ namespace TrophyIsBetter.Models
       return File.Exists(System.IO.Path.Combine(Path, "TROPCONF.SFM"));
     } // IsPS3
 
-    #endregion
+    private List<Trophy> ConvertTrophyData(List<TrophyParser.Structs.Trophy> trophies)
+    {
+      List<Trophy> result = new List<Trophy>();
+
+      foreach (TrophyParser.Structs.Trophy trophy in trophies)
+      {
+        Trophy convertedTrophy = new Trophy()
+        {
+          Icon = Path + @"\TROP" + string.Format("{0:000}", trophy.ID) + ".PNG",
+          Name = trophy.Name,
+          Description = trophy.Detail,
+          Type = trophy.Rank,
+          Hidden = trophy.Hidden == "yes",
+          Group = trophy.Gid == 0 ? "BaseGame" : $"DLC{trophy.Gid}",
+          Achieved = trophy.Timestamp?.Earned != false,
+          Synced = trophy.Timestamp?.Synced != false,
+          Timestamp = trophy.Timestamp?.Time != null ? (DateTime)trophy.Timestamp?.Time : DateTime.MinValue
+        };
+
+        result.Add(convertedTrophy);
+      }
+
+      return result;
+    } // ConvertTrophyData
+
+    #endregion Private Methods
   } // GameListEntry
 } // TrophyIsBetter.Models

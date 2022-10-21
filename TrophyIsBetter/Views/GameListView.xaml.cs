@@ -14,6 +14,6 @@ namespace TrophyIsBetter.Views
       InitializeComponent();
     } // GameListView
 
-    #endregion
+    #endregion Constructors
   } // GameListView
 } // TrophyIsBetter

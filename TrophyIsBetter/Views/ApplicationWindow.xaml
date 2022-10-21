@@ -25,6 +25,9 @@
     <DataTemplate DataType="{x:Type viewModels:GameListViewModel}">
       <views:GameListView />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:GameViewModel}">
+      <views:GameView />
+    </DataTemplate>
   </Window.Resources>
 
   <!--#endregion Resources-->

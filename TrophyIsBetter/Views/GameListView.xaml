@@ -4,7 +4,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:local="clr-namespace:TrophyIsBetter.ViewModels"
              mc:Ignorable="d"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              TextElement.FontWeight="Regular"
@@ -20,21 +19,27 @@
 
     <!--#region ToolBar Panel-->
 
-    <StackPanel x:Name="ToolBarPanel"
-                DockPanel.Dock="Top">
+    <DockPanel x:Name="ToolBarPanel"
+               DockPanel.Dock="Top">
 
-      <Menu x:Name="Menu">
-        <MenuItem Header="File">
-          <MenuItem Header="_Import Folders"
-                    Icon="{materialDesign:PackIcon FolderArrowUp}"
-                    Command="{Binding ImportCommand}"/>
-          <Separator/>
-          <MenuItem Header="_Close"
-                    Icon="{materialDesign:PackIcon ExitToApp}" />
-        </MenuItem>
-      </Menu>
+      <Button Content="{materialDesign:PackIcon Plus}"
+              ToolTip="Import Game(s)"
+              Command="{Binding ImportCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="50"
+              Width="60"
+              HorizontalAlignment="Left" />
+      <Button Content="{materialDesign:PackIcon Pencil}"
+              ToolTip="Edit Game"
+              IsEnabled="{Binding CanEdit}"
+              Command="{Binding DataContext.ChangePageCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+              CommandParameter="{Binding SelectedEntry}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="auto"
+              Width="60"
+              HorizontalAlignment="Left" />
 
-    </StackPanel>
+    </DockPanel>
 
     <!--#endregion ToolBar-->
 
@@ -42,8 +47,18 @@
 
     <DataGrid x:Name="GameList"
               ItemsSource="{Binding GameCollection}"
+              SelectedItem="{Binding SelectedEntry, Mode=OneWayToSource}"
               AutoGenerateColumns="False"
-              CanUserAddRows="False">
+              CanUserAddRows="False" 
+              SelectionMode="Single" >
+
+      <DataGrid.CellStyle>
+        <Style TargetType="DataGridCell"
+               BasedOn="{StaticResource {x:Type DataGridCell}}" >
+          <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+      </DataGrid.CellStyle>
+
       <DataGrid.Columns>
 
         <DataGridTemplateColumn Header="Icon"
