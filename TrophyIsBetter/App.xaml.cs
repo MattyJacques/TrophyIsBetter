@@ -1,17 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
+using TrophyIsBetter.ViewModels;
+using TrophyIsBetter.Views;
 
 namespace TrophyIsBetter
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+  /// <summary>
+  /// Interaction logic for App.xaml
+  /// </summary>
+  public partial class App : Application
+  {
+    #region Protected Methods
+
+    protected override void OnStartup(StartupEventArgs e)
     {
+      base.OnStartup(e);
+
+      ApplicationWindow app = new ApplicationWindow
+      {
+        DataContext = new ApplicationViewModel()
+      };
+
+      app.Show();
     }
+
+    #endregion Protected Methods
+  }
 }
