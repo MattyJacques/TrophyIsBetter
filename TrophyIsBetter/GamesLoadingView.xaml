@@ -1,0 +1,22 @@
+﻿<Window x:Class="TrophyIsBetter.GamesLoadingView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TrophyIsBetter"
+        mc:Ignorable="d"
+        Title="Loading Games..." Height="120" Width="300"
+        ContentRendered="Window_ContentRendered">
+
+  <StackPanel Margin="20">
+    <TextBlock Name="percentBlock"
+               Text="{Binding ElementName=loadingStatus, Path=Value, StringFormat={}{0:0}%}" 
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center" />
+    <ProgressBar Minimum="0" Maximum="100" Name="loadingStatus" />
+    <TextBlock Name="copyingBlock"
+               Text="{Binding BarText}" 
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center" />
+  </StackPanel>
+</Window>

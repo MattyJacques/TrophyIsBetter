@@ -1,4 +1,4 @@
-﻿<Window x:Class="TrophyIsBetter.MainWindow"
+﻿<Window x:Class="TrophyIsBetter.Views.GameView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -25,13 +25,13 @@
       <Menu x:Name="Menu">
         <MenuItem Header="File"
                   Icon="{materialDesign:PackIcon File}">
-          <MenuItem Header="_Open File"
-                    Icon="{materialDesign:PackIcon FileImport}"
-                    Click="OpenFile_Click"/>
+          <MenuItem Header="_Open Folder"
+                    Icon="{materialDesign:PackIcon FolderArrowUp}"
+                    Click="OpenFolder_Click"/>
           <MenuItem Header="_Save File"
                     Icon="{materialDesign:PackIcon ContentSave}" />
           <MenuItem Header="_Close File"
-                    Icon="{materialDesign:PackIcon FileExport}" />
+                    Icon="{materialDesign:PackIcon FolderArrowDown}" />
           <Separator/>
           <MenuItem Header="_Close"
                     Icon="{materialDesign:PackIcon ExitToApp}" />
