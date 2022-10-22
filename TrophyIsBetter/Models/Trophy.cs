@@ -2,7 +2,7 @@
 
 namespace TrophyIsBetter.Models
 {
-  internal class Trophy
+  public class Trophy
   {
     public string Icon { get; set; }
     public string Name { get; set; }
@@ -13,5 +13,5 @@ namespace TrophyIsBetter.Models
     public bool Achieved { get; set; }
     public bool Synced { get; set; }
     public DateTime Timestamp { get; set; }
-  }
-}
+  } // Trophy
+} // TrophyIsBetter.Models

@@ -8,7 +8,7 @@
       <!-- Material Design -->
       <ResourceDictionary.MergedDictionaries>
         <materialDesign:CustomColorTheme BaseTheme="Inherit"
-                                         PrimaryColor="DarkSlateBlue"
+                                         PrimaryColor="SlateBlue"
                                          SecondaryColor="DarkSlateBlue" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
       </ResourceDictionary.MergedDictionaries>

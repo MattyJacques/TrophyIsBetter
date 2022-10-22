@@ -13,7 +13,7 @@ namespace TrophyIsBetter.Interfaces
     /// <summary>
     /// Load all of the games in the application data directory
     /// </summary>
-    List<GameListEntry> LoadGames();
+    List<Game> LoadGames();
 
     /// <summary>
     /// Close the files that have been opened

@@ -18,9 +18,9 @@ namespace TrophyIsBetter.ViewModels
     private readonly IGameListModel _model;
     private string _name = "Games";
 
-    private ObservableCollection<GameListEntryViewModel> _gameCollection = new ObservableCollection<GameListEntryViewModel>();
+    private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
     private CollectionView _gameCollectionView = null;
-    private GameListEntryViewModel _selectedEntry = null;
+    private GameViewModel _selectedEntry = null;
 
     private bool _isOpen = false;
 
@@ -32,6 +32,7 @@ namespace TrophyIsBetter.ViewModels
       _model = model;
 
       ImportCommand = new RelayCommand(Import);
+      EditGameCommand = new RelayCommand(EditGame);
 
       LoadGames();
     } // GameListViewModel
@@ -40,20 +41,22 @@ namespace TrophyIsBetter.ViewModels
     #region Public Properties
 
     /// <summary>
-    /// Open a single trophy folder or a directory containing multiple
+    /// Import a single trophy folder or a directory containing multiple
     /// </summary>
     public ICommand ImportCommand { get; set; }
 
     /// <summary>
+    /// Open a trophy folder ready for editing
+    /// </summary>
+    public ICommand EditGameCommand { get; set; }
+
+    /// <summary>
     /// Get/Set the list of games
     /// </summary>
-    public ObservableCollection<GameListEntryViewModel> GameCollection
+    public ObservableCollection<GameViewModel> GameCollection
     {
       get => _gameCollection;
-      private set
-      {
-        SetProperty(ref _gameCollection, value);
-      }
+      private set => SetProperty(ref _gameCollection, value);
     }
 
     /// <summary>
@@ -70,6 +73,27 @@ namespace TrophyIsBetter.ViewModels
 
         return _gameCollectionView;
       }
+    }
+
+    /// <summary>
+    /// Get the selected entry from the list
+    /// </summary>
+    public GameViewModel SelectedEntry
+    {
+      get => _selectedEntry;
+      set
+      {
+        SetProperty(ref _selectedEntry, value);
+        OnPropertyChanged(nameof(CanEdit));
+      }
+    }
+
+    /// <summary>
+    /// Is a game selected ready to be edited
+    /// </summary>
+    public bool CanEdit
+    {
+      get => SelectedEntry != null;
     }
 
     /// <summary>
@@ -91,6 +115,16 @@ namespace TrophyIsBetter.ViewModels
         ImportDirectory(path);
       }
     } // Import
+
+    /// <summary>
+    /// Open the game view ready for trophy editing
+    /// </summary>
+    public void EditGame()
+    {
+      if (SelectedEntry != null)
+      {
+      }
+    } // EditGame
 
     /// <summary>
     /// Save files and close the directory
@@ -145,15 +179,15 @@ namespace TrophyIsBetter.ViewModels
     /// </summary>
     private void LoadGames()
     {
-      List<GameListEntry> games = _model.LoadGames();
+      List<Game> games = _model.LoadGames();
 
       if (games != null)
       {
         GameCollection.Clear();
 
-        foreach (GameListEntry entry in games)
+        foreach (Game entry in games)
         {
-          GameCollection.Add(new GameListEntryViewModel(entry));
+          GameCollection.Add(new GameViewModel(entry));
         }
       }
 

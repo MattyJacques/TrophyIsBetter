@@ -12,10 +12,17 @@ namespace TrophyIsBetter.Models
   {
     #region Private Const Members
 
+#if DEBUG
+    private static readonly string APP_DATA_DIR_NAME = "TrophyIsBetter - Debug";
+#else
+    private static readonly string APP_DATA_DIR_NAME = "TrophyIsBetter";
+#endif
+
+
     private static readonly Regex TROPHY_FOLDER_REGEX = new Regex("NPWR[\\d]{5}_00$");
     private static readonly string APP_DATA_PATH =
       Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                   "TrophyIsBetter");
+                   APP_DATA_DIR_NAME);
     private static readonly string TROPHY_DATA_PATH = Path.Combine(APP_DATA_PATH, "Trophies");
     private static readonly string BACKUP_DATA_PATH = Path.Combine(APP_DATA_PATH, "Backup");
 
@@ -25,7 +32,7 @@ namespace TrophyIsBetter.Models
     private string _gameDirectory;
     private string _tempGameDirectory;
 
-    private List<GameListEntry> _games = new List<GameListEntry>();
+    private List<Game> _games = new List<Game>();
 
     #endregion Private Members
     #region Public Methods
@@ -46,14 +53,14 @@ namespace TrophyIsBetter.Models
         string path = CopyWithBackup(dir);
         Utility.PfdTool.DecryptTrophyData(path);
 
-        _games.Add(new GameListEntry(path));
+        _games.Add(new Game(path));
       }
     } // ImportGames
 
     /// <summary>
     /// Load all of the games in the application data directory
     /// </summary>
-    public List<GameListEntry> LoadGames()
+    public List<Game> LoadGames()
     {
       if (Directory.Exists(TROPHY_DATA_PATH))
       {
@@ -67,7 +74,7 @@ namespace TrophyIsBetter.Models
 
         foreach (string folder in trophyFolders)
         {
-          _games.Add(new GameListEntry(folder));
+          _games.Add(new Game(folder));
         }
       }
 
@@ -81,7 +88,7 @@ namespace TrophyIsBetter.Models
     {
       if (!string.IsNullOrEmpty(_tempGameDirectory))
       {
-        foreach (GameListEntry list in _games)
+        foreach (Game list in _games)
         {
           Utility.PfdTool.EncryptTrophyData(list.Path);
         }

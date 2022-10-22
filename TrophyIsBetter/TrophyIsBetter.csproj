@@ -93,12 +93,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Interfaces\IGameListEntryModel.cs" />
+    <Compile Include="Interfaces\IGameModel.cs" />
     <Compile Include="Interfaces\IPageViewModel.cs" />
     <Compile Include="Models\GameList.cs" />
-    <Compile Include="Models\GameListEntry.cs" />
+    <Compile Include="Models\Game.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
-    <Compile Include="ViewModels\GameListEntryViewModel.cs" />
+    <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="ViewModels\GameListViewModel.cs" />
     <Page Include="Views\ApplicationWindow.xaml">
       <SubType>Designer</SubType>
@@ -120,6 +120,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModels\TrophyViewModel.cs" />
     <Compile Include="Views\ApplicationWindow.xaml.cs">
       <DependentUpon>ApplicationWindow.xaml</DependentUpon>
     </Compile>

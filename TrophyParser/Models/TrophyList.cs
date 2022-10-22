@@ -25,6 +25,7 @@ namespace TrophyParser
     public abstract string Progress { get; }
     public abstract DateTime? LastTimestamp { get; }
     public abstract DateTime? LastSyncedTimestamp { get; }
+    public List<Trophy> Trophies { get => _trophies; }
 
     #endregion Public Properties
   } // TrophyList
