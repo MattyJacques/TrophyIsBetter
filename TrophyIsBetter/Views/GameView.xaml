@@ -56,11 +56,26 @@
     <!--#region Trophy List-->
 
     <DataGrid x:Name="TrophyList"
-              ItemsSource="{Binding TrophyCollection}"
+              ItemsSource="{Binding TrophyCollectionView}"
+              IsSynchronizedWithCurrentItem="True"
               AutoGenerateColumns="False"
-              CanUserAddRows="False">
-      <DataGrid.Columns>
+              CanUserAddRows="False"
+              SelectionMode="Single" >
 
+      <DataGrid.CellStyle>
+        <Style TargetType="DataGridCell"
+               BasedOn="{StaticResource {x:Type DataGridCell}}" >
+          <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+      </DataGrid.CellStyle>
+
+      <DataGrid.InputBindings>
+        <MouseBinding
+            MouseAction="LeftDoubleClick"
+            Command="{Binding EditTrophyCommand}" />
+      </DataGrid.InputBindings>
+
+      <DataGrid.Columns>
         <DataGridTemplateColumn Header="Icon"
                                 Width="SizeToCells"
                                 IsReadOnly="True">

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using TrophyIsBetter.Models;
 
 namespace TrophyIsBetter.ViewModels
 {
-  public class TrophyViewModel
+  public class TrophyViewModel : ObservableObject
   {
     #region Private Members
 
@@ -28,7 +29,15 @@ namespace TrophyIsBetter.ViewModels
     public bool Hidden { get => _model.Hidden; }
     public bool Achieved { get => _model.Achieved; }
     public bool Synced { get => _model.Synced; }
-    public DateTime Timestamp { get => _model.Timestamp; }
+    public DateTime Timestamp
+    {
+      get => _model.Timestamp;
+      set
+      {
+        _model.Timestamp = value;
+        OnPropertyChanged();
+      }
+    }
 
     #endregion Public Properties
   } // TrophyViewModel

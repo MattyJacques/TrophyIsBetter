@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Documents;
-using System.Windows.Shapes;
 using TrophyIsBetter.Interfaces;
 using TrophyParser;
 using TrophyParser.PS3;

@@ -1,12 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Security.Cryptography;
-using System.Windows.Documents;
-using System.Windows.Forms;
+using System.Windows.Data;
+using System.Windows.Input;
 using TrophyIsBetter.Interfaces;
 using TrophyIsBetter.Models;
+using TrophyIsBetter.Views;
 
 namespace TrophyIsBetter.ViewModels
 {
@@ -16,17 +17,18 @@ namespace TrophyIsBetter.ViewModels
 
     private Game _model;
     private ObservableCollection<TrophyViewModel> _trophyCollection = new ObservableCollection<TrophyViewModel>();
+    private CollectionView _trophyCollectionView;
 
     #endregion Private Members
     #region Constructors
 
-    public GameViewModel()
-    {
-    } // Constructor()
-
     public GameViewModel(Game entry)
     {
       _model = entry;
+
+      EditTrophyCommand = new RelayCommand(EditTrophy);
+
+      _trophyCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(_trophyCollection);
 
       LoadTrophies();
     } // Constructor(Game)
@@ -41,6 +43,13 @@ namespace TrophyIsBetter.ViewModels
       get => _trophyCollection;
       private set => SetProperty(ref _trophyCollection, value);
     }
+
+    public CollectionView TrophyCollectionView { get => _trophyCollectionView; }
+
+    /// <summary>
+    /// Edit the timestamp of a single trophy
+    /// </summary>
+    public ICommand EditTrophyCommand { get; set; }
 
     public string Icon { get => _model.Icon; }
 
@@ -62,7 +71,24 @@ namespace TrophyIsBetter.ViewModels
 
     public string Path { get => _model.Path; }
 
-    #endregion
+    #endregion Public Properties
+    #region Public Methods
+
+    public void EditTrophy()
+    {
+      EditTimestampWindow window = new EditTimestampWindow();
+      window.DataContext = new EditTimestampViewModel();
+
+      bool? result = window.ShowDialog();
+
+      if (result == true)
+      {
+        ((TrophyViewModel)TrophyCollectionView.CurrentItem).Timestamp =
+          ((EditTimestampViewModel)window.DataContext).Timestamp;
+      }
+    } // EditTrophy
+
+    #endregion Public Methods
     #region Private Methods
 
     private void LoadTrophies()
@@ -78,7 +104,7 @@ namespace TrophyIsBetter.ViewModels
           TrophyCollection.Add(new TrophyViewModel(trophy));
         }
       }
-    }
+    } // LoadTrophies
 
     #endregion Private Methods
 
