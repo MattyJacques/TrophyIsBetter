@@ -8,7 +8,7 @@ namespace TrophyIsBetter.ViewModels
   {
     #region Private Members
 
-    private readonly Trophy _model;
+    private Trophy _model;
 
     #endregion Private Members
     #region Constructors
@@ -21,6 +21,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Constructors
     #region Public Properties
 
+    public Trophy Model { get => _model; }
     public string Icon { get => _model.Icon; }
     public string Name { get => _model.Name; }
     public string Description { get => _model.Description; }

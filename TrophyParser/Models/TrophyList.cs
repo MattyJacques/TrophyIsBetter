@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TrophyParser.Interfaces;
-using static TrophyParser.Structs;
+using TrophyParser.Models;
 
 namespace TrophyParser
 {
@@ -12,7 +12,7 @@ namespace TrophyParser
     protected List<Trophy> _trophies = new List<Trophy>();
 
     #endregion
-    #region Public Properties
+    #region Public Abstract Properties
 
     public abstract string Icon { get; }
     public abstract string Name { get; }
@@ -25,8 +25,25 @@ namespace TrophyParser
     public abstract string Progress { get; }
     public abstract DateTime? LastTimestamp { get; }
     public abstract DateTime? LastSyncedTimestamp { get; }
+
+    #endregion Public Abstract Properties
+    #region Public Properties
+
     public List<Trophy> Trophies { get => _trophies; }
 
     #endregion Public Properties
+    #region Public Abstract Methods
+
+    public abstract void UnlockTrophy(int id, DateTime time);
+    public abstract void LockTrophy(int id);
+    public abstract void Save();
+
+    #endregion Public Abstract Methods
+    #region Public Methods
+
+    public void UnlockTrophy(Trophy trophy, DateTime time) => UnlockTrophy(trophy.ID, time);
+    public void LockTrophy(Trophy trophy) => LockTrophy(trophy.ID);
+
+    #endregion Public Methods
   } // TrophyList
 } // TrophyParser

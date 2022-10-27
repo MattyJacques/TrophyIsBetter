@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using static TrophyParser.PS3.Structs;
@@ -82,6 +83,26 @@ namespace TrophyParser.PS3
       }
     } // []
 
+    public void AddTrophy(int id, int trophyType, DateTime unlockTime)
+    {
+      EarnedInfo timestamp = new EarnedInfo(id, trophyType, unlockTime);
+
+      int insertPoint;
+      for (insertPoint = 0; insertPoint < _timestamps.Count; insertPoint++)
+      {
+        if (DateTime.Compare(_timestamps[insertPoint].Time, unlockTime) < 0 &&
+            _timestamps[insertPoint].IsSynced)
+        {
+          throw new SyncTimeException(_timestamps[insertPoint].Time);
+        }
+      }
+
+      _timestamps.Insert(insertPoint, timestamp);
+      _earnedCount++;
+
+      Debug.WriteLine($"Unlocked trophy {id} in TROPTRNS");
+    } // AddTrophy
+
     public void PrintState()
     {
       Console.WriteLine("\n----- TROPTRNS Data -----");
@@ -89,7 +110,8 @@ namespace TrophyParser.PS3
       Console.WriteLine("Account ID: {0}", _accountID);
       Console.WriteLine("Trophy ID: {0}", _trophyID);
 
-      Console.WriteLine("Earned Trophys: {0} Synced Trophys: {1} ", _earnedCount, _syncedCount);
+      Console.WriteLine("Earned Trophys: {0} Synced Trophys: {1} ",
+        _earnedCount, _syncedCount);
 
       _header.Output();
 
@@ -102,11 +124,12 @@ namespace TrophyParser.PS3
       Console.WriteLine("\nTimestamps");
       for (int i = 0; i < _timestamps.Count; i++)
       {
-        Console.WriteLine("ID: {0}, Trophy ID: {1}, Type: {2}, Exists: {3}, Timestamp: {4}, Synced: {5}",
-            _timestamps[i].ID, _timestamps[i].TrophyID,
-            _timestamps[i].TrophyType, _timestamps[i].DoesExist, _timestamps[i].Time,
-            _timestamps[i].IsSynced
-           );
+        Console.WriteLine("ID: {0}, Trophy ID: {1}, Type: {2}, Exists: {3}, " +
+          "Timestamp: {4}, Synced: {5}",
+          _timestamps[i].ID, _timestamps[i].TrophyID,
+          _timestamps[i].TrophyType, _timestamps[i].DoesExist, _timestamps[i].Time,
+          _timestamps[i].IsSynced
+        );
       }
     } // PrintState
 

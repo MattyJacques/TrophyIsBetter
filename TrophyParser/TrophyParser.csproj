@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Extensions.cs" />
     <Compile Include="Interfaces\ITrophyList.cs" />
+    <Compile Include="Models\Trophy.cs" />
     <Compile Include="PS3\DataParsing.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Program.cs" />

@@ -28,15 +28,14 @@ namespace TrophyIsBetter.ViewModels
 
       EditTrophyCommand = new RelayCommand(EditTrophy);
 
-      _trophyCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(_trophyCollection);
+      _trophyCollectionView =
+        (CollectionView)CollectionViewSource.GetDefaultView(_trophyCollection);
 
       LoadTrophies();
-    } // Constructor(Game)
+    } // Constructor
 
     #endregion Constructors
     #region Public Properties
-
-    public Game Model { get => _model; set => SetProperty(ref _model, value); }
 
     public ObservableCollection<TrophyViewModel> TrophyCollection
     {
@@ -83,8 +82,11 @@ namespace TrophyIsBetter.ViewModels
 
       if (result == true)
       {
-        ((TrophyViewModel)TrophyCollectionView.CurrentItem).Timestamp =
-          ((EditTimestampViewModel)window.DataContext).Timestamp;
+        TrophyViewModel selectedTrophy = (TrophyViewModel)TrophyCollectionView.CurrentItem;
+        DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
+
+        _model.UnlockTrophy(selectedTrophy.Model, timestamp);
+        selectedTrophy.Timestamp = timestamp;
       }
     } // EditTrophy
 

@@ -25,7 +25,9 @@ namespace TrophyParser
     {
       this.psnSyncTime = psnSyncTime;
     }
-    public SyncTimeException(DateTime psnSyncTime) : base(string.Format("The last trophy synchronized with PSN has the following date: {0:dd/MM/yyyy HH:mm:ss}. Select a date greater than this.", psnSyncTime)) { }
+    public SyncTimeException(DateTime psnSyncTime)
+      : base(string.Format("This trophy has already been synced to PSN with timestamp: " +
+          "{0:dd/MM/yyyy HH:mm:ss}. Select a date earlier than this.", psnSyncTime)) { }
   } // SynctimeException
 
   public class TrophyNotFound : Exception

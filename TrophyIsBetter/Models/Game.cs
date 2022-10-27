@@ -30,7 +30,7 @@ namespace TrophyIsBetter.Models
       {
         _trophyList = new VitaTrophyList(_path);
       }
-    } // GameListEntry
+    } // Constructor
 
     #endregion Constructors
     #region Public Properties
@@ -49,6 +49,11 @@ namespace TrophyIsBetter.Models
 
     #endregion Public Properties
     #region Public Methods
+
+    public void UnlockTrophy(Trophy trophy, DateTime timestamp)
+    {
+      _trophyList.UnlockTrophy(trophy.ID, timestamp);
+    } // UnlockTrophy
 
     #endregion Public Methods
     #region Private Methods
@@ -70,14 +75,15 @@ namespace TrophyIsBetter.Models
       return File.Exists(System.IO.Path.Combine(Path, "TROPCONF.SFM"));
     } // IsPS3
 
-    private List<Trophy> ConvertTrophyData(List<TrophyParser.Structs.Trophy> trophies)
+    private List<Trophy> ConvertTrophyData(List<TrophyParser.Models.Trophy> trophies)
     {
       List<Trophy> result = new List<Trophy>();
 
-      foreach (TrophyParser.Structs.Trophy trophy in trophies)
+      foreach (TrophyParser.Models.Trophy trophy in trophies)
       {
         Trophy convertedTrophy = new Trophy()
         {
+          ID = trophy.ID,
           Icon = Path + @"\TROP" + string.Format("{0:000}", trophy.ID) + ".PNG",
           Name = trophy.Name,
           Description = trophy.Detail,

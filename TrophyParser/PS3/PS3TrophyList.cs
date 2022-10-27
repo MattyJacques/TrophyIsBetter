@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using static TrophyParser.Structs;
 
 namespace TrophyParser.PS3
@@ -56,5 +57,27 @@ namespace TrophyParser.PS3
     public override DateTime? LastSyncedTimestamp => _usr.LastSyncedTimestamp;
 
     #endregion Public Properties
+    #region Public Methods
+
+    public override void UnlockTrophy(int id, DateTime time)
+    {
+      Debug.WriteLine($"Unlocking {Name} (PS3) - {_trophies[id].Name} with timestamp: {time}");
+
+      _usr.UnlockTrophy(id, time);
+      _trns.AddTrophy(id, _usr.TrophyTypes[id].Type, time);
+      _trophies[id].Timestamp = new Timestamp { Time = time, Synced = false };
+    } // UnlockTrophy
+
+    public override void LockTrophy(int id)
+    {
+      throw new NotImplementedException();
+    } // LockTrophy
+
+    public override void Save()
+    {
+      throw new NotImplementedException();
+    } // Save
+
+    #endregion Public Methods
   } // PS3TrophyList
 } // TrophyParser.PS3

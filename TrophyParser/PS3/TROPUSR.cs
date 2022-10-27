@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using static TrophyParser.PS3.Structs;
@@ -99,6 +100,7 @@ namespace TrophyParser.PS3
     #endregion Constructors
     #region Public Properties
 
+    public List<TrophyType> TrophyTypes { get => _types; }
     public int EarnedCount { get { return _listInfo.AchievedCount; } }
     public DateTime LastTimestamp { get { return _listInfo.LastAchievedTrophyTime; } }
     public DateTime LastSyncedTimestamp
@@ -119,6 +121,30 @@ namespace TrophyParser.PS3
 
     #endregion Public Properties
     #region Public Methods
+
+    public void UnlockTrophy(int id, DateTime unlockTime)
+    {
+      Timestamp timestamp = _timestamps[id];
+      timestamp.Time = unlockTime;
+      if (!timestamp.IsEarned)
+      {
+        _listInfo.AchievedCount++;
+        _achievedStats.EarnedCount++;
+      }
+
+      _listInfo.AchievementRate[id / 32] |= (uint)(1 << id).ChangeEndian();
+      _completionRate[id / 32] |= (uint)(1 << id);
+      timestamp.IsEarned = true;
+      timestamp.SyncState = (int)TropSyncState.NotSync;
+      _timestamps[id] = timestamp;
+      if (unlockTime > _listInfo.LastAchievedTrophyTime)
+      {
+        _listInfo.LastAchievedTrophyTime = unlockTime;
+        _listInfo.LastUpdated = unlockTime;
+      }
+
+      Debug.WriteLine($"Unlocked trophy {id} in TROPUSR");
+    } // UnlockTrophy
 
     public void PrintState()
     { // Print all data within TROPUSR

@@ -48,5 +48,23 @@ namespace TrophyParser.Vita
     public override DateTime? LastSyncedTimestamp => _title.LastSyncedTimestamp;
 
     #endregion Public Properties
+    #region Public Methods
+
+    public override void UnlockTrophy(int id, DateTime time)
+    {
+      throw new NotImplementedException();
+    } // Unlock Trophy
+
+    public override void LockTrophy(int id)
+    {
+      throw new NotImplementedException();
+    } // LockTrophy
+
+    public override void Save()
+    {
+      throw new NotImplementedException();
+    } // Save
+
+    #endregion Public Methods
   } // VitaTrophyList
 } // TrophyParser.Vita
