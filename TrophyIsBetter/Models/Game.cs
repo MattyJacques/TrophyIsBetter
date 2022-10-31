@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using TrophyIsBetter.Interfaces;
 using TrophyParser;
 using TrophyParser.PS3;
@@ -51,24 +52,12 @@ namespace TrophyIsBetter.Models
     #region Public Methods
 
     public void UnlockTrophy(Trophy trophy, DateTime timestamp)
-    {
-      _trophyList.UnlockTrophy(trophy.ID, timestamp);
-    } // UnlockTrophy
+      => _trophyList.UnlockTrophy(trophy.ID, timestamp);
+
+    public void Save() => _trophyList.Save();
 
     #endregion Public Methods
     #region Private Methods
-
-    private string GetPlatform()
-    {
-      if (IsPS3())
-      {
-        return "PS3";
-      }
-      else
-      {
-        return "Vita";
-      }
-    } // GetPlatform
 
     private bool IsPS3()
     {

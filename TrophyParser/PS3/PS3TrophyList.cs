@@ -28,8 +28,8 @@ namespace TrophyParser.PS3
       for (int i = 0; i < TrophyCount; ++i)
       {
         var trophy = _conf[i];
-        var trophyInfo = _trns[i];
-        if (trophyInfo.HasValue)
+        var trophyInfo = _usr[i];
+        if (trophyInfo.HasValue && trophyInfo.Value.IsEarned)
         {
           trophy.Timestamp = new Timestamp { Time = trophyInfo.Value.Time, Synced = trophyInfo.Value.IsSynced };
         }
@@ -75,7 +75,10 @@ namespace TrophyParser.PS3
 
     public override void Save()
     {
-      throw new NotImplementedException();
+      Debug.WriteLine($"Saving {Name} (PS3)");
+
+      _usr.Save();
+      _trns.Save();
     } // Save
 
     #endregion Public Methods

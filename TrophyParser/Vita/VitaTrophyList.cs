@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace TrophyParser.Vita
 {
@@ -52,7 +53,10 @@ namespace TrophyParser.Vita
 
     public override void UnlockTrophy(int id, DateTime time)
     {
-      throw new NotImplementedException();
+      Debug.WriteLine($"Unlocking {Name} (Vita) - {_trophies[id].Name} with timestamp: {time}");
+
+      //_trans.UnlockTrophy(id, _trophies[id].GetType, time);
+      //_title.AddTrophy(id, time);
     } // Unlock Trophy
 
     public override void LockTrophy(int id)

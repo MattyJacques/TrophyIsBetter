@@ -8,7 +8,7 @@ namespace TrophyIsBetter.ViewModels
   {
     #region Private Members
 
-    private Trophy _model;
+    private readonly Trophy _model;
 
     #endregion Private Members
     #region Constructors

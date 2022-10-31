@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using TrophyIsBetter.Interfaces;
@@ -25,7 +26,9 @@ namespace TrophyIsBetter.ViewModels
     public GameViewModel(Game entry)
     {
       _model = entry;
+      ((ApplicationWindow)Application.Current.MainWindow).Closing += OnCloseSave; ;
 
+      ChangeViewToHomeCommand = new RelayCommand(ChangeViewToHome);
       EditTrophyCommand = new RelayCommand(EditTrophy);
 
       _trophyCollectionView =
@@ -44,6 +47,11 @@ namespace TrophyIsBetter.ViewModels
     }
 
     public CollectionView TrophyCollectionView { get => _trophyCollectionView; }
+
+    /// <summary>
+    /// Change the view back to the game list
+    /// </summary>
+    public ICommand ChangeViewToHomeCommand { get; set; }
 
     /// <summary>
     /// Edit the timestamp of a single trophy
@@ -90,6 +98,15 @@ namespace TrophyIsBetter.ViewModels
       }
     } // EditTrophy
 
+    public void ChangeViewToHome()
+    {
+      _model.Save();
+
+      // Go back to game list
+      ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
+        .ChangePageToHomeCommand.Execute(null);
+    } // ChangeViewToHome
+
     #endregion Public Methods
     #region Private Methods
 
@@ -107,6 +124,11 @@ namespace TrophyIsBetter.ViewModels
         }
       }
     } // LoadTrophies
+
+    private void OnCloseSave(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+      _model.Save();
+    } // OnCloseSave
 
     #endregion Private Methods
 
