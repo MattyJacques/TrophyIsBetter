@@ -78,7 +78,31 @@ namespace TrophyParser.Vita
 
     public void Save()
     {
-      throw new NotImplementedException();
+      _writer = new BinaryWriter(new FileStream(_path, FileMode.Open));
+      _writer.BaseStream.Position = _pointer;
+
+      foreach (Timestamp trophy in _timestamps)
+      {
+
+        _writer.Write((byte)(trophy.Earned ? 0x02 : 0x00));
+
+        byte[] time = trophy.Time.HasValue ?
+          BitConverter.GetBytes(trophy.Time.Value.Ticks / 10) : BitConverter.GetBytes((long)0);
+        Array.Reverse(time);
+        _writer.BaseStream.Position += 31;
+        _writer.Write(trophy.Type);
+
+        _writer.BaseStream.Position += 2;
+        _writer.Write(trophy.Unknown);
+
+        _writer.BaseStream.Position += 5;
+        _writer.Write(time);
+
+        _writer.Write(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        _writer.BaseStream.Position += 119;
+      }
+      _writer.Flush();
+      _writer.Close();
     } // Save
 
     #endregion Public Methods
