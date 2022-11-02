@@ -83,8 +83,10 @@ namespace TrophyIsBetter.ViewModels
 
     public void EditTrophy()
     {
-      EditTimestampWindow window = new EditTimestampWindow();
-      window.DataContext = new EditTimestampViewModel();
+      EditTimestampWindow window = new EditTimestampWindow
+      {
+        DataContext = new EditTimestampViewModel()
+      };
 
       bool? result = window.ShowDialog();
 
@@ -100,7 +102,7 @@ namespace TrophyIsBetter.ViewModels
 
     public void ChangeViewToHome()
     {
-      _model.Save();
+      Save();
 
       // Go back to game list
       ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
@@ -125,10 +127,27 @@ namespace TrophyIsBetter.ViewModels
       }
     } // LoadTrophies
 
-    private void OnCloseSave(object sender, System.ComponentModel.CancelEventArgs e)
+    /// <summary>
+    /// Ask the user if they want to save when closing
+    /// </summary>
+    private void OnCloseSave(object sender, System.ComponentModel.CancelEventArgs e) => Save();
+
+    /// <summary>
+    /// Ask the user if they want to save
+    /// </summary>
+    private void Save()
     {
-      _model.Save();
-    } // OnCloseSave
+      if (_model.HasUnsavedChanges &&
+          MessageBox.Show($"There are unsaved changes in {Name}, would you like to save?", "Save?",
+          MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+      {
+        _model.Save();
+      }
+      else
+      {
+        _model.Reload();
+      }
+    } // Save
 
     #endregion Private Methods
 

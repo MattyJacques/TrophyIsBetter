@@ -15,5 +15,10 @@ namespace TrophyIsBetter.Interfaces
     /// </summary>
     void Save();
 
+    /// <summary>
+    /// Reload the data from file
+    /// </summary>
+    void Reload();
+
   } // IGameModel
 } // TrophyIsBetter.Interfaces

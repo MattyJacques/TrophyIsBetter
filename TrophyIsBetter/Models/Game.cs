@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Runtime.CompilerServices;
 using TrophyIsBetter.Interfaces;
@@ -14,7 +15,8 @@ namespace TrophyIsBetter.Models
     #region Private Members
 
     private string _path;
-    private readonly TrophyList _trophyList;
+    private TrophyList _trophyList;
+    private bool _hasChanges = false;
 
     #endregion Private Members
     #region Constructors
@@ -47,14 +49,36 @@ namespace TrophyIsBetter.Models
     public DateTime? SyncTime => _trophyList.LastSyncedTimestamp;
     public List<Trophy> Trophies => ConvertTrophyData(_trophyList.Trophies);
     public string Path => _path;
+    public bool HasUnsavedChanges { get => _hasChanges; set => _hasChanges = value; }
 
     #endregion Public Properties
     #region Public Methods
 
     public void UnlockTrophy(Trophy trophy, DateTime timestamp)
-      => _trophyList.UnlockTrophy(trophy.ID, timestamp);
+    {
+      _trophyList.UnlockTrophy(trophy.ID, timestamp);
+      HasUnsavedChanges = true;
+    } // UnlockTrophy
 
-    public void Save() => _trophyList.Save();
+    public void Save()
+    {
+      _trophyList.Save();
+      HasUnsavedChanges = false;
+    } // Save
+
+    public void Reload()
+    {
+      if (IsPS3())
+      {
+        _trophyList = new PS3TrophyList(_path);
+      }
+      else
+      {
+        _trophyList = new VitaTrophyList(_path);
+      }
+
+      HasUnsavedChanges = false;
+    } // Reload
 
     #endregion Public Methods
     #region Private Methods
