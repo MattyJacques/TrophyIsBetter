@@ -13,6 +13,7 @@ namespace TrophyParser
       public bool Earned { get => Time.HasValue && Time.Value.CompareTo(DateTime.MinValue) != 0; }
       public DateTime? Time;
       public bool Synced;
+      public byte Type;
       public byte Unknown;
 
       public override string ToString()

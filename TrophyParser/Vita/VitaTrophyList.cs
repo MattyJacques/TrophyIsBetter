@@ -27,7 +27,6 @@ namespace TrophyParser.Vita
       for (int i = 0; i < _trop.TrophyCount; ++i)
       {
         var trophy = _trop[i];
-        trophy = _trop[i];
         trophy.Timestamp = _title[i];
         _trophies.Add(trophy);
       }
@@ -55,8 +54,8 @@ namespace TrophyParser.Vita
     {
       Debug.WriteLine($"Unlocking {Name} (Vita) - {_trophies[id].Name} with timestamp: {time}");
 
-      //_trans.UnlockTrophy(id, _trophies[id].GetType, time);
-      //_title.AddTrophy(id, time);
+      _trans.UnlockTrophy(id, _trophies[id].Rank, time);
+      _title.UnlockTrophy(id, time);
     } // Unlock Trophy
 
     public override void LockTrophy(int id)
@@ -66,7 +65,10 @@ namespace TrophyParser.Vita
 
     public override void Save()
     {
-      throw new NotImplementedException();
+      Debug.WriteLine($"Saving {Name} (Vita)");
+
+      _trans.Save();
+      _title.Save();
     } // Save
 
     #endregion Public Methods
