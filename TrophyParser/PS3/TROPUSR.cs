@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using static TrophyParser.PS3.Structs;
 
@@ -70,16 +71,16 @@ namespace TrophyParser.PS3
     #endregion Public Properties
     #region Public Methods
 
-    public Timestamp? this[int TrophyID]
+    public Timestamp? this[int trophyID]
     {
       get
       {
         Timestamp? ret = null;
-        for (int i = 0; i < _timestamps.Count; i++)
+        foreach (Timestamp timestamp in _timestamps)
         {
-          if (_timestamps[i].ID == TrophyID)
+          if (timestamp.ID == trophyID)
           {
-            ret = _timestamps[i];
+            ret = timestamp;
             break;
           }
         }
@@ -96,6 +97,21 @@ namespace TrophyParser.PS3
 
       Debug.WriteLine($"Unlocked trophy {id} in TROPUSR");
     } // UnlockTrophy
+
+    public void LockTrophy(int id)
+    {
+      Timestamp timestamp = _timestamps[id];
+      
+      if (timestamp.SyncState == (int)TrophySyncState.Synced)
+        throw new AlreadySyncedException(timestamp.ID);
+      
+      if (!timestamp.IsEarned)
+        throw new AlreadyLockedException(timestamp.ID);
+
+      ResetTimestamp(timestamp);
+      RemoveFromRates(id);
+      ResetListInfo(timestamp.Time);
+    } // LockTrophy
 
     public void Save()
     {
@@ -224,11 +240,32 @@ namespace TrophyParser.PS3
       timestamp.SyncState = (int)TrophySyncState.NotSynced;
     } // UpdateTimestamp
 
+    private void ResetTimestamp(Timestamp timestamp)
+    {
+      timestamp.Time = new DateTime(0);
+      if (timestamp.IsEarned)
+      {
+        _listInfo.AchievedCount--;
+        _achievedStats.EarnedCount--;
+      }
+      else
+      {
+        timestamp.IsEarned = false;
+        timestamp.SyncState = 0;
+      }
+    } // ResetTimestamp
+
     private void UpdateRates(int id)
     {
       _listInfo.AchievementRate[id / 32] |= (uint)(1 << id).ChangeEndian();
       _completionRate[id / 32] |= (uint)(1 << id);
     } // UpdateRates
+
+    private void RemoveFromRates(int id)
+    {
+      _listInfo.AchievementRate[id / 32] &= 0xFFFFFFFF ^ (uint)(1 << id).ChangeEndian();
+      _completionRate[id / 32] &= 0xFFFFFFFF ^ (uint)(1 << id);
+    } // RemoveFromRates
 
     private void UpdateListInfo(DateTime timestamp)
     {
@@ -240,9 +277,24 @@ namespace TrophyParser.PS3
 
       if (_listInfo.DateAdded > timestamp)
       {
-        _listInfo.DateAdded = timestamp;
+        _listInfo.DateAdded = timestamp.AddHours(-1);
       }
     } // UpdateListInfo
+
+    private void ResetListInfo(DateTime timestamp)
+    {
+      if (DateTime.Compare(CalcDateAdded(timestamp), _listInfo.DateAdded) == 0
+        || DateTime.Compare(timestamp, _listInfo.LastAchievedTrophyTime) == 0)
+      {
+        var orderedTimestamps = _timestamps.OrderBy(p => p.Time);
+
+        _listInfo.LastAchievedTrophyTime = orderedTimestamps.Last().Time;
+        _listInfo.DateAdded = CalcDateAdded(orderedTimestamps.First().Time);
+        _listInfo.LastUpdated = orderedTimestamps.Last().Time;
+      }
+    } // ResetListInfo
+
+    private DateTime CalcDateAdded(DateTime timestamp) => timestamp.AddHours(-1);
 
     #endregion Data Ending
     #region File Saving

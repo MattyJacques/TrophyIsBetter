@@ -58,21 +58,42 @@ namespace TrophyParser.PS3
     {
       EarnedInfo timestamp = new EarnedInfo(id, trophyType, unlockTime);
 
+      // Check to see if a synced trophy has a later timestamp
       int insertPoint;
       for (insertPoint = 0; insertPoint < _timestamps.Count; insertPoint++)
       {
-        if (DateTime.Compare(_timestamps[insertPoint].Time, unlockTime) < 0 &&
-            _timestamps[insertPoint].IsSynced)
+        if (DateTime.Compare(_timestamps[insertPoint].Time, unlockTime) > 0)
         {
-          throw new SyncTimeException(_timestamps[insertPoint].Time);
+          if (_timestamps[insertPoint].IsSynced)
+          {
+            throw new SyncTimeException(_timestamps[insertPoint].Time);
+          }
+          break;
         }
       }
 
       _timestamps.Insert(insertPoint, timestamp);
       _earnedCount++;
 
-      Debug.WriteLine($"Unlocked trophy {id} in TROPTRNS");
+      Debug.WriteLine($"Added trophy {id} in TROPTRNS");
     } // AddTrophy
+
+    public void RemoveTrophy(int id)
+    {
+      EarnedInfo timestamp = _timestamps.Find(x => x.TrophyID == id);
+
+      if (!timestamp.IsSynced)
+      {
+        _timestamps.Remove(timestamp);
+        _earnedCount--;
+      }
+      else
+      {
+        throw new AlreadySyncedException(timestamp.TrophyID);
+      }
+
+      Debug.WriteLine($"Removed trophy {id} from TROPTRNS");
+    } // RemoveTrophy
 
     public void Save()
     {

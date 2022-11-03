@@ -70,7 +70,11 @@ namespace TrophyParser.PS3
 
     public override void LockTrophy(int id)
     {
-      throw new NotImplementedException();
+      Debug.WriteLine($"Locking {Name} (PS3) - {_trophies[id].Name}");
+
+      _usr.LockTrophy(id);
+      _trns.RemoveTrophy(id);
+      _trophies[id].Timestamp = new Timestamp { Time = null, Synced = false }; ;
     } // LockTrophy
 
     public override void Save()
