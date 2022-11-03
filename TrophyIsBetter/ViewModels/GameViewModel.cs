@@ -156,7 +156,7 @@ namespace TrophyIsBetter.ViewModels
     /// Notify that the selected trophy has changed
     /// </summary>
     private void OnSelectedTrophyChanged(object sender, EventArgs e)
-      => ((RelayCommand)LockTrophyCommand).NotifyCanExecuteChanged();
+      => LockTrophyCommand.NotifyCanExecuteChanged();
 
     /// <summary>
     /// Ask the user if they want to save when closing

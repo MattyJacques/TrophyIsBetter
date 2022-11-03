@@ -20,7 +20,6 @@ namespace TrophyIsBetter.ViewModels
 
     private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
     private CollectionView _gameCollectionView = null;
-    private GameViewModel _selectedEntry = null;
 
     private bool _isOpen = false;
 
@@ -32,7 +31,8 @@ namespace TrophyIsBetter.ViewModels
       _model = model;
 
       ImportCommand = new RelayCommand(Import);
-      EditGameCommand = new RelayCommand(EditGame);
+
+      GameCollectionView.CurrentChanged += OnSelectedGameChanged;
 
       LoadGames();
     } // GameListViewModel
@@ -43,12 +43,7 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Import a single trophy folder or a directory containing multiple
     /// </summary>
-    public ICommand ImportCommand { get; set; }
-
-    /// <summary>
-    /// Open a trophy folder ready for editing
-    /// </summary>
-    public ICommand EditGameCommand { get; set; }
+    public RelayCommand ImportCommand { get; set; }
 
     /// <summary>
     /// Get/Set the list of games
@@ -76,24 +71,17 @@ namespace TrophyIsBetter.ViewModels
     }
 
     /// <summary>
-    /// Get the selected entry from the list
+    /// Get the selected game from the list
     /// </summary>
-    public GameViewModel SelectedEntry
-    {
-      get => _selectedEntry;
-      set
-      {
-        SetProperty(ref _selectedEntry, value);
-        OnPropertyChanged(nameof(CanEdit));
-      }
-    }
+    /// 
+    public GameViewModel SelectedGame => (GameViewModel)GameCollectionView.CurrentItem;
 
     /// <summary>
     /// Is a game selected ready to be edited
     /// </summary>
     public bool CanEdit
     {
-      get => SelectedEntry != null;
+      get => SelectedGame != null;
     }
 
     /// <summary>
@@ -117,16 +105,6 @@ namespace TrophyIsBetter.ViewModels
     } // Import
 
     /// <summary>
-    /// Open the game view ready for trophy editing
-    /// </summary>
-    public void EditGame()
-    {
-      if (SelectedEntry != null)
-      {
-      }
-    } // EditGame
-
-    /// <summary>
     /// Save files and close the directory
     /// </summary>
     public void CloseDirectory()
@@ -139,6 +117,14 @@ namespace TrophyIsBetter.ViewModels
 
     #endregion Public Methods
     #region Private Methods
+
+    /// <summary>
+    /// Notify that the selected game has changed
+    /// </summary>
+    private void OnSelectedGameChanged(object sender, EventArgs e)
+    {
+      OnPropertyChanged(nameof(CanEdit));
+    } // OnSelectedGameChanged
 
     /// <summary>
     /// Choose path to import

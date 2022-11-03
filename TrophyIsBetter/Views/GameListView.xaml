@@ -33,7 +33,7 @@
               ToolTip="Edit Game"
               IsEnabled="{Binding CanEdit}"
               Command="{Binding DataContext.ChangePageCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-              CommandParameter="{Binding SelectedEntry}"
+              CommandParameter="{Binding GameCollectionView.CurrentItem}"
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="auto"
               Width="60"
@@ -47,7 +47,7 @@
 
     <DataGrid x:Name="GameList"
               ItemsSource="{Binding GameCollection}"
-              SelectedItem="{Binding SelectedEntry, Mode=OneWayToSource}"
+              IsSynchronizedWithCurrentItem="True"
               AutoGenerateColumns="False"
               CanUserAddRows="False" 
               SelectionMode="Single" >
