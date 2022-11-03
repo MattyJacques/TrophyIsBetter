@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using TrophyParser.Models;
+using static TrophyParser.Enums;
 
 namespace TrophyParser.Interfaces
 {
@@ -10,7 +11,7 @@ namespace TrophyParser.Interfaces
     string Icon { get; }
     string Name { get; }
     string NpCommID { get; }
-    string Platform { get; }
+    PlatformEnum Platform { get; }
     bool HasPlatinum { get; }
     bool IsSynced { get; }
     int TrophyCount { get; }

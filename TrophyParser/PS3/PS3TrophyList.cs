@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using static TrophyParser.Enums;
 using static TrophyParser.Structs;
 
 namespace TrophyParser.PS3
@@ -47,7 +48,7 @@ namespace TrophyParser.PS3
     public override string Icon => $"{_path}\\ICON0.PNG";
     public override string Name => _conf.TitleName;
     public override string NpCommID => _conf.NpCommID;
-    public override string Platform => "PS3";
+    public override PlatformEnum Platform => PlatformEnum.PS3;
     public override bool HasPlatinum => _conf.HasPlatinum;
     public override bool IsSynced => _trns.IsSynced;
     public override int TrophyCount => _conf.TrophyCount;

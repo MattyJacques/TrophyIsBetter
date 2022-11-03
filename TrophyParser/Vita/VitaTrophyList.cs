@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using static TrophyParser.Enums;
 
 namespace TrophyParser.Vita
 {
@@ -38,7 +39,7 @@ namespace TrophyParser.Vita
     public override string Icon => $"{_path}\\ICON0.PNG";
     public override string Name => _trop.TitleName;
     public override string NpCommID => _trop.NpCommID;
-    public override string Platform => "PS Vita";
+    public override PlatformEnum Platform => PlatformEnum.Vita;
     public override bool HasPlatinum => _trop.HasPlatinum;
     public override bool IsSynced => _trans.IsSynced;
     public override int TrophyCount => _trop.TrophyCount;

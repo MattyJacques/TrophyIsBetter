@@ -59,7 +59,7 @@
     <!--#endregion ToolBar-->
 
     <!--#region Trophy List-->
-
+    <FrameworkElement x:Name="IconColVisibility" Visibility="Collapsed"/>
     <DataGrid x:Name="TrophyList"
               ItemsSource="{Binding TrophyCollectionView}"
               IsSynchronizedWithCurrentItem="True"
@@ -83,11 +83,13 @@
       <DataGrid.Columns>
         <DataGridTemplateColumn Header="Icon"
                                 Width="SizeToCells"
-                                IsReadOnly="True">
+                                IsReadOnly="True"
+                                Visibility="{Binding DataContext.IconVisibility,
+                                                     Source={x:Reference IconColVisibility}}">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <Image Source="{Binding Icon}"
-                     Width="50"/>
+                     Width="50" />
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>

@@ -32,7 +32,8 @@
       <Button Content="{materialDesign:PackIcon Pencil}"
               ToolTip="Edit Game"
               IsEnabled="{Binding CanEdit}"
-              Command="{Binding DataContext.ChangePageCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+              Command="{Binding DataContext.ChangePageCommand,
+                                RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
               CommandParameter="{Binding GameCollectionView.CurrentItem}"
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="auto"

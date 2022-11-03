@@ -5,8 +5,10 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using TrophyIsBetter.Interfaces;
 using TrophyParser;
+using TrophyParser.Models;
 using TrophyParser.PS3;
 using TrophyParser.Vita;
+using static TrophyParser.Enums;
 
 namespace TrophyIsBetter.Models
 {
@@ -41,7 +43,7 @@ namespace TrophyIsBetter.Models
     public string Icon => _trophyList.Icon;
     public string Name => _trophyList.Name;
     public string NpCommID => _trophyList.NpCommID;
-    public string Platform => _trophyList.Platform;
+    public PlatformEnum Platform => _trophyList.Platform;
     public bool HasPlatinum => _trophyList.HasPlatinum;
     public bool IsSynced => _trophyList.IsSynced;
     public string Progress => _trophyList.Progress;
@@ -103,7 +105,7 @@ namespace TrophyIsBetter.Models
         Trophy convertedTrophy = new Trophy()
         {
           ID = trophy.ID,
-          Icon = Path + @"\TROP" + string.Format("{0:000}", trophy.ID) + ".PNG",
+          Icon = GetIconPath(trophy.ID),
           Name = trophy.Name,
           Description = trophy.Detail,
           Type = trophy.Rank,
@@ -111,7 +113,8 @@ namespace TrophyIsBetter.Models
           Group = trophy.Gid == 0 ? "BaseGame" : $"DLC{trophy.Gid}",
           Achieved = trophy.Timestamp?.IsEarned != false,
           Synced = trophy.Timestamp?.IsSynced != false,
-          Timestamp = trophy.Timestamp?.Time != null ? (DateTime)trophy.Timestamp?.Time : DateTime.MinValue
+          Timestamp =
+            trophy.Timestamp?.Time != null ? (DateTime)trophy.Timestamp?.Time : DateTime.MinValue
         };
 
         result.Add(convertedTrophy);
@@ -119,6 +122,22 @@ namespace TrophyIsBetter.Models
 
       return result;
     } // ConvertTrophyData
+
+    private string GetIconPath(int id)
+    {
+      string result = null;
+
+      if (IsPS3())
+      {
+        result = Path + @"\TROP" + string.Format("{0:000}", id) + ".PNG";
+      }
+      else
+      {
+        result = $@"{Path}\ICON0.PNG";
+      }
+
+      return result;
+    } // GetIconPath
 
     #endregion Private Methods
   } // GameListEntry

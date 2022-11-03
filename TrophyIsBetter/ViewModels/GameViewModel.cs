@@ -9,6 +9,7 @@ using System.Windows.Input;
 using TrophyIsBetter.Interfaces;
 using TrophyIsBetter.Models;
 using TrophyIsBetter.Views;
+using static TrophyParser.Enums;
 
 namespace TrophyIsBetter.ViewModels
 {
@@ -75,9 +76,10 @@ namespace TrophyIsBetter.ViewModels
     /// Is a game selected ready to be edited
     /// </summary>
     public bool CanLock
-    {
-      get => SelectedTrophy != null && SelectedTrophy.Achieved && !SelectedTrophy.Synced;
-    }
+      => SelectedTrophy != null && SelectedTrophy.Achieved && !SelectedTrophy.Synced;
+
+    public Visibility IconVisibility
+      => _model.Platform == PlatformEnum.PS3 ? Visibility.Visible : Visibility.Hidden;
 
     public string Icon { get => _model.Icon; }
 
@@ -85,7 +87,7 @@ namespace TrophyIsBetter.ViewModels
 
     public string NpCommunicationID { get => _model.NpCommID; }
 
-    public string Platform { get => _model.Platform; }
+    public PlatformEnum Platform { get => _model.Platform; }
 
     public bool HasPlatinum { get => _model.HasPlatinum; }
 
