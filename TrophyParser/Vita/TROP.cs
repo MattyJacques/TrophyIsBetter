@@ -14,7 +14,6 @@ namespace TrophyParser.Vita
 
     public TROP(string path)
     {
-      FileStream reader = null;
       if (!File.Exists(Path.Combine(path, "TROP.SFM")))
         throw new Exception($"Cannot find {path}/TROP.SFM.");
 

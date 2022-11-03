@@ -28,6 +28,11 @@
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="50"
               Width="60" />
+      <Button Content="{materialDesign:PackIcon Lock}"
+              Command="{Binding LockTrophyCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="50"
+              Width="60" />
       <Menu x:Name="Menu">
         <MenuItem Header="File"
                   Icon="{materialDesign:PackIcon File}"

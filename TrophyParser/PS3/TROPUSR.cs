@@ -108,9 +108,9 @@ namespace TrophyParser.PS3
       if (!timestamp.IsEarned)
         throw new AlreadyLockedException(timestamp.ID);
 
+      ResetListInfo(timestamp.Time);
       ResetTimestamp(timestamp);
       RemoveFromRates(id);
-      ResetListInfo(timestamp.Time);
 
       Debug.WriteLine($"Locked trophy {id} in TROPUSR");
     } // LockTrophy
@@ -288,7 +288,9 @@ namespace TrophyParser.PS3
       if (DateTime.Compare(CalcDateAdded(timestamp), _listInfo.DateAdded) == 0
         || DateTime.Compare(timestamp, _listInfo.LastAchievedTrophyTime) == 0)
       {
-        var orderedTimestamps = _timestamps.OrderBy(p => p.Time);
+        var orderedTimestamps = _timestamps
+          .Where(x => DateTime.Compare(x.Time, DateTime.MinValue) != 0)
+          .OrderBy(p => p.Time);
 
         _listInfo.LastAchievedTrophyTime = orderedTimestamps.Last().Time;
         _listInfo.DateAdded = CalcDateAdded(orderedTimestamps.First().Time);

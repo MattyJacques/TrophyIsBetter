@@ -30,9 +30,12 @@ namespace TrophyIsBetter.ViewModels
 
       ChangeViewToHomeCommand = new RelayCommand(ChangeViewToHome);
       EditTrophyCommand = new RelayCommand(EditTrophy);
+      LockTrophyCommand = new RelayCommand(LockTrophy, () => CanLock);
 
       _trophyCollectionView =
         (CollectionView)CollectionViewSource.GetDefaultView(_trophyCollection);
+
+      TrophyCollectionView.CurrentChanged += OnSelectedTrophyChanged;
 
       LoadTrophies();
     } // Constructor
@@ -48,15 +51,33 @@ namespace TrophyIsBetter.ViewModels
 
     public CollectionView TrophyCollectionView { get => _trophyCollectionView; }
 
+    public TrophyViewModel SelectedTrophy
+    {
+      get => (TrophyViewModel)TrophyCollectionView.CurrentItem;
+    }
+
     /// <summary>
     /// Change the view back to the game list
     /// </summary>
-    public ICommand ChangeViewToHomeCommand { get; set; }
+    public RelayCommand ChangeViewToHomeCommand { get; set; }
 
     /// <summary>
     /// Edit the timestamp of a single trophy
     /// </summary>
-    public ICommand EditTrophyCommand { get; set; }
+    public RelayCommand EditTrophyCommand { get; set; }
+
+    /// <summary>
+    /// Lock a single trophy
+    /// </summary>
+    public RelayCommand LockTrophyCommand { get; set; }
+
+    /// <summary>
+    /// Is a game selected ready to be edited
+    /// </summary>
+    public bool CanLock
+    {
+      get => SelectedTrophy != null && SelectedTrophy.Achieved && !SelectedTrophy.Synced;
+    }
 
     public string Icon { get => _model.Icon; }
 
@@ -92,13 +113,17 @@ namespace TrophyIsBetter.ViewModels
 
       if (result == true)
       {
-        TrophyViewModel selectedTrophy = (TrophyViewModel)TrophyCollectionView.CurrentItem;
         DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
 
-        _model.UnlockTrophy(selectedTrophy.Model, timestamp);
-        selectedTrophy.Timestamp = timestamp;
+        _model.UnlockTrophy(SelectedTrophy.Model, timestamp);
+        SelectedTrophy.Timestamp = timestamp;
       }
     } // EditTrophy
+
+    public void LockTrophy()
+    {
+      _model.LockTrophy(SelectedTrophy.Model);
+    } // LockTrophy
 
     public void ChangeViewToHome()
     {
@@ -126,6 +151,12 @@ namespace TrophyIsBetter.ViewModels
         }
       }
     } // LoadTrophies
+
+    /// <summary>
+    /// Notify that the selected trophy has changed
+    /// </summary>
+    private void OnSelectedTrophyChanged(object sender, EventArgs e)
+      => ((RelayCommand)LockTrophyCommand).NotifyCanExecuteChanged();
 
     /// <summary>
     /// Ask the user if they want to save when closing

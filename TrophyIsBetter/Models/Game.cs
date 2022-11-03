@@ -60,6 +60,12 @@ namespace TrophyIsBetter.Models
       HasUnsavedChanges = true;
     } // UnlockTrophy
 
+    internal void LockTrophy(Trophy trophy)
+    {
+      _trophyList.LockTrophy(trophy.ID);
+      HasUnsavedChanges = true;
+    } // LockTrophy
+
     public void Save()
     {
       _trophyList.Save();
