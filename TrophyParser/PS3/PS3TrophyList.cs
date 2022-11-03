@@ -31,11 +31,11 @@ namespace TrophyParser.PS3
         var trophyInfo = _usr[i];
         if (trophyInfo.HasValue && trophyInfo.Value.IsEarned)
         {
-          trophy.Timestamp = new Timestamp { Time = trophyInfo.Value.Time, Synced = trophyInfo.Value.IsSynced };
+          trophy.Timestamp = new Timestamp { Time = trophyInfo.Value.Time, IsSynced = trophyInfo.Value.IsSynced };
         }
         else
         {
-          trophy.Timestamp = new Timestamp { Time = null, Synced = false };
+          trophy.Timestamp = new Timestamp { Time = null, IsSynced = false };
         }
         _trophies.Add(trophy);
       }
@@ -65,7 +65,7 @@ namespace TrophyParser.PS3
 
       _usr.UnlockTrophy(id, time);
       _trns.AddTrophy(id, _usr.TrophyTypes[id].Type, time);
-      _trophies[id].Timestamp = new Timestamp { Time = time, Synced = false };
+      _trophies[id].Timestamp = new Timestamp { Time = time, IsSynced = false };
     } // UnlockTrophy
 
     public override void LockTrophy(int id)
@@ -74,7 +74,7 @@ namespace TrophyParser.PS3
 
       _usr.LockTrophy(id);
       _trns.RemoveTrophy(id);
-      _trophies[id].Timestamp = new Timestamp { Time = null, Synced = false }; ;
+      _trophies[id].Timestamp = new Timestamp { Time = null, IsSynced = false }; ;
     } // LockTrophy
 
     public override void Save()

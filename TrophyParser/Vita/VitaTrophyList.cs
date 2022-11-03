@@ -60,7 +60,10 @@ namespace TrophyParser.Vita
 
     public override void LockTrophy(int id)
     {
-      throw new NotImplementedException();
+      Debug.WriteLine($"Locking {Name} (Vita) - {_trophies[id].Name}");
+
+      _trans.LockTrophy(id);
+      _title.LockTrophy(id);
     } // LockTrophy
 
     public override void Save()

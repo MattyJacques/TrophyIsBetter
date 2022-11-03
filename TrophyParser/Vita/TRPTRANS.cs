@@ -76,6 +76,17 @@ namespace TrophyParser.Vita
       Debug.WriteLine($"Unlocked trophy {id} in TRPTRANS");
     } // UnlockTrophy
 
+    internal void LockTrophy(int id)
+    {
+      Timestamp timestamp = _timestamps[id];
+      timestamp.Type = 0x00;
+      timestamp.Time = null;
+
+      //_timestamps[id] = timestamp;
+
+      Debug.WriteLine($"Locked trophy {id} in TRPTRANS");
+    } // LockTrophy
+
     public void Save()
     {
       _writer = new BinaryWriter(new FileStream(_path, FileMode.Open));
@@ -84,7 +95,7 @@ namespace TrophyParser.Vita
       foreach (Timestamp trophy in _timestamps)
       {
 
-        _writer.Write((byte)(trophy.Earned ? 0x02 : 0x00));
+        _writer.Write((byte)(trophy.IsEarned ? 0x02 : 0x00));
 
         byte[] time = trophy.Time.HasValue ?
           BitConverter.GetBytes(trophy.Time.Value.Ticks / 10) : BitConverter.GetBytes((long)0);

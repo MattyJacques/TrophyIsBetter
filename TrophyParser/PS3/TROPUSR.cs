@@ -111,6 +111,8 @@ namespace TrophyParser.PS3
       ResetTimestamp(timestamp);
       RemoveFromRates(id);
       ResetListInfo(timestamp.Time);
+
+      Debug.WriteLine($"Locked trophy {id} in TROPUSR");
     } // LockTrophy
 
     public void Save()

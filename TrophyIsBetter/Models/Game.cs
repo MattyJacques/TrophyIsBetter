@@ -103,8 +103,8 @@ namespace TrophyIsBetter.Models
           Type = trophy.Rank,
           Hidden = trophy.Hidden == "yes",
           Group = trophy.Gid == 0 ? "BaseGame" : $"DLC{trophy.Gid}",
-          Achieved = trophy.Timestamp?.Earned != false,
-          Synced = trophy.Timestamp?.Synced != false,
+          Achieved = trophy.Timestamp?.IsEarned != false,
+          Synced = trophy.Timestamp?.IsSynced != false,
           Timestamp = trophy.Timestamp?.Time != null ? (DateTime)trophy.Timestamp?.Time : DateTime.MinValue
         };
 

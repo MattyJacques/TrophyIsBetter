@@ -45,7 +45,7 @@ namespace TrophyParser.Vita
 
         foreach (Timestamp timestamp in _timestamps)
         {
-          if (timestamp.Earned)
+          if (timestamp.IsEarned)
           {
             count++;
           }
@@ -62,7 +62,7 @@ namespace TrophyParser.Vita
         DateTime? result = new DateTime(2008, 1, 1);
         foreach (Timestamp timestamp in _timestamps)
         {
-          if (timestamp.Earned && timestamp.Time > result)
+          if (timestamp.IsEarned && timestamp.Time > result)
           {
             result = timestamp.Time;
           }
@@ -79,7 +79,7 @@ namespace TrophyParser.Vita
         DateTime? result = new DateTime(2008, 1, 1);
         foreach (Timestamp timestamp in _timestamps)
         {
-          if (timestamp.Synced && timestamp.Time > result)
+          if (timestamp.IsSynced && timestamp.Time > result)
           {
             result = timestamp.Time;
           }
@@ -141,7 +141,22 @@ namespace TrophyParser.Vita
       _timestamps[id] = timestamp;
 
       Debug.WriteLine($"Unlocked trophy {id} in TRPTITLE");
-    } // AddTrophy
+    } // UnlockTrophy
+
+    internal void LockTrophy(int id)
+    {
+      if (_timestamps[id].IsSynced)
+        throw new Exception("Can't delete sync trophies");
+
+      Timestamp timestamp = _timestamps[id];
+
+      timestamp.Time = null;
+      timestamp.Type = 0;
+
+      //_timestamps[id] = timestamp;
+
+      Debug.WriteLine($"Locked trophy {id} in TRPTITLE");
+    } // LockTrophy
 
     public void Save()
     {
@@ -152,7 +167,7 @@ namespace TrophyParser.Vita
       {
         var data = new List<byte>
         {
-          (byte)(trophy.Earned ? 0x01 : 0x00)
+          (byte)(trophy.IsEarned ? 0x01 : 0x00)
         };
 
         data.AddRange(new byte[] { 0, 0, trophy.Unknown, 0, 0, 0, 0, 0 });
