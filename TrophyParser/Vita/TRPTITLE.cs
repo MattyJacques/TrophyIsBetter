@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using static TrophyParser.Structs;
+using TrophyParser.Models;
 
 namespace TrophyParser.Vita
 {
   internal class TRPTITLE
   {
+    #region Const Members
+
+    private const string TRPTITLE_FILE_NAME = "TRPTITLE.DAT";
+
+    #endregion Const Members
     #region Private Members
 
     private BinaryReader _reader;
@@ -15,6 +21,76 @@ namespace TrophyParser.Vita
     private long pointer = -1;
     public List<Timestamp> _timestamps = new List<Timestamp>();
     private string _path;
+
+    #endregion Private Members
+    #region Constructors
+
+    public TRPTITLE(string path)
+    {
+      _path = Utility.File.GetFullPath(path, TRPTITLE_FILE_NAME);
+
+      ReadFile();
+    } // Constructor
+
+    #endregion Constructors
+    #region Public Properties
+
+    public Timestamp this[int index] => _timestamps[index];
+
+    public int EarnedCount
+    {
+      get
+      {
+        int count = 0;
+
+        foreach (Timestamp timestamp in _timestamps)
+        {
+          if (timestamp.IsEarned)
+          {
+            count++;
+          }
+        }
+
+        return count;
+      }
+    } // EarnedCount
+
+    public DateTime? LastTimestamp
+    {
+      get
+      {
+        DateTime? result = new DateTime(2008, 1, 1);
+        foreach (Timestamp timestamp in _timestamps)
+        {
+          if (timestamp.IsEarned && timestamp.Time > result)
+          {
+            result = timestamp.Time;
+          }
+        }
+
+        return result;
+      }
+    } // LastTimestamp
+
+    public DateTime? LastSyncedTimestamp
+    {
+      get
+      {
+        DateTime? result = new DateTime(2008, 1, 1);
+        foreach (Timestamp timestamp in _timestamps)
+        {
+          if (timestamp.IsSynced && timestamp.Time > result)
+          {
+            result = timestamp.Time;
+          }
+        }
+
+        return result;
+      }
+    } // LastSyncedTimestamp
+
+    #endregion Public Properties
+    #region Private Properties
 
     private byte[] Block
     {
@@ -42,21 +118,76 @@ namespace TrophyParser.Vita
       }
     } // Block
 
-    #endregion Private Members
-    #region Constructors
+    #endregion Private Properties
+    #region Public Methods
 
-    public TRPTITLE(string path)
+    public void PrintState()
     {
-      if (!path.EndsWith(@"\"))
-        path += @"\";
-      if (!File.Exists(Path.Combine(path, "TRPTITLE.DAT")))
-        throw new Exception($"Cannot find {path}/TRPTITLE.DAT");
+      Console.WriteLine("\n----- TRPTITLE Data -----");
 
-      _path = path;
+      Console.WriteLine("\nTimestamps");
+      for (int i = 0; i < _timestamps.Count; i++)
+      {
+        Console.WriteLine(_timestamps[i]);
+      }
+    } // PrintState
 
+    public void UnlockTrophy(int id, DateTime time)
+    {
+      _timestamps[id].Time = time;
+      _timestamps[id].Unknown = 0x50;
+
+      Debug.WriteLine($"Unlocked trophy {id} in TRPTITLE");
+    } // UnlockTrophy
+
+    internal void ChangeTimestamp(int id, DateTime time) => _timestamps[id].Time = time;
+
+    internal void LockTrophy(int id)
+    {
+      if (_timestamps[id].IsSynced)
+        throw new Exception("Can't delete sync trophies");
+
+      _timestamps[id].Time = null;
+      _timestamps[id].Type = 0;
+
+      Debug.WriteLine($"Locked trophy {id} in TRPTITLE");
+    } // LockTrophy
+
+    public void Save()
+    {
+      _writer = new BinaryWriter(new FileStream(_path, FileMode.Open));
+      _writer.BaseStream.Position = pointer;
+
+      foreach (var trophy in _timestamps)
+      {
+        var data = new List<byte>
+        {
+          (byte)(trophy.IsEarned ? 0x01 : 0x00)
+        };
+
+        data.AddRange(new byte[] { 0, 0, trophy.Unknown, 0, 0, 0, 0, 0 });
+
+        var time = trophy.Time.HasValue ?
+          BitConverter.GetBytes(trophy.Time.Value.Ticks / 10) : BitConverter.GetBytes((long)0);
+        Array.Reverse(time);
+        data.AddRange(time);
+
+        data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        Block = data.ToArray();
+      }
+
+      _writer.Flush();
+      _writer.Close();
+    } // Save
+
+    #endregion Public Methods
+    #region Private Methods
+
+    private void ReadFile()
+    {
       try
       {
-        _reader = new BinaryReader(new FileStream(path + "TRPTITLE.DAT", FileMode.Open));
+        _reader = new BinaryReader(new FileStream(_path, FileMode.Open));
         var block = Block;
         do
         {
@@ -77,79 +208,9 @@ namespace TrophyParser.Vita
       {
         throw new InvalidFileException("Fail in TRPTITLE.DAT");
       }
-    } // Constructor
+    } // ReadFile
 
-    #endregion Constructors
-    #region Public Properties
+    #endregion Private Methods
 
-    public Timestamp this[int index] => _timestamps[index];
-
-    public int EarnedCount
-    {
-      get
-      {
-        int count = 0;
-
-        foreach (Timestamp timestamp in _timestamps)
-        {
-          if (timestamp.Earned)
-          {
-            count++;
-          }
-        }
-
-        return count;
-      }
-    } // EarnedCount
-
-    public DateTime? LastTimestamp
-    {
-      get
-      {
-        DateTime? result = new DateTime(2008, 1, 1);
-        foreach (Timestamp timestamp in _timestamps)
-        {
-          if (timestamp.Earned && timestamp.Time > result)
-          {
-            result = timestamp.Time;
-          }
-        }
-
-        return result;
-      }
-    } // LastTimestamp
-
-    public DateTime? LastSyncedTimestamp
-    {
-      get
-      {
-        DateTime? result = new DateTime(2008, 1, 1);
-        foreach (Timestamp timestamp in _timestamps)
-        {
-          if (timestamp.Synced && timestamp.Time > result)
-          {
-            result = timestamp.Time;
-          }
-        }
-
-        return result;
-      }
-    } // LastSyncedTimestamp
-
-    #endregion Public Properties
-    #region Public Methods
-
-    public void PrintState()
-    {
-      Console.WriteLine("\n----- TRPTITLE Data -----");
-
-      Console.WriteLine("\nTimestamps");
-      for (int i = 0; i < _timestamps.Count; i++)
-      {
-        Console.WriteLine(_timestamps[i]);
-      }
-    } // PrintState
-
-    #endregion
   } // TRPTITLE
 } // TrophyParser.Vita

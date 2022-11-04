@@ -42,13 +42,7 @@ namespace TrophyIsBetter.Models
     /// </summary>
     public void ImportGames(string pathToGames)
     {
-      var dirs = from dir
-                 in Directory.EnumerateDirectories(pathToGames, "*",
-                    SearchOption.AllDirectories)
-                 where TROPHY_FOLDER_REGEX.IsMatch(dir)
-                 select dir;
-
-      foreach (string dir in dirs)
+      foreach (string dir in GetDirectories(pathToGames))
       {
         string path = CopyWithBackup(dir);
         Utility.PfdTool.DecryptTrophyData(path);
@@ -118,6 +112,28 @@ namespace TrophyIsBetter.Models
         return "Vita";
       }
     } // GetPlatform
+
+    /// <summary>
+    /// Get a list of trophy directories from the given path
+    /// </summary>
+    public static List<string> GetDirectories(string rootPath)
+    {
+      var result = from dir
+                   in Directory.EnumerateDirectories(rootPath, "*",
+                      SearchOption.AllDirectories)
+                   where TROPHY_FOLDER_REGEX.IsMatch(dir)
+                   select dir;
+
+      if (!result.Any() && TROPHY_FOLDER_REGEX.IsMatch(rootPath))
+      {
+        result = new List<string>()
+        {
+          rootPath
+        };
+      }
+
+      return (List<string>)result;
+    } // GetDirectories
 
     /// <summary>
     /// Copy the directory the application data directory with a backup

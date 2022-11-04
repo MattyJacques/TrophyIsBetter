@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using static TrophyParser.PS3.Structs;
 
@@ -15,10 +17,11 @@ namespace TrophyParser.PS3
     #endregion Const Members
     #region Private Members
 
+    private string _filePath;
     private Header _header;
     private Dictionary<int, TypeRecord> _typeRecords;
     private string _accountID;
-    private string _trophyID;
+    private string _listID;
     private int _earnedCount;
     private int _syncedCount;
     private TrophyInitTime _trophyInitTime;
@@ -30,30 +33,17 @@ namespace TrophyParser.PS3
 
     public TROPTRNS(string path)
     {
-      string filePath = Utility.File.GetFullPath(path, TROPTRNS_FILE_NAME);
+      _filePath = Utility.File.GetFullPath(path, TROPTRNS_FILE_NAME);
 
-      using (var fileStream = new FileStream(filePath, FileMode.Open))
-      using (var TROPTRNSReader = new BigEndianBinaryReader(fileStream))
-      {
-        _header = DataParsing.ParseHeader(filePath, TROPTRNSReader);
-        _typeRecords = DataParsing.ParseTypeRecords(_header, TROPTRNSReader);
+      BigEndianBinaryReader reader =
+        new BigEndianBinaryReader(new FileStream(_filePath, FileMode.Open));
 
-        // Type 2
-        TypeRecord accountIDRecord = _typeRecords[2];
-        TROPTRNSReader.BaseStream.Position = accountIDRecord.Offset + 32; // Skip blank lines
-        _accountID = Encoding.UTF8.GetString(TROPTRNSReader.ReadBytes(16));
+      _header = DataParsing.ParseHeader(_filePath, reader);
+      _typeRecords = DataParsing.ParseTypeRecords(_header, reader);
 
-        // Type 3
-        TypeRecord trophy_id_Record = _typeRecords[3];
-        TROPTRNSReader.BaseStream.Position = trophy_id_Record.Offset + 16; // Skip blank lines
-        _trophyID = Encoding.UTF8.GetString(TROPTRNSReader.ReadBytes(16)).Trim('\0');
-        _u1 = TROPTRNSReader.ReadInt32(); // always 00000090
-        _earnedCount = TROPTRNSReader.ReadInt32();
-        _syncedCount = TROPTRNSReader.ReadInt32();
-
-        // Type 4
-        ParseTrophyInfo(TROPTRNSReader);
-      }
+      ParseAccountInfo(reader);
+      ParseListInfo(reader);
+      ParseTrophyInfo(reader);
     } // Constructor
 
     #endregion Constructors
@@ -64,32 +54,68 @@ namespace TrophyParser.PS3
     #endregion Public Properties
     #region Public Methods
 
-    public EarnedInfo? this[int TrophyID]
+    public void AddTrophy(int id, int trophyType, DateTime unlockTime)
     {
-      get
-      {
-        EarnedInfo? ret = null;
-        for (int i = 0; i < _timestamps.Count; i++)
-        {
-          if (_timestamps[i].TrophyID == TrophyID)
-          {
-            ret = _timestamps[i];
-            break;
-          }
-        }
+      EarnedInfo timestamp = new EarnedInfo(id, trophyType, unlockTime);
 
-        return ret;
-      }
-    } // []
+      InsertTimestamp(timestamp);
+      _earnedCount++;
+
+      Debug.WriteLine($"Added trophy {id} in TROPTRNS");
+    } // AddTrophy
+
+    internal void ChangeTimestamp(int id, DateTime time)
+    {
+      int oldIndex = _timestamps.FindIndex(x => x.TrophyID == id);
+
+      if (oldIndex == -1)
+        throw new TrophyNotFound(id);
+
+      EarnedInfo timestamp = _timestamps[oldIndex];
+
+      if (timestamp.IsSynced)
+        throw new AlreadySyncedException(timestamp.TrophyID);
+
+      _timestamps.RemoveAt(oldIndex);
+
+      InsertTimestamp(timestamp);
+    } // ChangeTimestamp
+
+    public void RemoveTrophy(int id)
+    {
+      EarnedInfo timestamp = _timestamps.Find(x => x.TrophyID == id);
+
+      if (timestamp.IsSynced)
+        throw new AlreadySyncedException(timestamp.TrophyID);
+
+      _timestamps.Remove(timestamp);
+      _earnedCount--;
+
+      Debug.WriteLine($"Removed trophy {id} from TROPTRNS");
+    } // RemoveTrophy
+
+    public void Save()
+    {
+      BigEndianBinaryWriter writer =
+        new BigEndianBinaryWriter(new FileStream(_filePath, FileMode.Open));
+
+      writer.Write(_header.StructToBytes());
+      SaveAccountInfo(writer);
+      SaveListInfo(writer);
+      SaveTrophyInfo(writer);
+
+      Debug.WriteLine($"Saved {_listID} TROPTRNS");
+    } // Save
 
     public void PrintState()
     {
       Console.WriteLine("\n----- TROPTRNS Data -----");
 
       Console.WriteLine("Account ID: {0}", _accountID);
-      Console.WriteLine("Trophy ID: {0}", _trophyID);
+      Console.WriteLine("Trophy ID: {0}", _listID);
 
-      Console.WriteLine("Earned Trophys: {0} Synced Trophys: {1} ", _earnedCount, _syncedCount);
+      Console.WriteLine("Earned Trophys: {0} Synced Trophys: {1} ",
+        _earnedCount, _syncedCount);
 
       _header.Output();
 
@@ -102,21 +128,40 @@ namespace TrophyParser.PS3
       Console.WriteLine("\nTimestamps");
       for (int i = 0; i < _timestamps.Count; i++)
       {
-        Console.WriteLine("ID: {0}, Trophy ID: {1}, Type: {2}, Exists: {3}, Timestamp: {4}, Synced: {5}",
-            _timestamps[i].ID, _timestamps[i].TrophyID,
-            _timestamps[i].TrophyType, _timestamps[i].DoesExist, _timestamps[i].Time,
-            _timestamps[i].IsSynced
-           );
+        Console.WriteLine("ID: {0}, Trophy ID: {1}, Type: {2}, Exists: {3}, " +
+          "Timestamp: {4}, Synced: {5}",
+          _timestamps[i].ID, _timestamps[i].TrophyID,
+          _timestamps[i].TrophyType, _timestamps[i].DoesExist, _timestamps[i].Time,
+          _timestamps[i].IsSynced
+        );
       }
     } // PrintState
 
     #endregion Public Methods
     #region Private Methods
+    #region File Parsing
+
+    private void ParseAccountInfo(BigEndianBinaryReader reader)
+    {
+      TypeRecord accountIDRecord = _typeRecords[2];
+      reader.BaseStream.Position = accountIDRecord.Offset + 32; // Skip blank lines
+      _accountID = Encoding.UTF8.GetString(reader.ReadBytes(16));
+    } // ParseAccountInfo
+
+    private void ParseListInfo(BigEndianBinaryReader reader)
+    {
+      TypeRecord listInfoRecord = _typeRecords[3];
+      reader.BaseStream.Position = listInfoRecord.Offset + 16; // Skip blank lines
+      _listID = Encoding.UTF8.GetString(reader.ReadBytes(16)).Trim('\0');
+      _u1 = reader.ReadInt32(); // always 00000090
+      _earnedCount = reader.ReadInt32();
+      _syncedCount = reader.ReadInt32();
+    } // ParseListInfo
 
     private void ParseTrophyInfo(BigEndianBinaryReader reader)
     {
-      TypeRecord TrophyInfoRecord = _typeRecords[4];
-      reader.BaseStream.Position = TrophyInfoRecord.Offset;
+      TypeRecord trophyInfoRecord = _typeRecords[4];
+      reader.BaseStream.Position = trophyInfoRecord.Offset;
       int type = reader.ReadInt32();
       int blocksize = reader.ReadInt32();
       int sequenceNumber = reader.ReadInt32(); // if have more than same type block, it will be used
@@ -132,6 +177,87 @@ namespace TrophyParser.PS3
         _timestamps.Add(ti);
       }
     } // ParseTrophyInfo
+
+    #endregion File Parsing
+    #region File Saving
+
+    private void SaveAccountInfo(BigEndianBinaryWriter writer)
+    {
+      TypeRecord accountInfoRecord = _typeRecords[2];
+      writer.BaseStream.Position = accountInfoRecord.Offset + 32;
+      writer.Write(_accountID.ToCharArray());
+    } // SaveAccountInfo
+
+    private void SaveListInfo(BigEndianBinaryWriter writer)
+    {
+      TypeRecord listInfoRecord = _typeRecords[3];
+      writer.BaseStream.Position = listInfoRecord.Offset + 16;
+      writer.Write(_listID.ToCharArray());
+      writer.BaseStream.Position = listInfoRecord.Offset + 32;
+      writer.Write(_u1);
+      writer.Write(_timestamps.Count + 1);
+      _syncedCount = 0;
+      for (int i = 0; i < _timestamps.Count; i++)
+      {
+        if (_timestamps[i].IsSynced)
+        {
+          _syncedCount++;
+        }
+      }
+
+      writer.Write(_syncedCount + 1);
+    } // SaveListInfo
+
+    private void SaveTrophyInfo(BigEndianBinaryWriter writer)
+    {
+      TypeRecord trophyTypeRecord = _typeRecords[4];
+      writer.BaseStream.Position = trophyTypeRecord.Offset;
+      writer.BaseStream.Position += 16;
+      writer.Write(_trophyInitTime.StructToBytes());
+
+      for (int i = 0; i < _timestamps.Count; i++)
+      {
+        writer.BaseStream.Position += 16;
+        EarnedInfo info = _timestamps[i];
+        info.ID = i + 1;
+        info._unknownInt3 = 0;
+
+        //_timestamps[i] = info;
+        writer.Write(_timestamps[i].StructToBytes());
+      }
+
+      byte[] emptyStruct = new byte[Marshal.SizeOf(typeof(EarnedInfo))];
+      Array.Clear(emptyStruct, 0, emptyStruct.Length);
+      EarnedInfo emptyTrophyInfo = emptyStruct.ToStruct<EarnedInfo>();
+      for (int i = _timestamps.Count; i < trophyTypeRecord.Size; i++)
+      {
+        writer.BaseStream.Position += 16;
+        emptyTrophyInfo.ID = i + 1;
+        writer.Write(emptyTrophyInfo.StructToBytes());
+      }
+    } // SaveTrophyInfo
+
+    #endregion File Saving
+
+    private void InsertTimestamp(EarnedInfo timestamp)
+    {
+      int insertPoint;
+
+      for (insertPoint = 0; insertPoint < _timestamps.Count; insertPoint++)
+      {
+        if (DateTime.Compare(_timestamps[insertPoint].Time, timestamp.Time) > 0)
+        {
+          if (_timestamps[insertPoint].IsSynced)
+          {
+            throw new SyncTimeException(_timestamps[insertPoint].Time);
+          }
+
+          break;
+        }
+      }
+
+      _timestamps.Insert(insertPoint, timestamp);
+    } // InsertTimestamp()
 
     #endregion  Private Members
   } // TROPTRNS

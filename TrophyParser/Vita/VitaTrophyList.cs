@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using static TrophyParser.Enums;
 
 namespace TrophyParser.Vita
 {
@@ -26,7 +28,6 @@ namespace TrophyParser.Vita
       for (int i = 0; i < _trop.TrophyCount; ++i)
       {
         var trophy = _trop[i];
-        trophy = _trop[i];
         trophy.Timestamp = _title[i];
         _trophies.Add(trophy);
       }
@@ -38,7 +39,7 @@ namespace TrophyParser.Vita
     public override string Icon => $"{_path}\\ICON0.PNG";
     public override string Name => _trop.TitleName;
     public override string NpCommID => _trop.NpCommID;
-    public override string Platform => "PS Vita";
+    public override PlatformEnum Platform => PlatformEnum.Vita;
     public override bool HasPlatinum => _trop.HasPlatinum;
     public override bool IsSynced => _trans.IsSynced;
     public override int TrophyCount => _trop.TrophyCount;
@@ -48,5 +49,38 @@ namespace TrophyParser.Vita
     public override DateTime? LastSyncedTimestamp => _title.LastSyncedTimestamp;
 
     #endregion Public Properties
+    #region Public Methods
+
+    public override void UnlockTrophy(int id, DateTime time)
+    {
+      Debug.WriteLine($"Unlocking {Name} (Vita) - {_trophies[id].Name} with timestamp: {time}");
+
+      _trans.UnlockTrophy(id, _trophies[id].Rank, time);
+      _title.UnlockTrophy(id, time);
+    } // Unlock Trophy
+
+    public override void ChangeTimestamp(int id, DateTime time)
+    {
+      _trans.ChangeTimestamp(id, time);
+      _title.ChangeTimestamp(id, time);
+    } // ChaneTimestamp
+
+    public override void LockTrophy(int id)
+    {
+      Debug.WriteLine($"Locking {Name} (Vita) - {_trophies[id].Name}");
+
+      _trans.LockTrophy(id);
+      _title.LockTrophy(id);
+    } // LockTrophy
+
+    public override void Save()
+    {
+      Debug.WriteLine($"Saving {Name} (Vita)");
+
+      _trans.Save();
+      _title.Save();
+    } // Save
+
+    #endregion Public Methods
   } // VitaTrophyList
 } // TrophyParser.Vita

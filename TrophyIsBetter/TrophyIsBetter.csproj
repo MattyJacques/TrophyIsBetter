@@ -98,9 +98,14 @@
     <Compile Include="Models\GameList.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
+    <Compile Include="ViewModels\EditTimestampViewModel.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="ViewModels\GameListViewModel.cs" />
     <Page Include="Views\ApplicationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EditTimestampWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -123,6 +128,9 @@
     <Compile Include="ViewModels\TrophyViewModel.cs" />
     <Compile Include="Views\ApplicationWindow.xaml.cs">
       <DependentUpon>ApplicationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EditTimestampWindow.xaml.cs">
+      <DependentUpon>EditTimestampWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GameListView.xaml.cs">
       <DependentUpon>GameListView.xaml</DependentUpon>

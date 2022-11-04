@@ -7,7 +7,7 @@ namespace TrophyParser
     {
         static void PrintPS3()
         {
-            string tempPath = Utility.File.CopyDirToTemp("C:\\Users\\Matty\\Desktop\\trophy\\PS3\\NPWR00071_00");
+            string tempPath = Utility.File.CopyDirToTemp("C:\\Users\\Matty\\Desktop\\trophy\\PS3\\NPWR03907_00");
 
             Utility.PfdTool.DecryptTrophyData(tempPath);
             TROPCONF conf = new TROPCONF(tempPath);
@@ -33,8 +33,8 @@ namespace TrophyParser
 
         static void Main(string[] args)
         {
-            //PrintPS3();
-            PrintVita();
+            PrintPS3();
+            //PrintVita();
         } // Main
     } // Program
 } // TrophyParser

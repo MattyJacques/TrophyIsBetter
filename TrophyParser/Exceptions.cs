@@ -25,12 +25,25 @@ namespace TrophyParser
     {
       this.psnSyncTime = psnSyncTime;
     }
-    public SyncTimeException(DateTime psnSyncTime) : base(string.Format("The last trophy synchronized with PSN has the following date: {0:dd/MM/yyyy HH:mm:ss}. Select a date greater than this.", psnSyncTime)) { }
-  } // SynctimeException
+    public SyncTimeException(DateTime psnSyncTime)
+      : base(string.Format("The last trophy synchronized with PSN has the following date:" +
+        " {0:dd/MM/yyyy HH:mm:ss}. Select a date greater than this.", psnSyncTime)) { }
+  } // SyncTimeException
+
+  public class AlreadySyncedException : Exception
+  {
+    public AlreadySyncedException(int id)
+      : base($"Trophy {id} is already synchronized. It can't be modified.") { }
+  } // AlreadySyncedException
+
+  public class AlreadyLockedException : Exception
+  {
+    public AlreadyLockedException(int id)
+      : base($"Trophy {id} is already locked.") { }
+  } // AlreadySyncedException
 
   public class TrophyNotFound : Exception
   {
-    public TrophyNotFound(string message) : base(message) { }
-    public TrophyNotFound() : base("Trophy ID not found.") { }
+    public TrophyNotFound(int id) : base($"Trophy {id} not found.") { }
   } // TrophyNotFound
 } // TrophyParser

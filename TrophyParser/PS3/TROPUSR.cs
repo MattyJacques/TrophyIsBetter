@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using static TrophyParser.PS3.Structs;
 
@@ -15,6 +17,7 @@ namespace TrophyParser.PS3
     #endregion Const Members
     #region Private Members
 
+    private string _filePath;
     private string _accountID;
     private string _listID;
     private int _trophyCount;
@@ -32,73 +35,21 @@ namespace TrophyParser.PS3
 
     public TROPUSR(string path)
     {
-      string filePath = Utility.File.GetFullPath(path, TROPUSR_FILE_NAME);
+      _filePath = Utility.File.GetFullPath(path, TROPUSR_FILE_NAME);
 
-      using (var fileStream = new FileStream(filePath, FileMode.Open))
-      using (var TROPUSRReader = new BigEndianBinaryReader(fileStream))
-      {
-        _header = DataParsing.ParseHeader(filePath, TROPUSRReader);
-        _typeRecords = DataParsing.ParseTypeRecords(_header, TROPUSRReader);
+      BigEndianBinaryReader reader =
+        new BigEndianBinaryReader(new FileStream(_filePath, FileMode.Open));
 
-        do
-        {
-          // 1 unknown 2 account_id 3 trophy_id and hash(?) 4 trophy info
-          // 
-          int type = TROPUSRReader.ReadInt32();
-          int blocksize = TROPUSRReader.ReadInt32();
-          int id = TROPUSRReader.ReadInt32(); // if have more than same type block, it will be used
-          int unknown = TROPUSRReader.ReadInt32();
-          byte[] blockdata = TROPUSRReader.ReadBytes(blocksize);
-          switch (type)
-          {
-            case 1: // Unknown
-              break;
-            case 2:
-              _accountID = Encoding.UTF8.GetString(blockdata, 16, 16);
-              break;
-            case 3:
-              _listID = Encoding.UTF8.GetString(blockdata, 0, 16).Trim('\0');
-              short u1 = BitConverter.ToInt16(blockdata, 16).ChangeEndian();
-              short u2 = BitConverter.ToInt16(blockdata, 18).ChangeEndian();
-              short u3 = BitConverter.ToInt16(blockdata, 20).ChangeEndian();
-              short u4 = BitConverter.ToInt16(blockdata, 22).ChangeEndian();
-              _trophyCount = BitConverter.ToInt32(blockdata, 24).ChangeEndian();
-              int u5 = BitConverter.ToInt32(blockdata, 28).ChangeEndian();
-              _completionRate[0] = BitConverter.ToUInt32(blockdata, 64);
-              _completionRate[1] = BitConverter.ToUInt32(blockdata, 68);
-              _completionRate[2] = BitConverter.ToUInt32(blockdata, 72);
-              _completionRate[3] = BitConverter.ToUInt32(blockdata, 76);
-              break;
-            case 4:
-              _types.Add(blockdata.ToStruct<TrophyType>());
-              break;
-            case 5:
-              _listInfo = blockdata.ToStruct<ListInfo>();
-              break;
-            case 6:
-              _timestamps.Add(blockdata.ToStruct<Timestamp>());
-              break;
-            case 7:
-              _achievedStats = blockdata.ToStruct<AchievedStats>();
-              break;
-            case 8: // Unknown Hash
-              _unknownHash = blockdata.SubArray(0, 20);
-              break;
-            case 9: // Unknown, "some number of platinum trophy"
-              break;
-            case 10: // Padding
-              break;
-          }
+      _header = DataParsing.ParseHeader(_filePath, reader);
+      _typeRecords = DataParsing.ParseTypeRecords(_header, reader);
 
-        } while (TROPUSRReader.BaseStream.Position < TROPUSRReader.BaseStream.Length);
-
-        _listInfo.LastUpdated = DateTime.Now;
-      }
+      ParseBlocks(reader);
     } // Constructor
 
     #endregion Constructors
     #region Public Properties
 
+    public List<TrophyType> TrophyTypes { get => _types; }
     public int EarnedCount { get { return _listInfo.AchievedCount; } }
     public DateTime LastTimestamp { get { return _listInfo.LastAchievedTrophyTime; } }
     public DateTime LastSyncedTimestamp
@@ -108,7 +59,7 @@ namespace TrophyParser.PS3
         DateTime result = new DateTime(2008, 1, 1);
         foreach (Timestamp timestamp in _timestamps)
         {
-          if (timestamp.IsSync && DateTime.Compare(timestamp.Time, result) > 0)
+          if (timestamp.IsSynced && DateTime.Compare(timestamp.Time, result) > 0)
           {
             result = timestamp.Time;
           }
@@ -119,6 +70,76 @@ namespace TrophyParser.PS3
 
     #endregion Public Properties
     #region Public Methods
+
+    public Timestamp? this[int trophyID]
+    {
+      get
+      {
+        Timestamp? ret = null;
+        foreach (Timestamp timestamp in _timestamps)
+        {
+          if (timestamp.ID == trophyID)
+          {
+            ret = timestamp;
+            break;
+          }
+        }
+
+        return ret;
+      }
+    } // []
+
+    public void UnlockTrophy(int id, DateTime unlockTime)
+    {
+      UpdateTimestamp(id, unlockTime);
+      UpdateRates(id);
+      UpdateListInfo(unlockTime);
+
+      Debug.WriteLine($"Unlocked trophy {id} in TROPUSR");
+    } // UnlockTrophy
+
+    internal void ChangeTimestamp(int id, DateTime time)
+    {
+      UpdateTimestamp(id, time);
+    } // ChangeTimestamp
+
+    public void LockTrophy(int id)
+    {
+      Timestamp timestamp = _timestamps[id];
+      
+      if (timestamp.SyncState == (int)TrophySyncState.Synced)
+        throw new AlreadySyncedException(timestamp.ID);
+      
+      if (!timestamp.IsEarned)
+        throw new AlreadyLockedException(timestamp.ID);
+
+      DateTime removedTimestamp = timestamp.Time;
+
+      ResetTimestamp(timestamp);
+      RemoveFromRates(id);
+      ResetListInfo(removedTimestamp);
+
+      Debug.WriteLine($"Locked trophy {id} in TROPUSR");
+    } // LockTrophy
+
+    public void Save()
+    {
+      BigEndianBinaryWriter writer =
+        new BigEndianBinaryWriter(new FileStream(_filePath, FileMode.Open));
+
+      writer.Write(_header.StructToBytes());
+      SaveAccountInfo(writer);
+      SaveListID(writer);
+      SaveTrophyInfo(writer);
+      SaveListInfo(writer);
+      SaveTimestamps(writer);
+      SaveAchievedInfo(writer);
+
+      writer.Flush();
+      writer.Close();
+
+      Debug.WriteLine($"Saved {_listID} TROPUSR");
+    } // Save()
 
     public void PrintState()
     { // Print all data within TROPUSR
@@ -150,7 +171,197 @@ namespace TrophyParser.PS3
 
     #endregion Public Methods
     #region Private Methods
+    #region File Parsing
 
+    private void ParseBlocks(BigEndianBinaryReader reader)
+    {
+      do
+      {
+        int type = reader.ReadInt32();
+        int blocksize = reader.ReadInt32();
+        int id = reader.ReadInt32(); // if have more than same type block, it will be used
+        int unknown = reader.ReadInt32();
+        byte[] blockdata = reader.ReadBytes(blocksize);
+        switch (type)
+        {
+          case 1: // Unknown
+            break;
+          case 2: // Account ID
+            _accountID = Encoding.UTF8.GetString(blockdata, 16, 16);
+            break;
+          case 3: // List Definition
+            ParseListDefinition(blockdata);
+            break;
+          case 4: // Trophy Info
+            _types.Add(blockdata.ToStruct<TrophyType>());
+            break;
+          case 5: // List Info
+            _listInfo = blockdata.ToStruct<ListInfo>();
+            break;
+          case 6: // Timestamps
+            _timestamps.Add(blockdata.ToStruct<Timestamp>());
+            break;
+          case 7: // Achieved Stats
+            _achievedStats = blockdata.ToStruct<AchievedStats>();
+            break;
+          case 8: // Unknown Hash
+            _unknownHash = blockdata.SubArray(0, 20);
+            break;
+          case 9: // Unknown, "some number of platinum trophy"
+            break;
+          case 10: // Padding
+            break;
+        }
+
+      } while (reader.BaseStream.Position < reader.BaseStream.Length);
+    } // ParseBlocks
+
+    private void ParseListDefinition(byte[] blockdata)
+    {
+      _listID = Encoding.UTF8.GetString(blockdata, 0, 16).Trim('\0');
+      short u1 = BitConverter.ToInt16(blockdata, 16).ChangeEndian();
+      short u2 = BitConverter.ToInt16(blockdata, 18).ChangeEndian();
+      short u3 = BitConverter.ToInt16(blockdata, 20).ChangeEndian();
+      short u4 = BitConverter.ToInt16(blockdata, 22).ChangeEndian();
+      _trophyCount = BitConverter.ToInt32(blockdata, 24).ChangeEndian();
+      int u5 = BitConverter.ToInt32(blockdata, 28).ChangeEndian();
+      _completionRate[0] = BitConverter.ToUInt32(blockdata, 64);
+      _completionRate[1] = BitConverter.ToUInt32(blockdata, 68);
+      _completionRate[2] = BitConverter.ToUInt32(blockdata, 72);
+      _completionRate[3] = BitConverter.ToUInt32(blockdata, 76);
+    } // ParseListDefinition
+
+    #endregion File Parsing
+    #region Data Editing
+
+    private void UpdateTimestamp(int id, DateTime unlockTime)
+    {
+      Timestamp timestamp = _timestamps[id];
+      timestamp.Time = unlockTime;
+
+      if (!timestamp.IsEarned)
+      {
+        _listInfo.AchievedCount++;
+        _achievedStats.EarnedCount++;
+        timestamp.IsEarned = true;
+      }
+
+      timestamp.SyncState = (int)TrophySyncState.NotSynced;
+    } // UpdateTimestamp
+
+    private void ResetTimestamp(Timestamp timestamp)
+    {
+      timestamp.Time = new DateTime(0);
+
+      if (timestamp.IsEarned)
+      {
+        _listInfo.AchievedCount--;
+        _achievedStats.EarnedCount--;
+        timestamp.IsEarned = false;
+      }
+      
+      timestamp.SyncState = 0;
+    } // ResetTimestamp
+
+    private void UpdateRates(int id)
+    {
+      _listInfo.AchievementRate[id / 32] |= (uint)(1 << id).ChangeEndian();
+      _completionRate[id / 32] |= (uint)(1 << id);
+    } // UpdateRates
+
+    private void RemoveFromRates(int id)
+    {
+      _listInfo.AchievementRate[id / 32] &= 0xFFFFFFFF ^ (uint)(1 << id).ChangeEndian();
+      _completionRate[id / 32] &= 0xFFFFFFFF ^ (uint)(1 << id);
+    } // RemoveFromRates
+
+    private void UpdateListInfo(DateTime timestamp)
+    {
+      if (timestamp > _listInfo.LastAchievedTrophyTime)
+      {
+        _listInfo.LastAchievedTrophyTime = timestamp;
+        _listInfo.LastUpdated = timestamp;
+      }
+
+      if (_listInfo.DateAdded > timestamp)
+      {
+        _listInfo.DateAdded = timestamp.AddHours(-1);
+      }
+    } // UpdateListInfo
+
+    private void ResetListInfo(DateTime timestamp)
+    {
+      if (DateTime.Compare(CalcDateAdded(timestamp), _listInfo.DateAdded) == 0
+        || DateTime.Compare(timestamp, _listInfo.LastAchievedTrophyTime) == 0)
+      {
+        var orderedTimestamps = _timestamps
+          .Where(x => DateTime.Compare(x.Time, DateTime.MinValue) != 0)
+          .OrderBy(p => p.Time);
+
+        _listInfo.LastAchievedTrophyTime = orderedTimestamps.Last().Time;
+        _listInfo.DateAdded = CalcDateAdded(orderedTimestamps.First().Time);
+        _listInfo.LastUpdated = orderedTimestamps.Last().Time;
+      }
+    } // ResetListInfo
+
+    private DateTime CalcDateAdded(DateTime timestamp) => timestamp.AddHours(-1);
+
+    #endregion Data Ending
+    #region File Saving
+
+    private void SaveAccountInfo(BigEndianBinaryWriter writer)
+    {
+      TypeRecord accountIdRecord = _typeRecords[2];
+      writer.BaseStream.Position = accountIdRecord.Offset + 32;
+      writer.Write(_accountID.ToCharArray());
+    } // SaveAccountInfo
+
+    private void SaveListID(BigEndianBinaryWriter writer)
+    {
+      TypeRecord listIdRecord = _typeRecords[3];
+      writer.BaseStream.Position = listIdRecord.Offset + 16;
+      writer.Write(_listID.ToCharArray());
+    } // SaveListID
+
+    private void SaveTrophyInfo(BigEndianBinaryWriter writer)
+    {
+      TypeRecord trophyTypeRecord = _typeRecords[4];
+      writer.BaseStream.Position = trophyTypeRecord.Offset;
+
+      foreach (TrophyType type in _types)
+      {
+        writer.BaseStream.Position += 16;
+        writer.Write(type.StructToBytes());
+      }
+    } // SaveTrophyInfo
+
+    private void SaveListInfo(BigEndianBinaryWriter writer)
+    {
+      TypeRecord listInfoRecord = _typeRecords[5];
+      writer.BaseStream.Position = listInfoRecord.Offset + 16;
+      writer.Write(_listInfo.StructToBytes());
+    } // SaveListInfo
+
+    private void SaveTimestamps(BigEndianBinaryWriter writer)
+    {
+      TypeRecord timestampRecord = _typeRecords[6];
+      writer.BaseStream.Position = timestampRecord.Offset;
+
+      foreach (Timestamp time in _timestamps)
+      {
+        writer.BaseStream.Position += 16;
+        writer.Write(time.StructToBytes());
+      }
+    } // SaveTimestamps
+
+    private void SaveAchievedInfo(BigEndianBinaryWriter writer)
+    {
+      TypeRecord achievedRecord = _typeRecords[7];
+      writer.BaseStream.Position = achievedRecord.Offset + 16;
+      writer.Write(_achievedStats.StructToBytes());
+    } // SaveAchievedInfo
+
+    #endregion File Saving
     #endregion Private Methods
   } // TROPUSR
 } // TrophyParser
