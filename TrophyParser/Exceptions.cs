@@ -44,7 +44,6 @@ namespace TrophyParser
 
   public class TrophyNotFound : Exception
   {
-    public TrophyNotFound(string message) : base(message) { }
-    public TrophyNotFound() : base("Trophy ID not found.") { }
+    public TrophyNotFound(int id) : base($"Trophy {id} not found.") { }
   } // TrophyNotFound
 } // TrophyParser

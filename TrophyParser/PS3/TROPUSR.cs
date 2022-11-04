@@ -98,6 +98,11 @@ namespace TrophyParser.PS3
       Debug.WriteLine($"Unlocked trophy {id} in TROPUSR");
     } // UnlockTrophy
 
+    internal void ChangeTimestamp(int id, DateTime time)
+    {
+      UpdateTimestamp(id, time);
+    } // ChangeTimestamp
+
     public void LockTrophy(int id)
     {
       Timestamp timestamp = _timestamps[id];
@@ -108,9 +113,11 @@ namespace TrophyParser.PS3
       if (!timestamp.IsEarned)
         throw new AlreadyLockedException(timestamp.ID);
 
-      ResetListInfo(timestamp.Time);
+      DateTime removedTimestamp = timestamp.Time;
+
       ResetTimestamp(timestamp);
       RemoveFromRates(id);
+      ResetListInfo(removedTimestamp);
 
       Debug.WriteLine($"Locked trophy {id} in TROPUSR");
     } // LockTrophy
@@ -245,16 +252,15 @@ namespace TrophyParser.PS3
     private void ResetTimestamp(Timestamp timestamp)
     {
       timestamp.Time = new DateTime(0);
+
       if (timestamp.IsEarned)
       {
         _listInfo.AchievedCount--;
         _achievedStats.EarnedCount--;
-      }
-      else
-      {
         timestamp.IsEarned = false;
-        timestamp.SyncState = 0;
       }
+      
+      timestamp.SyncState = 0;
     } // ResetTimestamp
 
     private void UpdateRates(int id)

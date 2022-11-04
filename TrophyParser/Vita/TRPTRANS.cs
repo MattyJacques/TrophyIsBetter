@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using static TrophyParser.Structs;
+using TrophyParser.Models;
 
 namespace TrophyParser.Vita
 {
@@ -19,7 +19,7 @@ namespace TrophyParser.Vita
     private BinaryReader _reader;
     private BinaryWriter _writer;
     private const int _pointer = 0x377;
-    public List<Timestamp> _timestamps = new List<Timestamp>();
+    private List<Timestamp> _timestamps = new List<Timestamp>();
     private string _path;
 
     #endregion Private Members
@@ -66,23 +66,19 @@ namespace TrophyParser.Vita
 
     public void UnlockTrophy(int id, string rank, DateTime time)
     {
-      Timestamp timestamp = _timestamps[id];
-      timestamp.Type = GetTrophyType(rank);
-      timestamp.Time = time;
-      timestamp.Unknown = 0x50;
-
-      _timestamps[id] = timestamp;
+      _timestamps[id].Type = GetTrophyType(rank);
+      _timestamps[id].Time = time;
+      _timestamps[id].Unknown = 0x50;
 
       Debug.WriteLine($"Unlocked trophy {id} in TRPTRANS");
     } // UnlockTrophy
 
+    internal void ChangeTimestamp(int id, DateTime time) => _timestamps[id].Time = time;
+
     internal void LockTrophy(int id)
     {
-      Timestamp timestamp = _timestamps[id];
-      timestamp.Type = 0x00;
-      timestamp.Time = null;
-
-      //_timestamps[id] = timestamp;
+      _timestamps[id].Type = 0x00;
+      _timestamps[id].Time = null;
 
       Debug.WriteLine($"Locked trophy {id} in TRPTRANS");
     } // LockTrophy

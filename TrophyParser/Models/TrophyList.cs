@@ -36,15 +36,10 @@ namespace TrophyParser
     #region Public Abstract Methods
 
     public abstract void UnlockTrophy(int id, DateTime time);
+    public abstract void ChangeTimestamp(int id, DateTime time);
     public abstract void LockTrophy(int id);
     public abstract void Save();
 
     #endregion Public Abstract Methods
-    #region Public Methods
-
-    public void UnlockTrophy(Trophy trophy, DateTime time) => UnlockTrophy(trophy.ID, time);
-    public void LockTrophy(Trophy trophy) => LockTrophy(trophy.ID);
-
-    #endregion Public Methods
   } // TrophyList
 } // TrophyParser

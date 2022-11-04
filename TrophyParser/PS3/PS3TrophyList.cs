@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using TrophyParser.Models;
 using static TrophyParser.Enums;
-using static TrophyParser.Structs;
 
 namespace TrophyParser.PS3
 {
@@ -68,6 +68,15 @@ namespace TrophyParser.PS3
       _trns.AddTrophy(id, _usr.TrophyTypes[id].Type, time);
       _trophies[id].Timestamp = new Timestamp { Time = time, IsSynced = false };
     } // UnlockTrophy
+
+    public override void ChangeTimestamp(int id, DateTime time)
+    {
+      Debug.WriteLine($"Changing timestamp of {Name} (PS3) - {_trophies[id].Name} to: {time}");
+
+      _usr.ChangeTimestamp(id, time);
+      _trns.ChangeTimestamp(id, time);
+      _trophies[id].Timestamp = new Timestamp { Time = time, IsSynced = false };
+    }
 
     public override void LockTrophy(int id)
     {

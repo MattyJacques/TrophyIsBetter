@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Input;
 using TrophyIsBetter.Interfaces;
 using TrophyIsBetter.Models;
 using TrophyIsBetter.Views;
@@ -117,14 +116,34 @@ namespace TrophyIsBetter.ViewModels
       {
         DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
 
-        _model.UnlockTrophy(SelectedTrophy.Model, timestamp);
+        if (SelectedTrophy.Achieved)
+        {
+          _model.ChangeTimestamp(SelectedTrophy.Model, timestamp);
+        }
+        else
+        {
+          _model.UnlockTrophy(SelectedTrophy.Model, timestamp);
+          SelectedTrophy.Achieved = true;
+        }
+
         SelectedTrophy.Timestamp = timestamp;
+
+        LockTrophyCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(LastTimestamp));
+        OnPropertyChanged(nameof(Progress));
       }
     } // EditTrophy
 
     public void LockTrophy()
     {
       _model.LockTrophy(SelectedTrophy.Model);
+      SelectedTrophy.Timestamp = DateTime.MinValue;
+      SelectedTrophy.Achieved = false;
+
+      LockTrophyCommand.NotifyCanExecuteChanged();
+      OnPropertyChanged(nameof(LastTimestamp));
+      OnPropertyChanged(nameof(Progress));
+
     } // LockTrophy
 
     public void ChangeViewToHome()

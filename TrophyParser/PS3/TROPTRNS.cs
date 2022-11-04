@@ -58,39 +58,38 @@ namespace TrophyParser.PS3
     {
       EarnedInfo timestamp = new EarnedInfo(id, trophyType, unlockTime);
 
-      // Check to see if a synced trophy has a later timestamp
-      int insertPoint;
-      for (insertPoint = 0; insertPoint < _timestamps.Count; insertPoint++)
-      {
-        if (DateTime.Compare(_timestamps[insertPoint].Time, unlockTime) > 0)
-        {
-          if (_timestamps[insertPoint].IsSynced)
-          {
-            throw new SyncTimeException(_timestamps[insertPoint].Time);
-          }
-          break;
-        }
-      }
-
-      _timestamps.Insert(insertPoint, timestamp);
+      InsertTimestamp(timestamp);
       _earnedCount++;
 
       Debug.WriteLine($"Added trophy {id} in TROPTRNS");
     } // AddTrophy
 
+    internal void ChangeTimestamp(int id, DateTime time)
+    {
+      int oldIndex = _timestamps.FindIndex(x => x.TrophyID == id);
+
+      if (oldIndex == -1)
+        throw new TrophyNotFound(id);
+
+      EarnedInfo timestamp = _timestamps[oldIndex];
+
+      if (timestamp.IsSynced)
+        throw new AlreadySyncedException(timestamp.TrophyID);
+
+      _timestamps.RemoveAt(oldIndex);
+
+      InsertTimestamp(timestamp);
+    } // ChangeTimestamp
+
     public void RemoveTrophy(int id)
     {
       EarnedInfo timestamp = _timestamps.Find(x => x.TrophyID == id);
 
-      if (!timestamp.IsSynced)
-      {
-        _timestamps.Remove(timestamp);
-        _earnedCount--;
-      }
-      else
-      {
+      if (timestamp.IsSynced)
         throw new AlreadySyncedException(timestamp.TrophyID);
-      }
+
+      _timestamps.Remove(timestamp);
+      _earnedCount--;
 
       Debug.WriteLine($"Removed trophy {id} from TROPTRNS");
     } // RemoveTrophy
@@ -239,6 +238,27 @@ namespace TrophyParser.PS3
     } // SaveTrophyInfo
 
     #endregion File Saving
+
+    private void InsertTimestamp(EarnedInfo timestamp)
+    {
+      int insertPoint;
+
+      for (insertPoint = 0; insertPoint < _timestamps.Count; insertPoint++)
+      {
+        if (DateTime.Compare(_timestamps[insertPoint].Time, timestamp.Time) > 0)
+        {
+          if (_timestamps[insertPoint].IsSynced)
+          {
+            throw new SyncTimeException(_timestamps[insertPoint].Time);
+          }
+
+          break;
+        }
+      }
+
+      _timestamps.Insert(insertPoint, timestamp);
+    } // InsertTimestamp()
+
     #endregion  Private Members
   } // TROPTRNS
 } // TrophyParser

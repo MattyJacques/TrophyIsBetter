@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Runtime.CompilerServices;
 using TrophyIsBetter.Interfaces;
 using TrophyParser;
-using TrophyParser.Models;
 using TrophyParser.PS3;
 using TrophyParser.Vita;
 using static TrophyParser.Enums;
@@ -62,7 +59,13 @@ namespace TrophyIsBetter.Models
       HasUnsavedChanges = true;
     } // UnlockTrophy
 
-    internal void LockTrophy(Trophy trophy)
+    public void ChangeTimestamp(Trophy trophy, DateTime timestamp)
+    {
+      _trophyList.ChangeTimestamp(trophy.ID, timestamp);
+      HasUnsavedChanges = true;
+    } // ChangeTimestamp
+
+    public void LockTrophy(Trophy trophy)
     {
       _trophyList.LockTrophy(trophy.ID);
       HasUnsavedChanges = true;

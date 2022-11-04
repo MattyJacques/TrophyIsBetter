@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using static TrophyParser.Structs;
 
 namespace TrophyParser.Models
 {
@@ -12,7 +11,7 @@ namespace TrophyParser.Models
     public string Name;
     public string Detail;
     public int Gid;
-    public Timestamp? Timestamp;
+    public Timestamp Timestamp;
 
     public Trophy(int id, string hidden, string rank, int pid, string name, string detail, int gid)
     {

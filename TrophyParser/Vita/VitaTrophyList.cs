@@ -59,6 +59,12 @@ namespace TrophyParser.Vita
       _title.UnlockTrophy(id, time);
     } // Unlock Trophy
 
+    public override void ChangeTimestamp(int id, DateTime time)
+    {
+      _trans.ChangeTimestamp(id, time);
+      _title.ChangeTimestamp(id, time);
+    } // ChaneTimestamp
+
     public override void LockTrophy(int id)
     {
       Debug.WriteLine($"Locking {Name} (Vita) - {_trophies[id].Name}");

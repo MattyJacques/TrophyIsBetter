@@ -64,6 +64,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Interfaces\ITrophyList.cs" />
+    <Compile Include="Models\Timestamp.cs" />
     <Compile Include="Models\Trophy.cs" />
     <Compile Include="PS3\DataParsing.cs" />
     <Compile Include="Exceptions.cs" />
@@ -75,7 +76,6 @@
     <Compile Include="PS3\TROPTRNS.cs" />
     <Compile Include="PS3\TROPUSR.cs" />
     <Compile Include="Models\SFM.cs" />
-    <Compile Include="Structs.cs" />
     <Compile Include="Models\TrophyList.cs" />
     <Compile Include="Vita\TROP.cs" />
     <Compile Include="Vita\TRPTITLE.cs" />

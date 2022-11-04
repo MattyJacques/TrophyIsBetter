@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using static TrophyParser.Structs;
+using TrophyParser.Models;
 
 namespace TrophyParser.Vita
 {
@@ -134,26 +134,21 @@ namespace TrophyParser.Vita
 
     public void UnlockTrophy(int id, DateTime time)
     {
-      Timestamp timestamp = _timestamps[id];
-      timestamp.Time = time;
-      timestamp.Unknown = 0x50;
-
-      _timestamps[id] = timestamp;
+      _timestamps[id].Time = time;
+      _timestamps[id].Unknown = 0x50;
 
       Debug.WriteLine($"Unlocked trophy {id} in TRPTITLE");
     } // UnlockTrophy
+
+    internal void ChangeTimestamp(int id, DateTime time) => _timestamps[id].Time = time;
 
     internal void LockTrophy(int id)
     {
       if (_timestamps[id].IsSynced)
         throw new Exception("Can't delete sync trophies");
 
-      Timestamp timestamp = _timestamps[id];
-
-      timestamp.Time = null;
-      timestamp.Type = 0;
-
-      //_timestamps[id] = timestamp;
+      _timestamps[id].Time = null;
+      _timestamps[id].Type = 0;
 
       Debug.WriteLine($"Locked trophy {id} in TRPTITLE");
     } // LockTrophy

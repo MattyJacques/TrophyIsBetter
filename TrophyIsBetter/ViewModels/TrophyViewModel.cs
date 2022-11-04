@@ -28,7 +28,15 @@ namespace TrophyIsBetter.ViewModels
     public string Type { get => _model.Type; }
     public string Group { get => _model.Group; }
     public bool Hidden { get => _model.Hidden; }
-    public bool Achieved { get => _model.Achieved; }
+    public bool Achieved
+    {
+      get => _model.Achieved;
+      set
+      {
+        _model.Achieved = value;
+        OnPropertyChanged();
+      }
+    }
     public bool Synced { get => _model.Synced; }
     public DateTime Timestamp
     {

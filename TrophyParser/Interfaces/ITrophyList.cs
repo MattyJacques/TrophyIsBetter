@@ -1,5 +1,4 @@
-﻿using static TrophyParser.Structs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using TrophyParser.Models;
 using static TrophyParser.Enums;
@@ -22,9 +21,8 @@ namespace TrophyParser.Interfaces
     List<Trophy> Trophies { get; }
 
     void UnlockTrophy(int id, DateTime time);
-    void UnlockTrophy(Trophy trophy, DateTime time);
+    void ChangeTimestamp(int id, DateTime time);
     void LockTrophy(int id);
-    void LockTrophy(Trophy trophy);
     void Save();
   } // ITrophyList
 } // TrophyParser.Interfaces
