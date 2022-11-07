@@ -20,11 +20,11 @@
     <StackPanel x:Name="PickerPanel"
                 Orientation="Horizontal">
       <DatePicker SelectedDate="{Binding Timestamp}"
-                  Width="80"/>
+                  Width="90"/>
       <materialDesign:TimePicker SelectedTime="{Binding Timestamp}"
                                  Is24Hours="True"
                                  WithSeconds="True"
-                                 Width="80"
+                                 Width="75"
                                  Margin="10,0,0,0"/>
     </StackPanel>
 
