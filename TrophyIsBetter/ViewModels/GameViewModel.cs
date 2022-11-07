@@ -19,6 +19,7 @@ namespace TrophyIsBetter.ViewModels
     private Game _model;
     private ObservableCollection<TrophyViewModel> _trophyCollection = new ObservableCollection<TrophyViewModel>();
     private CollectionView _trophyCollectionView;
+    private DateTime? _lastUsedTimestamp = null;
 
     #endregion Private Members
     #region Constructors
@@ -107,7 +108,7 @@ namespace TrophyIsBetter.ViewModels
     {
       EditTimestampWindow window = new EditTimestampWindow
       {
-        DataContext = new EditTimestampViewModel()
+        DataContext = new EditTimestampViewModel(_lastUsedTimestamp ?? DateTime.Now)
       };
 
       bool? result = window.ShowDialog();
@@ -127,6 +128,7 @@ namespace TrophyIsBetter.ViewModels
         }
 
         SelectedTrophy.Timestamp = timestamp;
+        _lastUsedTimestamp = timestamp;
 
         LockTrophyCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(LastTimestamp));

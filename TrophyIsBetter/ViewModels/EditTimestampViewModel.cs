@@ -8,9 +8,17 @@ namespace TrophyIsBetter.ViewModels
   {
     #region Private Members
 
-    private DateTime _timestamp = DateTime.Now;
+    private DateTime _timestamp;
 
     #endregion Private Members
+    #region Constructors
+
+    public EditTimestampViewModel(DateTime startTimestamp)
+    {
+      Timestamp = startTimestamp;
+    } // Constructor
+
+    #endregion Constructors
     #region Public Properties
 
     /// <summary>
