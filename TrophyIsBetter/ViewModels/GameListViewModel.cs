@@ -30,6 +30,7 @@ namespace TrophyIsBetter.ViewModels
       _model = model;
 
       ImportCommand = new RelayCommand(Import);
+      EditGameCommand = new RelayCommand(EditGame);
 
       GameCollectionView.CurrentChanged += OnSelectedGameChanged;
 
@@ -43,6 +44,11 @@ namespace TrophyIsBetter.ViewModels
     /// Import a single trophy folder or a directory containing multiple
     /// </summary>
     public RelayCommand ImportCommand { get; set; }
+
+    /// <summary>
+    /// Edit a games trophies
+    /// </summary>
+    public RelayCommand EditGameCommand { get; set; }
 
     /// <summary>
     /// Get/Set the list of games
@@ -102,6 +108,15 @@ namespace TrophyIsBetter.ViewModels
         ImportDirectory(path);
       }
     } // Import
+
+    /// <summary>
+    /// Switch page to the single game view
+    /// </summary>
+    public void EditGame()
+    {
+      ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
+        .ChangePageCommand.Execute(SelectedGame);
+    } // EditGame
 
     /// <summary>
     /// Save files and close the directory
