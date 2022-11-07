@@ -32,8 +32,7 @@
       <Button Content="{materialDesign:PackIcon Pencil}"
               ToolTip="Edit Game"
               IsEnabled="{Binding CanEdit}"
-              Command="{Binding DataContext.ChangePageCommand,
-                                RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+              Command="{Binding EditGameCommand}"
               CommandParameter="{Binding GameCollectionView.CurrentItem}"
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="auto"
@@ -53,17 +52,29 @@
               CanUserAddRows="False" 
               SelectionMode="Single"
               IsTextSearchEnabled="True"
-              TextSearch.TextPath="Name" >
+              TextSearch.TextPath="Name">
 
-      <DataGrid.CellStyle>
-        <Style TargetType="DataGridCell"
-               BasedOn="{StaticResource {x:Type DataGridCell}}" >
-          <Setter Property="BorderThickness" Value="0"/>
-        </Style>
-      </DataGrid.CellStyle>
+      <DataGrid.Resources>
+        <SolidColorBrush x:Key="MaterialDesignTextBoxBorder" Color="Transparent"/>
+      </DataGrid.Resources>
+
+      <DataGrid.InputBindings>
+        <MouseBinding
+            MouseAction="LeftDoubleClick"
+            Command="{Binding EditGameCommand}"
+                    CommandParameter="{Binding GameCollectionView.CurrentItem}" />
+      </DataGrid.InputBindings>
+
+      <DataGrid.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="Edit"
+                    Icon="{materialDesign:PackIcon Pencil}"
+                    Command="{Binding EditGameCommand}"
+                    CommandParameter="{Binding GameCollectionView.CurrentItem}" />
+        </ContextMenu>
+      </DataGrid.ContextMenu>
 
       <DataGrid.Columns>
-
         <DataGridTemplateColumn Header="Icon"
                                 Width="SizeToCells"
                                 IsReadOnly="True">

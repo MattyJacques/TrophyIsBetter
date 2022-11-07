@@ -69,12 +69,9 @@
               IsTextSearchEnabled="True"
               TextSearch.TextPath="Name" >
 
-      <DataGrid.CellStyle>
-        <Style TargetType="DataGridCell"
-               BasedOn="{StaticResource {x:Type DataGridCell}}" >
-          <Setter Property="BorderThickness" Value="0"/>
-        </Style>
-      </DataGrid.CellStyle>
+      <DataGrid.Resources>
+        <SolidColorBrush x:Key="MaterialDesignTextBoxBorder" Color="Transparent"/>
+      </DataGrid.Resources>
 
       <DataGrid.InputBindings>
         <MouseBinding
