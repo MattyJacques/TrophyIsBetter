@@ -51,7 +51,9 @@
               IsSynchronizedWithCurrentItem="True"
               AutoGenerateColumns="False"
               CanUserAddRows="False" 
-              SelectionMode="Single" >
+              SelectionMode="Single"
+              IsTextSearchEnabled="True"
+              TextSearch.TextPath="Name" >
 
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell"

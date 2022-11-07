@@ -65,7 +65,9 @@
               IsSynchronizedWithCurrentItem="True"
               AutoGenerateColumns="False"
               CanUserAddRows="False"
-              SelectionMode="Single" >
+              SelectionMode="Single"
+              IsTextSearchEnabled="True"
+              TextSearch.TextPath="Name" >
 
       <DataGrid.CellStyle>
         <Style TargetType="DataGridCell"
@@ -85,7 +87,7 @@
                                 Width="SizeToCells"
                                 IsReadOnly="True"
                                 Visibility="{Binding DataContext.IconVisibility,
-                                                     Source={x:Reference IconColVisibility}}">
+                                                     Source={x:Reference IconColVisibility}}" >
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <Image Source="{Binding Icon}"
