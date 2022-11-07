@@ -116,7 +116,7 @@ namespace TrophyIsBetter.Models
     /// <summary>
     /// Get a list of trophy directories from the given path
     /// </summary>
-    public static List<string> GetDirectories(string rootPath)
+    public static IEnumerable<string> GetDirectories(string rootPath)
     {
       var result = from dir
                    in Directory.EnumerateDirectories(rootPath, "*",
@@ -132,7 +132,7 @@ namespace TrophyIsBetter.Models
         };
       }
 
-      return (List<string>)result;
+      return result;
     } // GetDirectories
 
     /// <summary>
