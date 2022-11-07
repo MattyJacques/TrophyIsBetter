@@ -298,9 +298,17 @@ namespace TrophyParser.PS3
           .Where(x => DateTime.Compare(x.Time, DateTime.MinValue) != 0)
           .OrderBy(p => p.Time);
 
-        _listInfo.LastAchievedTrophyTime = orderedTimestamps.Last().Time;
-        _listInfo.DateAdded = CalcDateAdded(orderedTimestamps.First().Time);
-        _listInfo.LastUpdated = orderedTimestamps.Last().Time;
+        if (orderedTimestamps.Any())
+        {
+          _listInfo.LastAchievedTrophyTime = orderedTimestamps.Last().Time;
+          _listInfo.DateAdded = CalcDateAdded(orderedTimestamps.First().Time);
+          _listInfo.LastUpdated = orderedTimestamps.Last().Time;
+        }
+        else
+        {
+          _listInfo.LastAchievedTrophyTime = DateTime.MinValue;
+          _listInfo.LastUpdated = DateTime.Now;
+        }
       }
     } // ResetListInfo
 
