@@ -124,8 +124,7 @@ namespace TrophyIsBetter.Models
           Group = trophy.Gid == 0 ? "BaseGame" : $"DLC{trophy.Gid}",
           Achieved = trophy.Timestamp?.IsEarned != false,
           Synced = trophy.Timestamp?.IsSynced != false,
-          Timestamp =
-            trophy.Timestamp?.Time != null ? (DateTime)trophy.Timestamp?.Time : DateTime.MinValue
+          Timestamp = trophy.Timestamp?.Time
         };
 
         result.Add(convertedTrophy);
