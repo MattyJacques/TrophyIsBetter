@@ -31,9 +31,16 @@
               HorizontalAlignment="Left" />
       <Button Content="{materialDesign:PackIcon Pencil}"
               ToolTip="Edit Game"
-              IsEnabled="{Binding CanEdit}"
+              IsEnabled="{Binding HasSelected}"
               Command="{Binding EditGameCommand}"
-              CommandParameter="{Binding GameCollectionView.CurrentItem}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="auto"
+              Width="60"
+              HorizontalAlignment="Left" />
+      <Button Content="{materialDesign:PackIcon FileExport}"
+              ToolTip="Export Game"
+              IsEnabled="{Binding HasSelected}"
+              Command="{Binding ExportGameCommand}"
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="auto"
               Width="60"
@@ -61,16 +68,17 @@
       <DataGrid.InputBindings>
         <MouseBinding
             MouseAction="LeftDoubleClick"
-            Command="{Binding EditGameCommand}"
-                    CommandParameter="{Binding GameCollectionView.CurrentItem}" />
+            Command="{Binding EditGameCommand}" />
       </DataGrid.InputBindings>
 
       <DataGrid.ContextMenu>
         <ContextMenu>
           <MenuItem Header="Edit"
                     Icon="{materialDesign:PackIcon Pencil}"
-                    Command="{Binding EditGameCommand}"
-                    CommandParameter="{Binding GameCollectionView.CurrentItem}" />
+                    Command="{Binding EditGameCommand}" />
+          <MenuItem Header="Export"
+                    Icon="{materialDesign:PackIcon FileExport}"
+                    Command="{Binding ExportGameCommand}" />
         </ContextMenu>
       </DataGrid.ContextMenu>
 

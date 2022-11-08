@@ -26,6 +26,11 @@ namespace TrophyIsBetter.Interfaces
     void Save();
 
     /// <summary>
+    /// Encrypt and export game data
+    /// </summary>
+    void Export(string exportPath);
+
+    /// <summary>
     /// Reload the data from file
     /// </summary>
     void Reload();
