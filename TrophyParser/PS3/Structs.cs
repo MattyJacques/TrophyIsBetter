@@ -3,10 +3,10 @@ using System.Text;
 
 namespace TrophyParser.PS3
 {
-  enum TropSyncState
+  enum TrophySyncState
   {
-    Sync = 0x100,
-    NotSync = 0x100000
+    Synced = 0x100,
+    NotSynced = 0x100000
   }
   public enum TropType
   {
@@ -331,7 +331,7 @@ namespace TrophyParser.PS3
       /// int
       public int SyncState;
 
-      public bool IsSync => (SyncState & (int)TropSyncState.Sync) == (int)TropSyncState.Sync;
+      public bool IsSynced => (SyncState & (int)TrophySyncState.Synced) == (int)TrophySyncState.Synced;
 
       /// int
       public int Unknown2;

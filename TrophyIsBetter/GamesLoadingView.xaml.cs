@@ -23,7 +23,7 @@ namespace TrophyIsBetter
 
     public bool IsFinished = false;
     public string LoadedPath;
-    internal ObservableCollection<GameListEntry> GameCollection = new ObservableCollection<GameListEntry>();
+    internal ObservableCollection<Game> GameCollection = new ObservableCollection<Game>();
 
     #endregion
     #region Private Members
@@ -58,7 +58,7 @@ namespace TrophyIsBetter
       {
         string folder = trophyFolders[i];
 
-        GameListEntry list = new GameListEntry(folder);
+        Game list = new Game(folder);
 
         GameCollection.Add(list);
 

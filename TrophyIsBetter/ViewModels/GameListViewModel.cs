@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Input;
 using TrophyIsBetter.Interfaces;
 using TrophyIsBetter.Models;
 
@@ -18,9 +17,8 @@ namespace TrophyIsBetter.ViewModels
     private readonly IGameListModel _model;
     private string _name = "Games";
 
-    private ObservableCollection<GameListEntryViewModel> _gameCollection = new ObservableCollection<GameListEntryViewModel>();
+    private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
     private CollectionView _gameCollectionView = null;
-    private GameListEntryViewModel _selectedEntry = null;
 
     private bool _isOpen = false;
 
@@ -32,6 +30,10 @@ namespace TrophyIsBetter.ViewModels
       _model = model;
 
       ImportCommand = new RelayCommand(Import);
+      EditGameCommand = new RelayCommand(EditGame);
+      ExportGameCommand = new RelayCommand(ExportGame);
+
+      GameCollectionView.CurrentChanged += OnSelectedGameChanged;
 
       LoadGames();
     } // GameListViewModel
@@ -40,20 +42,27 @@ namespace TrophyIsBetter.ViewModels
     #region Public Properties
 
     /// <summary>
-    /// Open a single trophy folder or a directory containing multiple
+    /// Import a single trophy folder or a directory containing multiple
     /// </summary>
-    public ICommand ImportCommand { get; set; }
+    public RelayCommand ImportCommand { get; set; }
+
+    /// <summary>
+    /// Edit a games trophies
+    /// </summary>
+    public RelayCommand EditGameCommand { get; set; }
+
+    /// <summary>
+    /// Encrypt the files and export the game
+    /// </summary>
+    public RelayCommand ExportGameCommand { get; set; }
 
     /// <summary>
     /// Get/Set the list of games
     /// </summary>
-    public ObservableCollection<GameListEntryViewModel> GameCollection
+    public ObservableCollection<GameViewModel> GameCollection
     {
       get => _gameCollection;
-      private set
-      {
-        SetProperty(ref _gameCollection, value);
-      }
+      private set => SetProperty(ref _gameCollection, value);
     }
 
     /// <summary>
@@ -71,6 +80,17 @@ namespace TrophyIsBetter.ViewModels
         return _gameCollectionView;
       }
     }
+
+    /// <summary>
+    /// Get the selected game from the list
+    /// </summary>
+    /// 
+    public GameViewModel SelectedGame => (GameViewModel)GameCollectionView.CurrentItem;
+
+    /// <summary>
+    /// Is a game selected
+    /// </summary>
+    public bool HasSelected => SelectedGame != null;
 
     /// <summary>
     /// The name of the view model
@@ -93,6 +113,36 @@ namespace TrophyIsBetter.ViewModels
     } // Import
 
     /// <summary>
+    /// Switch page to the single game view
+    /// </summary>
+    public void EditGame()
+    {
+      ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
+        .ChangePageCommand.Execute(SelectedGame);
+    } // EditGame
+
+    /// <summary>
+    /// Encrypt the files and export
+    /// </summary>
+    public void ExportGame()
+    {
+      string path = ChoosePath();
+      if (!string.IsNullOrEmpty(path))
+      {
+        try
+        {
+          SelectedGame.Model.Export(path);
+        }
+        catch (Exception ex)
+        {
+          GC.Collect();
+          Console.WriteLine(ex.StackTrace);
+          MessageBox.Show("Export Failed:" + ex.Message);
+        }
+      }
+    } // ExportGame
+
+    /// <summary>
     /// Save files and close the directory
     /// </summary>
     public void CloseDirectory()
@@ -105,6 +155,14 @@ namespace TrophyIsBetter.ViewModels
 
     #endregion Public Methods
     #region Private Methods
+
+    /// <summary>
+    /// Notify that the selected game has changed
+    /// </summary>
+    private void OnSelectedGameChanged(object sender, EventArgs e)
+    {
+      OnPropertyChanged(nameof(HasSelected));
+    } // OnSelectedGameChanged
 
     /// <summary>
     /// Choose path to import
@@ -145,15 +203,15 @@ namespace TrophyIsBetter.ViewModels
     /// </summary>
     private void LoadGames()
     {
-      List<GameListEntry> games = _model.LoadGames();
+      List<Game> games = _model.LoadGames();
 
       if (games != null)
       {
         GameCollection.Clear();
 
-        foreach (GameListEntry entry in games)
+        foreach (Game entry in games)
         {
-          GameCollection.Add(new GameListEntryViewModel(entry));
+          GameCollection.Add(new GameViewModel(entry));
         }
       }
 

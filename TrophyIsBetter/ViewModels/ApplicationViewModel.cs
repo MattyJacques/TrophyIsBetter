@@ -15,47 +15,31 @@ namespace TrophyIsBetter.ViewModels
     #region Private Members
 
     private readonly List<IPageViewModel> _pageViewModels = new List<IPageViewModel>();
-    private ICommand _changePageCommand;
 
     private IPageViewModel _currentPageViewModel;
 
     #endregion Private Members
-
     #region Public Constructors
 
     public ApplicationViewModel()
     {
       WindowClosing = new RelayCommand<CancelEventArgs>(OnWindowClosing);
 
-      GameList gameListModel = new GameList();
+      ChangePageCommand = new RelayCommand<IPageViewModel>(p => ChangeViewModel(p));
+      ChangePageToHomeCommand = new RelayCommand(ChangePageToGameList);
 
       // Add available pages
-      PageViewModels.Add(new GameListViewModel(gameListModel));
+      PageViewModels.Add(new GameListViewModel(new GameList()));
 
-      // Set starting page
-      CurrentPageViewModel = PageViewModels[0];
-    }
+      ChangePageToGameList();
+    } // Constructor
 
     #endregion Public Constructors
-
     #region Public Properties
 
-    /// <summary>
-    /// Command to change to the view of the window
-    /// </summary>
-    public ICommand ChangePageCommand
-    {
-      get
-      {
-        if (_changePageCommand == null)
-        {
-          _changePageCommand = new RelayCommand<IPageViewModel>(p => ChangeViewModel(p),
-                                                                p => p is IPageViewModel);
-        }
+    public ICommand ChangePageCommand { get; set; }
 
-        return _changePageCommand;
-      }
-    }
+    public ICommand ChangePageToHomeCommand { get; set; }
 
     public IPageViewModel CurrentPageViewModel
     {
@@ -68,7 +52,6 @@ namespace TrophyIsBetter.ViewModels
     public ICommand WindowClosing { get; private set; }
 
     #endregion Public Properties
-
     #region Private Methods
 
     /// <summary>
@@ -77,13 +60,24 @@ namespace TrophyIsBetter.ViewModels
     /// <param name="viewModel">View model to change to</param>
     private void ChangeViewModel(IPageViewModel viewModel)
     {
-      if (!PageViewModels.Contains(viewModel))
+      if (viewModel != null)
       {
-        PageViewModels.Add(viewModel);
-      }
+        if (!PageViewModels.Contains(viewModel))
+        {
+          PageViewModels.Add(viewModel);
+        }
 
-      CurrentPageViewModel = PageViewModels.FirstOrDefault(vm => vm == viewModel);
+        CurrentPageViewModel = PageViewModels.FirstOrDefault(vm => vm == viewModel);
+      }
     } // ChangeViewModel
+
+    /// <summary>
+    /// Change the ViewModel to the Game List ViewModel
+    /// </summary>
+    private void ChangePageToGameList()
+    {
+      ChangePageCommand.Execute(PageViewModels[0]);
+    } // ChangePageToGameList
 
     /// <summary>
     /// Confirm exit of the application

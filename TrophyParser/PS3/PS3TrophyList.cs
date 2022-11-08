@@ -1,5 +1,7 @@
 ﻿using System;
-using static TrophyParser.Structs;
+using System.Diagnostics;
+using TrophyParser.Models;
+using static TrophyParser.Enums;
 
 namespace TrophyParser.PS3
 {
@@ -27,14 +29,14 @@ namespace TrophyParser.PS3
       for (int i = 0; i < TrophyCount; ++i)
       {
         var trophy = _conf[i];
-        var trophyInfo = _trns[i];
-        if (trophyInfo.HasValue)
+        var trophyInfo = _usr[i];
+        if (trophyInfo.HasValue && trophyInfo.Value.IsEarned)
         {
-          trophy.Timestamp = new Timestamp { Time = trophyInfo.Value.Time, Synced = trophyInfo.Value.IsSynced };
+          trophy.Timestamp = new Timestamp { Time = trophyInfo.Value.Time, IsSynced = trophyInfo.Value.IsSynced };
         }
         else
         {
-          trophy.Timestamp = new Timestamp { Time = null, Synced = false };
+          trophy.Timestamp = new Timestamp { Time = null, IsSynced = false };
         }
         _trophies.Add(trophy);
       }
@@ -46,7 +48,7 @@ namespace TrophyParser.PS3
     public override string Icon => $"{_path}\\ICON0.PNG";
     public override string Name => _conf.TitleName;
     public override string NpCommID => _conf.NpCommID;
-    public override string Platform => "PS3";
+    public override PlatformEnum Platform => PlatformEnum.PS3;
     public override bool HasPlatinum => _conf.HasPlatinum;
     public override bool IsSynced => _trns.IsSynced;
     public override int TrophyCount => _conf.TrophyCount;
@@ -56,5 +58,43 @@ namespace TrophyParser.PS3
     public override DateTime? LastSyncedTimestamp => _usr.LastSyncedTimestamp;
 
     #endregion Public Properties
+    #region Public Methods
+
+    public override void UnlockTrophy(int id, DateTime time)
+    {
+      Debug.WriteLine($"Unlocking {Name} (PS3) - {_trophies[id].Name} with timestamp: {time}");
+
+      _usr.UnlockTrophy(id, time);
+      _trns.AddTrophy(id, _usr.TrophyTypes[id].Type, time);
+      _trophies[id].Timestamp = new Timestamp { Time = time, IsSynced = false };
+    } // UnlockTrophy
+
+    public override void ChangeTimestamp(int id, DateTime time)
+    {
+      Debug.WriteLine($"Changing timestamp of {Name} (PS3) - {_trophies[id].Name} to: {time}");
+
+      _usr.ChangeTimestamp(id, time);
+      _trns.ChangeTimestamp(id, time);
+      _trophies[id].Timestamp = new Timestamp { Time = time, IsSynced = false };
+    }
+
+    public override void LockTrophy(int id)
+    {
+      Debug.WriteLine($"Locking {Name} (PS3) - {_trophies[id].Name}");
+
+      _usr.LockTrophy(id);
+      _trns.RemoveTrophy(id);
+      _trophies[id].Timestamp = new Timestamp { Time = null, IsSynced = false }; ;
+    } // LockTrophy
+
+    public override void Save()
+    {
+      Debug.WriteLine($"Saving {Name} (PS3)");
+
+      _usr.Save();
+      _trns.Save();
+    } // Save
+
+    #endregion Public Methods
   } // PS3TrophyList
 } // TrophyParser.PS3
