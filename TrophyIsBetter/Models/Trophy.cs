@@ -1,8 +1,9 @@
 ﻿using System;
+using TrophyIsBetter.Interfaces;
 
 namespace TrophyIsBetter.Models
 {
-  public class Trophy
+  public class Trophy : ITrophyModel
   {
     #region Public Properties
 

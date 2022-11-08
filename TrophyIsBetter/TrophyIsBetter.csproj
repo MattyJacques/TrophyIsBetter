@@ -98,6 +98,7 @@
     </ApplicationDefinition>
     <Compile Include="Interfaces\IGameModel.cs" />
     <Compile Include="Interfaces\IPageViewModel.cs" />
+    <Compile Include="Interfaces\ITrophyModel.cs" />
     <Compile Include="Models\GameList.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />

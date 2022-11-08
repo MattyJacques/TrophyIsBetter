@@ -16,7 +16,7 @@ namespace TrophyIsBetter.ViewModels
   {
     #region Private Members
 
-    private Game _model;
+    private IGameModel _model;
     private ObservableCollection<TrophyViewModel> _trophyCollection = new ObservableCollection<TrophyViewModel>();
     private CollectionView _trophyCollectionView;
     private DateTime? _lastUsedTimestamp = null;
@@ -24,7 +24,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Private Members
     #region Constructors
 
-    public GameViewModel(Game entry)
+    public GameViewModel(IGameModel entry)
     {
       _model = entry;
       ((ApplicationWindow)Application.Current.MainWindow).Closing += OnCloseSave; ;
@@ -164,7 +164,7 @@ namespace TrophyIsBetter.ViewModels
 
     private void LoadTrophies()
     {
-      List<Trophy> trophies = _model.Trophies;
+      List<ITrophyModel> trophies = _model.Trophies;
 
       if (trophies.Count != 0)
       {
