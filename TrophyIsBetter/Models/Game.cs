@@ -121,7 +121,7 @@ namespace TrophyIsBetter.Models
           Description = trophy.Detail,
           Type = trophy.Rank,
           Hidden = trophy.Hidden == "yes",
-          Group = trophy.Gid == 0 ? "BaseGame" : $"DLC{trophy.Gid}",
+          Group = trophy.Gid == 0 ? "Base Game" : $"DLC {trophy.Gid}",
           Achieved = trophy.Timestamp?.IsEarned != false,
           Synced = trophy.Timestamp?.IsSynced != false,
           Timestamp = trophy.Timestamp?.Time

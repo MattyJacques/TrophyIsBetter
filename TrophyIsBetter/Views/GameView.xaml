@@ -119,7 +119,7 @@
 
         <DataGridTextColumn Header="Group"
                             Binding="{Binding Group, Mode=OneWay}"
-                            Width="100"/>
+                            Width="105"/>
       </DataGrid.Columns>
     </DataGrid>
 
