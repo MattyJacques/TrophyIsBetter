@@ -46,26 +46,26 @@ namespace TrophyIsBetter.Models
     public string Progress => _trophyList.Progress;
     public DateTime? LastTimestamp => _trophyList.LastTimestamp;
     public DateTime? SyncTime => _trophyList.LastSyncedTimestamp;
-    public List<Trophy> Trophies => ConvertTrophyData(_trophyList.Trophies);
+    public List<ITrophyModel> Trophies => ConvertTrophyData(_trophyList.Trophies);
     public string Path => _path;
     public bool HasUnsavedChanges { get => _hasChanges; set => _hasChanges = value; }
 
     #endregion Public Properties
     #region Public Methods
 
-    public void UnlockTrophy(Trophy trophy, DateTime timestamp)
+    public void UnlockTrophy(ITrophyModel trophy, DateTime timestamp)
     {
       _trophyList.UnlockTrophy(trophy.ID, timestamp);
       HasUnsavedChanges = true;
     } // UnlockTrophy
 
-    public void ChangeTimestamp(Trophy trophy, DateTime timestamp)
+    public void ChangeTimestamp(ITrophyModel trophy, DateTime timestamp)
     {
       _trophyList.ChangeTimestamp(trophy.ID, timestamp);
       HasUnsavedChanges = true;
     } // ChangeTimestamp
 
-    public void LockTrophy(Trophy trophy)
+    public void LockTrophy(ITrophyModel trophy)
     {
       _trophyList.LockTrophy(trophy.ID);
       HasUnsavedChanges = true;
@@ -107,9 +107,9 @@ namespace TrophyIsBetter.Models
       return File.Exists(System.IO.Path.Combine(Path, "TROPCONF.SFM"));
     } // IsPS3
 
-    private List<Trophy> ConvertTrophyData(List<TrophyParser.Models.Trophy> trophies)
+    private List<ITrophyModel> ConvertTrophyData(List<TrophyParser.Models.Trophy> trophies)
     {
-      List<Trophy> result = new List<Trophy>();
+      List<ITrophyModel> result = new List<ITrophyModel>();
 
       foreach (TrophyParser.Models.Trophy trophy in trophies)
       {

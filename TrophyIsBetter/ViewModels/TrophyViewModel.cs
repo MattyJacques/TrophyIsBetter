@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using TrophyIsBetter.Models;
+using TrophyIsBetter.Interfaces;
 
 namespace TrophyIsBetter.ViewModels
 {
@@ -8,12 +8,12 @@ namespace TrophyIsBetter.ViewModels
   {
     #region Private Members
 
-    private readonly Trophy _model;
+    private readonly ITrophyModel _model;
 
     #endregion Private Members
     #region Constructors
 
-    public TrophyViewModel(Trophy model)
+    public TrophyViewModel(ITrophyModel model)
     {
       _model = model;
     } // Constructor
@@ -21,7 +21,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Constructors
     #region Public Properties
 
-    public Trophy Model { get => _model; }
+    internal ITrophyModel Model { get => _model; }
     public string Icon { get => _model.Icon; }
     public string Name { get => _model.Name; }
     public string Description { get => _model.Description; }
