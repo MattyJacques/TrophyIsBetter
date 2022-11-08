@@ -31,6 +31,7 @@ namespace TrophyIsBetter.ViewModels
 
       ImportCommand = new RelayCommand(Import);
       EditGameCommand = new RelayCommand(EditGame);
+      ExportGameCommand = new RelayCommand(ExportGame);
 
       GameCollectionView.CurrentChanged += OnSelectedGameChanged;
 
@@ -49,6 +50,11 @@ namespace TrophyIsBetter.ViewModels
     /// Edit a games trophies
     /// </summary>
     public RelayCommand EditGameCommand { get; set; }
+
+    /// <summary>
+    /// Encrypt the files and export the game
+    /// </summary>
+    public RelayCommand ExportGameCommand { get; set; }
 
     /// <summary>
     /// Get/Set the list of games
@@ -82,12 +88,9 @@ namespace TrophyIsBetter.ViewModels
     public GameViewModel SelectedGame => (GameViewModel)GameCollectionView.CurrentItem;
 
     /// <summary>
-    /// Is a game selected ready to be edited
+    /// Is a game selected
     /// </summary>
-    public bool CanEdit
-    {
-      get => SelectedGame != null;
-    }
+    public bool HasSelected => SelectedGame != null;
 
     /// <summary>
     /// The name of the view model
@@ -119,6 +122,27 @@ namespace TrophyIsBetter.ViewModels
     } // EditGame
 
     /// <summary>
+    /// Encrypt the files and export
+    /// </summary>
+    public void ExportGame()
+    {
+      string path = ChoosePath();
+      if (!string.IsNullOrEmpty(path))
+      {
+        try
+        {
+          SelectedGame.Model.Export(path);
+        }
+        catch (Exception ex)
+        {
+          GC.Collect();
+          Console.WriteLine(ex.StackTrace);
+          MessageBox.Show("Export Failed:" + ex.Message);
+        }
+      }
+    } // ExportGame
+
+    /// <summary>
     /// Save files and close the directory
     /// </summary>
     public void CloseDirectory()
@@ -137,7 +161,7 @@ namespace TrophyIsBetter.ViewModels
     /// </summary>
     private void OnSelectedGameChanged(object sender, EventArgs e)
     {
-      OnPropertyChanged(nameof(CanEdit));
+      OnPropertyChanged(nameof(HasSelected));
     } // OnSelectedGameChanged
 
     /// <summary>

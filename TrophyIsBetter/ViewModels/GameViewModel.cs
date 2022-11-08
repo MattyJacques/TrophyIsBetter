@@ -101,6 +101,8 @@ namespace TrophyIsBetter.ViewModels
 
     public string Path { get => _model.Path; }
 
+    public IGameModel Model { get => _model; }
+
     #endregion Public Properties
     #region Public Methods
 

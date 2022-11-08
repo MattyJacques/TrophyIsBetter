@@ -77,6 +77,14 @@ namespace TrophyIsBetter.Models
       HasUnsavedChanges = false;
     } // Save
 
+    public void Export(string exportPath)
+    {
+      string fullExportPath = System.IO.Path.Combine(exportPath, System.IO.Path.GetFileName(Path));
+
+      Utility.File.CopyDirectory(Path, fullExportPath, false);
+      Utility.PfdTool.EncryptTrophyData(fullExportPath);
+    } // Export
+
     public void Reload()
     {
       if (IsPS3())
