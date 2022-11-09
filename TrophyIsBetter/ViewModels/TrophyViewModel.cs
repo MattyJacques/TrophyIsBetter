@@ -38,12 +38,20 @@ namespace TrophyIsBetter.ViewModels
       }
     }
     public bool Synced { get => _model.Synced; }
-    public DateTime Timestamp
+    public DateTime? Timestamp
     {
       get => _model.Timestamp;
+      /*{
+        DateTime? result = null;
+
+        if (_model.Timestamp != DateTime.MinValue)
+          result = _model.Timestamp;
+
+        return result;
+      }*/
       set
       {
-        _model.Timestamp = value;
+        _model.Timestamp = (DateTime)value;
         OnPropertyChanged();
       }
     }

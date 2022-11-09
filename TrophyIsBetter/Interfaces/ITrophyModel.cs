@@ -13,6 +13,6 @@ namespace TrophyIsBetter.Interfaces
     bool Hidden { get; }
     bool Achieved { get; set; }
     bool Synced { get; }
-    DateTime Timestamp { get; set; }
+    DateTime? Timestamp { get; set; }
   } // ITrophyModel
 } // TrophyIsBetter.Interfaces

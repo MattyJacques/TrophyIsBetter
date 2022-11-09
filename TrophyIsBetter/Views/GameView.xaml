@@ -107,10 +107,6 @@
                                 Binding="{Binding Hidden, Mode=OneWay}"
                                 IsReadOnly="True" />
 
-        <DataGridCheckBoxColumn Header="Achieved"
-                                Binding="{Binding Achieved, Mode=OneWay}"
-                                IsReadOnly="True" />
-
         <DataGridCheckBoxColumn Header="Synced"
                                 Binding="{Binding Synced, Mode=OneWay}"
                                 IsReadOnly="True" />
@@ -123,7 +119,7 @@
 
         <DataGridTextColumn Header="Group"
                             Binding="{Binding Group, Mode=OneWay}"
-                            Width="100"/>
+                            Width="105"/>
       </DataGrid.Columns>
     </DataGrid>
 
