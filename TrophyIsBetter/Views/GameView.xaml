@@ -24,12 +24,20 @@
                 DockPanel.Dock="Top">
 
       <Button Content="{materialDesign:PackIcon ArrowLeft}"
+              ToolTip="Back"
               Command="{Binding ChangeViewToHomeCommand}"
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="50"
               Width="60" />
       <Button Content="{materialDesign:PackIcon Lock}"
+              ToolTip="Lock trophy"
               Command="{Binding LockTrophyCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="50"
+              Width="60" />
+      <Button Content="{materialDesign:PackIcon TrophyBroken}"
+              ToolTip="Lock unsynchronised"
+              Command="{Binding LockUnsyncedCommand}"
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="50"
               Width="60" />

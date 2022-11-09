@@ -41,17 +41,9 @@ namespace TrophyIsBetter.ViewModels
     public DateTime? Timestamp
     {
       get => _model.Timestamp;
-      /*{
-        DateTime? result = null;
-
-        if (_model.Timestamp != DateTime.MinValue)
-          result = _model.Timestamp;
-
-        return result;
-      }*/
       set
       {
-        _model.Timestamp = (DateTime)value;
+        _model.Timestamp = value;
         OnPropertyChanged();
       }
     }

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
@@ -32,6 +33,7 @@ namespace TrophyIsBetter.ViewModels
       ChangeViewToHomeCommand = new RelayCommand(ChangeViewToHome);
       EditTrophyCommand = new RelayCommand(EditTrophy);
       LockTrophyCommand = new RelayCommand(LockTrophy, () => CanLock);
+      LockUnsyncedCommand = new RelayCommand(LockUnsynced);
 
       _trophyCollectionView =
         (CollectionView)CollectionViewSource.GetDefaultView(_trophyCollection);
@@ -71,6 +73,11 @@ namespace TrophyIsBetter.ViewModels
     /// Lock a single trophy
     /// </summary>
     public RelayCommand LockTrophyCommand { get; set; }
+
+    /// <summary>
+    /// Lock all unsyncronised trophies
+    /// </summary>
+    public RelayCommand LockUnsyncedCommand { get; set; }
 
     /// <summary>
     /// Is a game selected ready to be edited
@@ -141,7 +148,7 @@ namespace TrophyIsBetter.ViewModels
     public void LockTrophy()
     {
       _model.LockTrophy(SelectedTrophy.Model);
-      SelectedTrophy.Timestamp = DateTime.MinValue;
+      SelectedTrophy.Timestamp = null;
       SelectedTrophy.Achieved = false;
 
       LockTrophyCommand.NotifyCanExecuteChanged();
@@ -149,6 +156,21 @@ namespace TrophyIsBetter.ViewModels
       OnPropertyChanged(nameof(Progress));
 
     } // LockTrophy
+
+    public void LockUnsynced()
+    {
+      foreach(TrophyViewModel trophy in
+        TrophyCollection.Where(trophy => trophy.Achieved && !trophy.Synced))
+      {
+          _model.LockTrophy(trophy.Model);
+          trophy.Timestamp = null;
+          trophy.Achieved = false;
+      }
+
+      LockTrophyCommand.NotifyCanExecuteChanged();
+      OnPropertyChanged(nameof(LastTimestamp));
+      OnPropertyChanged(nameof(Progress));
+    } // LockUnsynced
 
     public void ChangeViewToHome()
     {
