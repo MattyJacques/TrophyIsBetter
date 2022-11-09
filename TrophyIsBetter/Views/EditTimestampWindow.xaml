@@ -13,26 +13,28 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{materialDesign:MaterialDesignFont}"
         Title="Edit Timestamp"
-        Height="130"
+        Height="145"
         Width="210">
 
   <StackPanel Margin="10">
     <StackPanel x:Name="PickerPanel"
                 Orientation="Horizontal">
-      <DatePicker SelectedDate="{Binding Timestamp}"
+      <DatePicker SelectedDate="{Binding DateTimestamp,
+                                         ValidatesOnDataErrors=True}"
                   Width="90"/>
-      <materialDesign:TimePicker SelectedTime="{Binding Timestamp}"
+      <materialDesign:TimePicker SelectedTime="{Binding Timestamp,
+                                                        ValidatesOnDataErrors=True}"
                                  Is24Hours="True"
                                  WithSeconds="True"
                                  Width="75"
-                                 Margin="10,0,0,0"/>
+                                 Margin="10,0,0,0">
+      </materialDesign:TimePicker>
     </StackPanel>
 
     <Button Content="Confirm"
-            ToolTip="MaterialDesignFlatDarkButton"
             IsDefault="True"
             Click="Confirm_Click"
             Style="{StaticResource MaterialDesignFlatDarkBgButton}"
-            Margin="0,10,0,0"/>
+            Margin="0,30,0,0"/>
   </StackPanel>
 </Window>
