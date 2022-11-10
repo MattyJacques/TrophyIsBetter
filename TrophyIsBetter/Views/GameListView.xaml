@@ -11,9 +11,26 @@
              TextOptions.TextFormattingMode="Ideal"
              TextOptions.TextRenderingMode="Auto"
              Background="{DynamicResource MaterialDesignPaper}"
-             FontFamily="{materialDesign:MaterialDesignFont}"
-             Height="750"
-             Width="1250">
+             FontFamily="{materialDesign:MaterialDesignFont}">
+
+  <UserControl.Resources>
+    <Style x:Key="ProgressButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignPaperButton}">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding ImportCommand.IsRunning}" Value="True">
+          <Setter Property="Button.Content">
+            <Setter.Value>
+              <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                       Value="0"
+                       IsIndeterminate="True" />
+            </Setter.Value>
+          </Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding ImportCommand.IsRunning}" Value="False">
+          <Setter Property="Button.Content" Value="{materialDesign:PackIcon Plus}" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </UserControl.Resources>
 
   <DockPanel x:Name="MainPanel">
 
@@ -21,11 +38,9 @@
 
     <DockPanel x:Name="ToolBarPanel"
                DockPanel.Dock="Top">
-
-      <Button Content="{materialDesign:PackIcon Plus}"
-              ToolTip="Import Game(s)"
+      <Button ToolTip="Import Game(s)"
               Command="{Binding ImportCommand}"
-              Style="{DynamicResource MaterialDesignPaperButton}"
+              Style="{StaticResource ProgressButtonStyle}"
               Height="50"
               Width="60"
               HorizontalAlignment="Left" />

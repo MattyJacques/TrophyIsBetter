@@ -3,6 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Security.Policy;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
@@ -19,6 +22,7 @@ namespace TrophyIsBetter.ViewModels
 
     private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
     private CollectionView _gameCollectionView = null;
+    private SynchronizationContext _uiContext = SynchronizationContext.Current;
 
     private bool _isOpen = false;
 
@@ -29,7 +33,7 @@ namespace TrophyIsBetter.ViewModels
     {
       _model = model;
 
-      ImportCommand = new RelayCommand(Import);
+      ImportCommand = new AsyncRelayCommand(Import);
       EditGameCommand = new RelayCommand(EditGame);
       ExportGameCommand = new RelayCommand(ExportGame);
 
@@ -44,7 +48,7 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Import a single trophy folder or a directory containing multiple
     /// </summary>
-    public RelayCommand ImportCommand { get; set; }
+    public AsyncRelayCommand ImportCommand { get; set; }
 
     /// <summary>
     /// Edit a games trophies
@@ -103,13 +107,14 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Show dialog to choose a directory to import then fire off importing process
     /// </summary>
-    public void Import()
+    public Task Import()
     {
       string path = ChoosePath();
       if (!string.IsNullOrEmpty(path))
       {
-        ImportDirectory(path);
+        return Task.Run(() => ImportDirectory(path));
       }
+      return Task.CompletedTask;
     } // Import
 
     /// <summary>
@@ -207,11 +212,11 @@ namespace TrophyIsBetter.ViewModels
 
       if (games != null)
       {
-        GameCollection.Clear();
+        _uiContext.Send(x => GameCollection.Clear(), null);
 
         foreach (Game entry in games)
         {
-          GameCollection.Add(new GameViewModel(entry));
+          _uiContext.Send(x => GameCollection.Add(new GameViewModel(entry)), null);
         }
       }
 

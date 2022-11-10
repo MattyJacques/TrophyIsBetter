@@ -162,9 +162,9 @@ namespace TrophyIsBetter.ViewModels
       foreach(TrophyViewModel trophy in
         TrophyCollection.Where(trophy => trophy.Achieved && !trophy.Synced))
       {
-          _model.LockTrophy(trophy.Model);
-          trophy.Timestamp = null;
-          trophy.Achieved = false;
+        _model.LockTrophy(trophy.Model);
+        trophy.Timestamp = null;
+        trophy.Achieved = false;
       }
 
       LockTrophyCommand.NotifyCanExecuteChanged();
