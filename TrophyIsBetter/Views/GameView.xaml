@@ -12,9 +12,7 @@
              TextOptions.TextFormattingMode="Ideal"
              TextOptions.TextRenderingMode="Auto"
              Background="{DynamicResource MaterialDesignPaper}"
-             FontFamily="{materialDesign:MaterialDesignFont}"
-             Height="750"
-             Width="1250">
+             FontFamily="{materialDesign:MaterialDesignFont}">
 
   <DockPanel x:Name="MainPanel">
 
