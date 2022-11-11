@@ -17,6 +17,8 @@ namespace TrophyIsBetter.Models
     public bool Achieved { get; set; }
     public bool Synced { get; set; }
     public DateTime? Timestamp { get; set; }
+    public DateTime? RemoteTimestamp { get; set; }
+    public bool ShouldCopy { get; set; }
 
     #endregion Public Properties
   } // Trophy

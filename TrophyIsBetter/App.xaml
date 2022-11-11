@@ -11,6 +11,7 @@
                                          PrimaryColor="SlateBlue"
                                          SecondaryColor="DarkSlateBlue" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+        <ResourceDictionary Source="/TrophyIsBetter;component/Resources/Dictionaries/Styles.xaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>

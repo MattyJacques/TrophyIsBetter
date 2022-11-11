@@ -47,6 +47,24 @@ namespace TrophyIsBetter.ViewModels
         OnPropertyChanged();
       }
     }
+    public DateTime? RemoteTimestamp
+    {
+      get => _model.RemoteTimestamp;
+      set
+      {
+        _model.RemoteTimestamp = value;
+        OnPropertyChanged();
+      }
+    }
+    public bool ShouldCopy
+    {
+      get => _model.ShouldCopy;
+      set
+      {
+        _model.ShouldCopy = value;
+        OnPropertyChanged();
+      }
+    }
 
     #endregion Public Properties
   } // TrophyViewModel

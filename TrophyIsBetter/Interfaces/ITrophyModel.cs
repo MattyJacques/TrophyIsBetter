@@ -14,5 +14,7 @@ namespace TrophyIsBetter.Interfaces
     bool Achieved { get; set; }
     bool Synced { get; }
     DateTime? Timestamp { get; set; }
+    DateTime? RemoteTimestamp { get; set; }
+    bool ShouldCopy { get; set; }
   } // ITrophyModel
 } // TrophyIsBetter.Interfaces

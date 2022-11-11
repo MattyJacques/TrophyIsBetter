@@ -120,11 +120,13 @@
 
         <DataGridCheckBoxColumn Header="Platinum"
                                 Binding="{Binding HasPlatinum, Mode=OneWay}"
-                                IsReadOnly="True" />
+                                IsReadOnly="True"
+                                ElementStyle="{DynamicResource DataGridCheckBox}" />
 
         <DataGridCheckBoxColumn Header="Synced"
                                 Binding="{Binding IsSynced, Mode=OneWay}"
-                                IsReadOnly="True" />
+                                IsReadOnly="True"
+                                ElementStyle="{DynamicResource DataGridCheckBox}" />
 
         <DataGridTextColumn Header="Last Timestamp"
                             Binding="{Binding LastTimestamp,

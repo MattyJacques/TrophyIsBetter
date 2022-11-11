@@ -39,6 +39,12 @@
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="50"
               Width="60" />
+      <Button Content="{materialDesign:PackIcon CloudDownload}"
+              ToolTip="Copy From PSNTL"
+              Command="{Binding CopyFromCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="50"
+              Width="60" />
       <Menu x:Name="Menu">
         <MenuItem Header="File"
                   Icon="{materialDesign:PackIcon File}"
@@ -94,7 +100,7 @@
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <Image Source="{Binding Icon}"
-                     Width="50" />
+                     Width="30" />
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
@@ -111,11 +117,13 @@
 
         <DataGridCheckBoxColumn Header="Hidden"
                                 Binding="{Binding Hidden, Mode=OneWay}"
-                                IsReadOnly="True" />
+                                IsReadOnly="True"
+                                ElementStyle="{DynamicResource DataGridCheckBox}" />
 
         <DataGridCheckBoxColumn Header="Synced"
                                 Binding="{Binding Synced, Mode=OneWay}"
-                                IsReadOnly="True" />
+                                IsReadOnly="True"
+                                ElementStyle="{DynamicResource DataGridCheckBox}" />
 
         <DataGridTextColumn Header="Timestamp"
                             Binding="{Binding Timestamp,

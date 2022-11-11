@@ -34,6 +34,7 @@ namespace TrophyIsBetter.ViewModels
       EditTrophyCommand = new RelayCommand(EditTrophy);
       LockTrophyCommand = new RelayCommand(LockTrophy, () => CanLock);
       LockUnsyncedCommand = new RelayCommand(LockUnsynced);
+      CopyFromCommand = new RelayCommand(CopyFrom);
 
       _trophyCollectionView =
         (CollectionView)CollectionViewSource.GetDefaultView(_trophyCollection);
@@ -78,6 +79,11 @@ namespace TrophyIsBetter.ViewModels
     /// Lock all unsyncronised trophies
     /// </summary>
     public RelayCommand LockUnsyncedCommand { get; set; }
+
+    /// <summary>
+    /// Lock all unsyncronised trophies
+    /// </summary>
+    public RelayCommand CopyFromCommand { get; set; }
 
     /// <summary>
     /// Is a game selected ready to be edited
@@ -126,22 +132,8 @@ namespace TrophyIsBetter.ViewModels
       {
         DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
 
-        if (SelectedTrophy.Achieved)
-        {
-          _model.ChangeTimestamp(SelectedTrophy.Model, timestamp);
-        }
-        else
-        {
-          _model.UnlockTrophy(SelectedTrophy.Model, timestamp);
-          SelectedTrophy.Achieved = true;
-        }
-
-        SelectedTrophy.Timestamp = timestamp;
+        UnlockTrophy(SelectedTrophy, timestamp);
         _lastUsedTimestamp = timestamp;
-
-        LockTrophyCommand.NotifyCanExecuteChanged();
-        OnPropertyChanged(nameof(LastTimestamp));
-        OnPropertyChanged(nameof(Progress));
       }
     } // EditTrophy
 
@@ -171,6 +163,25 @@ namespace TrophyIsBetter.ViewModels
       OnPropertyChanged(nameof(LastTimestamp));
       OnPropertyChanged(nameof(Progress));
     } // LockUnsynced
+
+    public void CopyFrom()
+    {
+      CopyFromWindow window = new CopyFromWindow
+      {
+        DataContext = new CopyFromViewModel(TrophyCollection)
+      };
+
+      bool? result = window.ShowDialog();
+
+      if (result == true)
+      {
+        CopyTimestamps();
+
+        LockTrophyCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(LastTimestamp));
+        OnPropertyChanged(nameof(Progress));
+      }
+    } // CopyFrom
 
     public void ChangeViewToHome()
     {
@@ -226,6 +237,45 @@ namespace TrophyIsBetter.ViewModels
         _model.Reload();
       }
     } // Save
+
+    /// <summary>
+    /// Unlock trophy
+    /// </summary>
+    private void UnlockTrophy(TrophyViewModel trophy, DateTime timestamp)
+    {
+      if (trophy.Achieved)
+      {
+        _model.ChangeTimestamp(trophy.Model, timestamp);
+      }
+      else
+      {
+        _model.UnlockTrophy(trophy.Model, timestamp);
+        trophy.Achieved = true;
+      }
+
+      trophy.Timestamp = timestamp;
+
+      LockTrophyCommand.NotifyCanExecuteChanged();
+      OnPropertyChanged(nameof(LastTimestamp));
+      OnPropertyChanged(nameof(Progress));
+    } // UnlockTrophy
+
+    /// <summary>
+    /// Unlock trophies using the remote timestamps
+    /// </summary>
+    private void CopyTimestamps()
+    {
+      foreach(TrophyViewModel trophy in TrophyCollection)
+      {
+        if (trophy.ShouldCopy && trophy.RemoteTimestamp.HasValue && !trophy.Synced)
+        {
+          UnlockTrophy(trophy, trophy.RemoteTimestamp.Value);
+
+          trophy.RemoteTimestamp = null;
+          trophy.ShouldCopy = false;
+        }
+      }
+    } // CopyTimestamps
 
     #endregion Private Methods
 

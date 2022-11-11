@@ -37,7 +37,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>platinum_trophy.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\platinum_trophy.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommunityToolkit.Mvvm, Version=8.0.0.0, Culture=neutral, PublicKeyToken=4aff67a105548ee2, processorArchitecture=MSIL">
@@ -102,10 +102,19 @@
     <Compile Include="Models\GameList.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
+    <Compile Include="ViewModels\CopyFromViewModel.cs" />
     <Compile Include="ViewModels\EditTimestampViewModel.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="ViewModels\GameListViewModel.cs" />
+    <Page Include="Resources\Dictionaries\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ApplicationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CopyFromWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -128,6 +137,9 @@
     <Compile Include="ViewModels\TrophyViewModel.cs" />
     <Compile Include="Views\ApplicationWindow.xaml.cs">
       <DependentUpon>ApplicationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CopyFromWindow.xaml.cs">
+      <DependentUpon>CopyFromWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\EditTimestampWindow.xaml.cs">
       <DependentUpon>EditTimestampWindow.xaml</DependentUpon>
@@ -180,8 +192,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="platinum_trophy.ico" />
+    <Resource Include="Resources\platinum_trophy.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
