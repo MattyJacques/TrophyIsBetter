@@ -7,7 +7,7 @@ using TrophyParser.Models;
 
 namespace TrophyParser.Vita
 {
-  public class TRPTRANS
+  internal class TRPTRANS
   {
     #region Const Members
 
@@ -25,7 +25,7 @@ namespace TrophyParser.Vita
     #endregion Private Members
     #region Constructors
 
-    public TRPTRANS(string path, int count)
+    internal TRPTRANS(string path, int count)
     {
       _path = Utility.File.GetFullPath(path, TROPTRANS_FILE_NAME);
 
@@ -33,11 +33,11 @@ namespace TrophyParser.Vita
     } // Constructor
 
     #endregion Constructors
-    #region Public Properties
+    #region Internal Properties
 
-    public bool IsSynced => _timestamps.Count == 0;
+    internal bool IsSynced => _timestamps.Count == 0;
 
-    #endregion Public Properties
+    #endregion Internal Properties
     #region Private Properties
 
     private byte[] Block
@@ -51,9 +51,9 @@ namespace TrophyParser.Vita
     } // Block
 
     #endregion Private Properties
-    #region Public Methods
+    #region Internal Methods
 
-    public void PrintState()
+    internal void PrintState()
     {
       Console.WriteLine("\n----- TRPTITLE Data -----");
 
@@ -64,7 +64,7 @@ namespace TrophyParser.Vita
       }
     } // PrintState
 
-    public void UnlockTrophy(int id, string rank, DateTime time)
+    internal void UnlockTrophy(int id, string rank, DateTime time)
     {
       _timestamps[id].Type = GetTrophyType(rank);
       _timestamps[id].Time = time;
@@ -83,7 +83,7 @@ namespace TrophyParser.Vita
       Debug.WriteLine($"Locked trophy {id} in TRPTRANS");
     } // LockTrophy
 
-    public void Save()
+    internal void Save()
     {
       _writer = new BinaryWriter(new FileStream(_path, FileMode.Open));
       _writer.BaseStream.Position = _pointer;
@@ -112,7 +112,7 @@ namespace TrophyParser.Vita
       _writer.Close();
     } // Save
 
-    #endregion Public Methods
+    #endregion Internal Methods
     #region Private Methods
 
     private void ReadFile(int count)

@@ -8,8 +8,8 @@ namespace TrophyParser.Models
     public bool IsEarned { get => Time.HasValue && Time.Value.CompareTo(DateTime.MinValue) != 0; }
     public DateTime? Time;
     public bool IsSynced;
-    public byte Type;
-    public byte Unknown;
+    internal byte Type;
+    internal byte Unknown;
 
     public override string ToString()
     {
