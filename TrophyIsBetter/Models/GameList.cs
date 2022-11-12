@@ -101,7 +101,7 @@ namespace TrophyIsBetter.Models
     /// <summary>
     /// Get the platform of the trophy folder
     /// </summary>
-    public static string GetPlatform(string directory)
+    internal static string GetPlatform(string directory)
     {
       if (File.Exists(Path.Combine(directory, "TROPCONF.SFM")))
       {
@@ -116,7 +116,7 @@ namespace TrophyIsBetter.Models
     /// <summary>
     /// Get a list of trophy directories from the given path
     /// </summary>
-    public static IEnumerable<string> GetDirectories(string rootPath)
+    internal static IEnumerable<string> GetDirectories(string rootPath)
     {
       var result = from dir
                    in Directory.EnumerateDirectories(rootPath, "*",
@@ -138,7 +138,7 @@ namespace TrophyIsBetter.Models
     /// <summary>
     /// Copy the directory the application data directory with a backup
     /// </summary>
-    public static string CopyWithBackup(string directory)
+    internal static string CopyWithBackup(string directory)
     {
       string destination = Path.Combine(GetPlatform(directory), Path.GetFileName(directory));
       string fullDataPath = Path.Combine(TROPHY_DATA_PATH, destination);

@@ -9,7 +9,7 @@ using static TrophyParser.Enums;
 
 namespace TrophyIsBetter.Models
 {
-  public class Game : IGameModel
+  internal class Game : IGameModel
   {
     #region Private Members
 
@@ -20,7 +20,7 @@ namespace TrophyIsBetter.Models
     #endregion Private Members
     #region Constructors
 
-    public Game(string path)
+    internal Game(string path)
     {
       _path = path;
 

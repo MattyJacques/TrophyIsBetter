@@ -13,7 +13,7 @@ using static TrophyParser.Enums;
 
 namespace TrophyIsBetter.ViewModels
 {
-  public class GameViewModel : ObservableObject, IPageViewModel
+  internal class GameViewModel : ObservableObject, IPageViewModel
   {
     #region Private Members
 
@@ -25,7 +25,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Private Members
     #region Constructors
 
-    public GameViewModel(IGameModel entry)
+    internal GameViewModel(IGameModel entry)
     {
       _model = entry;
       ((ApplicationWindow)Application.Current.MainWindow).Closing += OnCloseSave; ;
@@ -47,18 +47,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Constructors
     #region Public Properties
 
-    public ObservableCollection<TrophyViewModel> TrophyCollection
-    {
-      get => _trophyCollection;
-      private set => SetProperty(ref _trophyCollection, value);
-    }
-
     public CollectionView TrophyCollectionView { get => _trophyCollectionView; }
-
-    public TrophyViewModel SelectedTrophy
-    {
-      get => (TrophyViewModel)TrophyCollectionView.CurrentItem;
-    }
 
     /// <summary>
     /// Change the view back to the game list
@@ -85,12 +74,6 @@ namespace TrophyIsBetter.ViewModels
     /// </summary>
     public RelayCommand CopyFromCommand { get; set; }
 
-    /// <summary>
-    /// Is a game selected ready to be edited
-    /// </summary>
-    public bool CanLock
-      => SelectedTrophy != null && SelectedTrophy.Achieved && !SelectedTrophy.Synced;
-
     public Visibility IconVisibility
       => _model.Platform == PlatformEnum.PS3 ? Visibility.Visible : Visibility.Hidden;
 
@@ -112,78 +95,34 @@ namespace TrophyIsBetter.ViewModels
 
     public DateTime? SyncTime { get => _model.SyncTime; }
 
-    public string Path { get => _model.Path; }
-
-    public IGameModel Model { get => _model; }
-
     #endregion Public Properties
-    #region Public Methods
+    #region Internal Properties
 
-    public void EditTrophy()
+    internal ObservableCollection<TrophyViewModel> TrophyCollection
     {
-      EditTimestampWindow window = new EditTimestampWindow
-      {
-        DataContext = new EditTimestampViewModel(_lastUsedTimestamp ?? DateTime.Now)
-      };
+      get => _trophyCollection;
+      private set => SetProperty(ref _trophyCollection, value);
+    }
 
-      bool? result = window.ShowDialog();
-
-      if (result == true)
-      {
-        DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
-
-        UnlockTrophy(SelectedTrophy, timestamp);
-        _lastUsedTimestamp = timestamp;
-      }
-    } // EditTrophy
-
-    public void LockTrophy()
+    internal TrophyViewModel SelectedTrophy
     {
-      _model.LockTrophy(SelectedTrophy.Model);
-      SelectedTrophy.Timestamp = null;
-      SelectedTrophy.Achieved = false;
+      get => (TrophyViewModel)TrophyCollectionView.CurrentItem;
+    }
 
-      LockTrophyCommand.NotifyCanExecuteChanged();
-      OnPropertyChanged(nameof(LastTimestamp));
-      OnPropertyChanged(nameof(Progress));
+    /// <summary>
+    /// Is a game selected ready to be edited
+    /// </summary>
+    internal bool CanLock
+      => SelectedTrophy != null && SelectedTrophy.Achieved && !SelectedTrophy.Synced;
 
-    } // LockTrophy
+    internal string Path { get => _model.Path; }
 
-    public void LockUnsynced()
-    {
-      foreach(TrophyViewModel trophy in
-        TrophyCollection.Where(trophy => trophy.Achieved && !trophy.Synced))
-      {
-        _model.LockTrophy(trophy.Model);
-        trophy.Timestamp = null;
-        trophy.Achieved = false;
-      }
+    internal IGameModel Model { get => _model; }
 
-      LockTrophyCommand.NotifyCanExecuteChanged();
-      OnPropertyChanged(nameof(LastTimestamp));
-      OnPropertyChanged(nameof(Progress));
-    } // LockUnsynced
+    #endregion Internal Properties
+    #region Private Methods
 
-    public void CopyFrom()
-    {
-      CopyFromWindow window = new CopyFromWindow
-      {
-        DataContext = new CopyFromViewModel(TrophyCollection)
-      };
-
-      bool? result = window.ShowDialog();
-
-      if (result == true)
-      {
-        CopyTimestamps();
-
-        LockTrophyCommand.NotifyCanExecuteChanged();
-        OnPropertyChanged(nameof(LastTimestamp));
-        OnPropertyChanged(nameof(Progress));
-      }
-    } // CopyFrom
-
-    public void ChangeViewToHome()
+    private void ChangeViewToHome()
     {
       Save();
 
@@ -191,9 +130,6 @@ namespace TrophyIsBetter.ViewModels
       ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
         .ChangePageToHomeCommand.Execute(null);
     } // ChangeViewToHome
-
-    #endregion Public Methods
-    #region Private Methods
 
     private void LoadTrophies()
     {
@@ -238,6 +174,24 @@ namespace TrophyIsBetter.ViewModels
       }
     } // Save
 
+    private void EditTrophy()
+    {
+      EditTimestampWindow window = new EditTimestampWindow
+      {
+        DataContext = new EditTimestampViewModel(_lastUsedTimestamp ?? DateTime.Now)
+      };
+
+      bool? result = window.ShowDialog();
+
+      if (result == true)
+      {
+        DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
+
+        UnlockTrophy(SelectedTrophy, timestamp);
+        _lastUsedTimestamp = timestamp;
+      }
+    } // EditTrophy
+
     /// <summary>
     /// Unlock trophy
     /// </summary>
@@ -260,6 +214,25 @@ namespace TrophyIsBetter.ViewModels
       OnPropertyChanged(nameof(Progress));
     } // UnlockTrophy
 
+    private void CopyFrom()
+    {
+      CopyFromWindow window = new CopyFromWindow
+      {
+        DataContext = new CopyFromViewModel(TrophyCollection)
+      };
+
+      bool? result = window.ShowDialog();
+
+      if (result == true)
+      {
+        CopyTimestamps();
+
+        LockTrophyCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(LastTimestamp));
+        OnPropertyChanged(nameof(Progress));
+      }
+    } // CopyFrom
+
     /// <summary>
     /// Unlock trophies using the remote timestamps
     /// </summary>
@@ -276,6 +249,33 @@ namespace TrophyIsBetter.ViewModels
         }
       }
     } // CopyTimestamps
+
+    private void LockTrophy()
+    {
+      _model.LockTrophy(SelectedTrophy.Model);
+      SelectedTrophy.Timestamp = null;
+      SelectedTrophy.Achieved = false;
+
+      LockTrophyCommand.NotifyCanExecuteChanged();
+      OnPropertyChanged(nameof(LastTimestamp));
+      OnPropertyChanged(nameof(Progress));
+
+    } // LockTrophy
+
+    private void LockUnsynced()
+    {
+      foreach (TrophyViewModel trophy in
+        TrophyCollection.Where(trophy => trophy.Achieved && !trophy.Synced))
+      {
+        _model.LockTrophy(trophy.Model);
+        trophy.Timestamp = null;
+        trophy.Achieved = false;
+      }
+
+      LockTrophyCommand.NotifyCanExecuteChanged();
+      OnPropertyChanged(nameof(LastTimestamp));
+      OnPropertyChanged(nameof(Progress));
+    } // LockUnsynced
 
     #endregion Private Methods
 

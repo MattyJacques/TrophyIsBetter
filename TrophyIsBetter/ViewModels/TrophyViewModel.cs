@@ -4,7 +4,7 @@ using TrophyIsBetter.Interfaces;
 
 namespace TrophyIsBetter.ViewModels
 {
-  public class TrophyViewModel : ObservableObject
+  internal class TrophyViewModel : ObservableObject
   {
     #region Private Members
 
@@ -13,7 +13,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Private Members
     #region Constructors
 
-    public TrophyViewModel(ITrophyModel model)
+    internal TrophyViewModel(ITrophyModel model)
     {
       _model = model;
     } // Constructor
@@ -21,22 +21,12 @@ namespace TrophyIsBetter.ViewModels
     #endregion Constructors
     #region Public Properties
 
-    internal ITrophyModel Model { get => _model; }
     public string Icon { get => _model.Icon; }
     public string Name { get => _model.Name; }
     public string Description { get => _model.Description; }
     public string Type { get => _model.Type; }
     public string Group { get => _model.Group; }
     public bool Hidden { get => _model.Hidden; }
-    public bool Achieved
-    {
-      get => _model.Achieved;
-      set
-      {
-        _model.Achieved = value;
-        OnPropertyChanged();
-      }
-    }
     public bool Synced { get => _model.Synced; }
     public DateTime? Timestamp
     {
@@ -67,5 +57,11 @@ namespace TrophyIsBetter.ViewModels
     }
 
     #endregion Public Properties
+    #region Internal Properties
+
+    internal ITrophyModel Model { get => _model; }
+    internal bool Achieved { get => _model.Achieved; set => _model.Achieved = value; }
+
+    #endregion Internal Properties
   } // TrophyViewModel
 } // TrophyIsBetter.ViewModels
