@@ -8,7 +8,7 @@ namespace TrophyParser.PS3
     Synced = 0x100,
     NotSynced = 0x100000
   }
-  public enum TropType
+  internal enum TropType
   {
     Platinum = 1,
     Gold = 2,
@@ -16,7 +16,7 @@ namespace TrophyParser.PS3
     Bronze = 4
   }
 
-  public enum TropGrade
+  internal enum TropGrade
   {
     Platinum = 180,
     Gold = 90,
@@ -24,17 +24,17 @@ namespace TrophyParser.PS3
     Bronze = 15
   }
 
-  public class Structs
+  internal class Structs
   {
     #region TROPUSR
 
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct TypeRecord
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    internal struct TypeRecord
     {
 
       /// int
       private int _id;
-      public int ID
+      internal int ID
       {
         get
         {
@@ -44,7 +44,7 @@ namespace TrophyParser.PS3
 
       /// int
       private int _size;
-      public int Size
+      internal int Size
       {
         get
         {
@@ -53,8 +53,8 @@ namespace TrophyParser.PS3
       }
 
       /// int
-      public int _unknown3;
-      public int Unknown3
+      internal int _unknown3;
+      internal int Unknown3
       {
         get
         {
@@ -64,7 +64,7 @@ namespace TrophyParser.PS3
 
       /// int
       private int _timesUsed;
-      public int TimesUsed
+      internal int TimesUsed
       {
         get
         {
@@ -73,8 +73,8 @@ namespace TrophyParser.PS3
       }
 
       /// int
-      public long _offset;
-      public long Offset
+      internal long _offset;
+      internal long Offset
       {
         get
         {
@@ -83,8 +83,8 @@ namespace TrophyParser.PS3
       }
 
       /// int
-      public long _unknown6;
-      public long Unknown6
+      internal long _unknown6;
+      internal long Unknown6
       {
         get
         {
@@ -105,13 +105,13 @@ namespace TrophyParser.PS3
       } // ToString
     } // TypeRecord
 
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct TrophyType
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    internal struct TrophyType
     { // Type of trophy in TROPUSR
 
       /// int
       private int _id;
-      public int ID
+      internal int ID
       {
         get
         {
@@ -121,7 +121,7 @@ namespace TrophyParser.PS3
 
       /// int
       private int _type;
-      public int Type
+      internal int Type
       {
         get
         {
@@ -134,12 +134,12 @@ namespace TrophyParser.PS3
       }
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] unknown;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] unknown;
 
       /// byte[56]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 56, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 56, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding;
 
       public override string ToString()
       {
@@ -150,18 +150,18 @@ namespace TrophyParser.PS3
       } // ToString
     } // TrophyType
 
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct ListInfo
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    internal struct ListInfo
     { // General data on trophy list
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding;
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       private byte[] _dateAdded;
-      public DateTime DateAdded
+      internal DateTime DateAdded
       {
         get
         {
@@ -191,9 +191,9 @@ namespace TrophyParser.PS3
       } // DateAdded
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       private byte[] _lastUpdated;
-      public DateTime LastUpdated
+      internal DateTime LastUpdated
       {
         get
         {
@@ -223,13 +223,13 @@ namespace TrophyParser.PS3
       } // LastUpdated
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding2;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding2;
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       private byte[] _lastAchievedTrophyTime;
-      public DateTime LastAchievedTrophyTime
+      internal DateTime LastAchievedTrophyTime
       {
         get
         {
@@ -259,11 +259,11 @@ namespace TrophyParser.PS3
       } // ListLastGetTrophyTime
 
       /// byte[32]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 32, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding3;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 32, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding3;
 
       private int _achievedCount;
-      public int AchievedCount
+      internal int AchievedCount
       {
         get
         {
@@ -276,36 +276,36 @@ namespace TrophyParser.PS3
       } // AchievedCount
 
       /// byte[12]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 12, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding4;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 12, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding4;
 
       /// uint[4]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I4)]
-      public uint[] AchievementRate;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I4)]
+      internal uint[] AchievementRate;
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding5;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding5;
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] hash;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] hash;
 
       /// byte[32]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 32, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding6;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 32, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding6;
     } // TrophyListInfo
 
     /// <summary>
     /// Timestamp for a trophy
     /// </summary>
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct Timestamp
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    internal struct Timestamp
     {
 
       /// int
       private int _id;
-      public int ID
+      internal int ID
       {
         get
         {
@@ -314,9 +314,9 @@ namespace TrophyParser.PS3
       }
 
       /// byte[4]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       private byte[] _achieved;
-      public bool IsEarned
+      internal bool IsEarned
       {
         get
         {
@@ -329,17 +329,17 @@ namespace TrophyParser.PS3
       }
 
       /// int
-      public int SyncState;
+      internal int SyncState;
 
-      public bool IsSynced => (SyncState & (int)TrophySyncState.Synced) == (int)TrophySyncState.Synced;
+      internal bool IsSynced => (SyncState & (int)TrophySyncState.Synced) == (int)TrophySyncState.Synced;
 
       /// int
-      public int Unknown2;
+      internal int Unknown2;
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       private byte[] _achievedTime;
-      public DateTime Time
+      internal DateTime Time
       {
         get
         {
@@ -369,8 +369,8 @@ namespace TrophyParser.PS3
       } // Time
 
       /// byte[64]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 64, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 64, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding;
 
       public override string ToString()
       {
@@ -383,13 +383,13 @@ namespace TrophyParser.PS3
       } // ToString
     } // Timestamp
 
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct AchievedStats
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    internal struct AchievedStats
     {
 
       /// int
       private int _earnedCount;
-      public int EarnedCount
+      internal int EarnedCount
       {
         get
         {
@@ -405,15 +405,15 @@ namespace TrophyParser.PS3
       private int _syncedCount;
 
       /// int
-      public int u3;
+      internal int u3;
 
       /// int
-      public int u4;
+      internal int u4;
 
       /// byte[8]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 8, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 8, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       private byte[] _lastSyncTime;
-      public DateTime ListSyncTime
+      internal DateTime ListSyncTime
       {
         get
         {
@@ -443,45 +443,45 @@ namespace TrophyParser.PS3
 
 
       /// byte[8]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 8, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 8, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding;
 
       /// byte[48]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 48, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding2;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 48, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding2;
     } // AchievedStats
 
     #endregion
     #region TROPTRNS
 
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct TrophyInitTime
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    internal struct TrophyInitTime
     {
-      public int u1;
-      public int u2;
-      public int u3;
-      public int u4;
+      internal int u1;
+      internal int u2;
+      internal int u3;
+      internal int u4;
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding;
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] _initTime;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] _initTime;
 
       /// byte[112]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 112, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding2;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 112, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding2;
     } // TrophyInitTime
 
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct EarnedInfo
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    internal struct EarnedInfo
     {
 
       /// int
       private int _id;
-      public int ID
+      internal int ID
       {
         get
         {
@@ -494,9 +494,9 @@ namespace TrophyParser.PS3
       }
 
       /// byte[4]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       private byte[] _doesExist;
-      public bool DoesExist
+      internal bool DoesExist
       {
         set
         {
@@ -510,9 +510,9 @@ namespace TrophyParser.PS3
 
 
       /// byte[4]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 4, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       private byte[] _isSynced;
-      public bool IsSynced
+      internal bool IsSynced
       {
         set
         {
@@ -525,16 +525,16 @@ namespace TrophyParser.PS3
       }
 
       /// int
-      public int _unknownInt1;
+      internal int _unknownInt1;
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding;
 
 
       /// int
       private int _trophyID;
-      public int TrophyID
+      internal int TrophyID
       {
         get
         {
@@ -548,7 +548,7 @@ namespace TrophyParser.PS3
 
       /// int
       private int _trophyType;
-      public int TrophyType
+      internal int TrophyType
       {
         get
         {
@@ -562,15 +562,15 @@ namespace TrophyParser.PS3
 
 
       /// int
-      public int _unknownInt2;
+      internal int _unknownInt2;
 
       /// int
-      public int _unknownInt3;
+      internal int _unknownInt3;
 
       /// byte[16]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 16, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
       private byte[] _getTime;
-      public DateTime Time
+      internal DateTime Time
       {
         get
         {
@@ -593,8 +593,8 @@ namespace TrophyParser.PS3
       }
 
       /// byte[96]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 96, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding2;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 96, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding2;
 
       public override string ToString()
       {
@@ -604,7 +604,7 @@ namespace TrophyParser.PS3
         return sb.ToString();
       }
 
-      public EarnedInfo(int id, int TrophyType, DateTime dt)
+      internal EarnedInfo(int id, int TrophyType, DateTime dt)
       {
         _id = 0;
         _doesExist = new byte[4];
@@ -624,14 +624,14 @@ namespace TrophyParser.PS3
     #endregion
     #region General
 
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct Header
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    internal struct Header
     { // Header data for TROPUSR and TROPTRNS
 
-      public ulong Magic;
+      internal ulong Magic;
 
-      public int _unknownCount;
-      public int UnknownCount
+      internal int _unknownCount;
+      internal int UnknownCount
       {
         get
         {
@@ -640,10 +640,10 @@ namespace TrophyParser.PS3
       }
 
       /// byte[36]
-      [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 36, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
-      public byte[] padding;
+      [System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.ByValArray, SizeConst = 36, ArraySubType = System.Runtime.InteropServices.UnmanagedType.I1)]
+      internal byte[] padding;
 
-      public void Output()
+      internal void Output()
       {
         Console.WriteLine("\nHeader");
         Console.WriteLine("UnknownCounter: {0}", UnknownCount);

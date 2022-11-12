@@ -4,7 +4,7 @@ using static TrophyParser.Enums;
 
 namespace TrophyIsBetter.Interfaces
 {
-  public interface IGameModel
+  internal interface IGameModel
   {
     string Icon { get; }
     string Name { get; }

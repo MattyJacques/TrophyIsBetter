@@ -1,6 +1,6 @@
 ﻿namespace TrophyIsBetter.Interfaces
 {
-  public interface IPageViewModel
+  internal interface IPageViewModel
   {
     #region Public Properties
 

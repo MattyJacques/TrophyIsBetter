@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace TrophyIsBetter.ViewModels
 {
-  public class EditTimestampViewModel : ObservableObject, IDataErrorInfo
+  internal class EditTimestampViewModel : ObservableObject, IDataErrorInfo
   {
     #region Private Members
 
@@ -14,7 +14,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Private Members
     #region Constructors
 
-    public EditTimestampViewModel(DateTime startTimestamp)
+    internal EditTimestampViewModel(DateTime startTimestamp)
     {
       Timestamp = startTimestamp;
     } // Constructor

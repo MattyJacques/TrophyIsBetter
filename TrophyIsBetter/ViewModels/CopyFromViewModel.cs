@@ -23,7 +23,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Private Members
     #region Constructors
 
-    public CopyFromViewModel(ObservableCollection<TrophyViewModel> trophies)
+    internal CopyFromViewModel(ObservableCollection<TrophyViewModel> trophies)
     {
       DownloadTimestampsCommand = new RelayCommand(DownloadTimestamps);
 

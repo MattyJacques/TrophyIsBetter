@@ -10,7 +10,7 @@ using TrophyIsBetter.Models;
 
 namespace TrophyIsBetter.ViewModels
 {
-  public class ApplicationViewModel : ObservableObject
+  internal class ApplicationViewModel : ObservableObject
   {
     #region Private Members
 
@@ -19,9 +19,9 @@ namespace TrophyIsBetter.ViewModels
     private IPageViewModel _currentPageViewModel;
 
     #endregion Private Members
-    #region Public Constructors
+    #region Internal Constructors
 
-    public ApplicationViewModel()
+    internal ApplicationViewModel()
     {
       WindowClosing = new RelayCommand<CancelEventArgs>(OnWindowClosing);
 
@@ -34,12 +34,8 @@ namespace TrophyIsBetter.ViewModels
       ChangePageToGameList();
     } // Constructor
 
-    #endregion Public Constructors
+    #endregion Internal Constructors
     #region Public Properties
-
-    public ICommand ChangePageCommand { get; set; }
-
-    public ICommand ChangePageToHomeCommand { get; set; }
 
     public IPageViewModel CurrentPageViewModel
     {
@@ -47,11 +43,18 @@ namespace TrophyIsBetter.ViewModels
       set => SetProperty(ref _currentPageViewModel, value);
     }
 
-    public List<IPageViewModel> PageViewModels { get => _pageViewModels; }
-
     public ICommand WindowClosing { get; private set; }
 
     #endregion Public Properties
+    #region Internal Properties
+
+    internal List<IPageViewModel> PageViewModels { get => _pageViewModels; }
+
+    internal ICommand ChangePageCommand { get; set; }
+
+    internal ICommand ChangePageToHomeCommand { get; set; }
+
+    #endregion Internal Properties
     #region Private Methods
 
     /// <summary>

@@ -8,7 +8,7 @@ using static TrophyParser.PS3.Structs;
 
 namespace TrophyParser.PS3
 {
-  public class TROPUSR
+  internal class TROPUSR
   {
     #region Const Members
 
@@ -33,7 +33,7 @@ namespace TrophyParser.PS3
     #endregion Private Members
     #region Constructors
 
-    public TROPUSR(string path)
+    internal TROPUSR(string path)
     {
       _filePath = Utility.File.GetFullPath(path, TROPUSR_FILE_NAME);
 
@@ -47,12 +47,12 @@ namespace TrophyParser.PS3
     } // Constructor
 
     #endregion Constructors
-    #region Public Properties
+    #region Internal Properties
 
-    public List<TrophyType> TrophyTypes { get => _types; }
-    public int EarnedCount { get { return _listInfo.AchievedCount; } }
-    public DateTime LastTimestamp { get { return _listInfo.LastAchievedTrophyTime; } }
-    public DateTime LastSyncedTimestamp
+    internal List<TrophyType> TrophyTypes { get => _types; }
+    internal int EarnedCount { get { return _listInfo.AchievedCount; } }
+    internal DateTime LastTimestamp { get { return _listInfo.LastAchievedTrophyTime; } }
+    internal DateTime LastSyncedTimestamp
     {
       get
       {
@@ -68,10 +68,10 @@ namespace TrophyParser.PS3
       }
     } // LastSyncedTimestamp
 
-    #endregion Public Properties
-    #region Public Methods
+    #endregion Internal Properties
+    #region Internal Methods
 
-    public Timestamp? this[int trophyID]
+    internal Timestamp? this[int trophyID]
     {
       get
       {
@@ -89,7 +89,7 @@ namespace TrophyParser.PS3
       }
     } // []
 
-    public void UnlockTrophy(int id, DateTime unlockTime)
+    internal void UnlockTrophy(int id, DateTime unlockTime)
     {
       UpdateTimestamp(id, unlockTime);
       UpdateRates(id);
@@ -103,7 +103,7 @@ namespace TrophyParser.PS3
       UpdateTimestamp(id, time);
     } // ChangeTimestamp
 
-    public void LockTrophy(int id)
+    internal void LockTrophy(int id)
     {
       Timestamp timestamp = _timestamps[id];
       
@@ -122,7 +122,7 @@ namespace TrophyParser.PS3
       Debug.WriteLine($"Locked trophy {id} in TROPUSR");
     } // LockTrophy
 
-    public void Save()
+    internal void Save()
     {
       BigEndianBinaryWriter writer =
         new BigEndianBinaryWriter(new FileStream(_filePath, FileMode.Open));
@@ -141,7 +141,7 @@ namespace TrophyParser.PS3
       Debug.WriteLine($"Saved {_listID} TROPUSR");
     } // Save()
 
-    public void PrintState()
+    internal void PrintState()
     { // Print all data within TROPUSR
 
       Console.WriteLine("\n----- TROPUSR Data -----");
@@ -169,7 +169,7 @@ namespace TrophyParser.PS3
       }
     } // PrintState
 
-    #endregion Public Methods
+    #endregion Internal Methods
     #region Private Methods
     #region File Parsing
 

@@ -2,7 +2,7 @@
 
 namespace TrophyIsBetter.Interfaces
 {
-  public interface ITrophyModel
+  internal interface ITrophyModel
   {
     int ID { get; }
     string Icon { get; }

@@ -6,7 +6,7 @@ using TrophyParser.Models;
 
 namespace TrophyParser
 {
-  public class SFM
+  internal class SFM
   {
     #region Private Members
 
@@ -19,21 +19,21 @@ namespace TrophyParser
     protected List<Trophy> _trophies = new List<Trophy>();
 
     #endregion Private Members
-    #region Public Properties
+    #region Internal Properties
 
-    public string TitleName => _titleName;
-    public string NpCommID => _npCommID;
-    public bool HasPlatinum => _trophies[0].Rank.Equals("P");
-    public int TrophyCount => _trophies.Count;
-    public Trophy this[int index] => _trophies[index];
+    internal string TitleName => _titleName;
+    internal string NpCommID => _npCommID;
+    internal bool HasPlatinum => _trophies[0].Rank.Equals("P");
+    internal int TrophyCount => _trophies.Count;
+    internal Trophy this[int index] => _trophies[index];
 
-    #endregion Public Properties
-    #region Public Methods
+    #endregion Internal Properties
+    #region Internal Methods
 
     /// <summary>
     /// Print data in the console for debugging
     /// </summary>
-    public void PrintState()
+    internal void PrintState()
     {
       Console.WriteLine("----- TROPCONF Data -----\n");
 
@@ -51,7 +51,7 @@ namespace TrophyParser
       }
     } // PrintState
 
-    #endregion Public Methods
+    #endregion Internal Methods
     #region Protected Methods
 
     /// <summary>

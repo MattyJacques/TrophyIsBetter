@@ -3,7 +3,7 @@ using TrophyIsBetter.Models;
 
 namespace TrophyIsBetter.Interfaces
 {
-  public interface IGameListModel
+  internal interface IGameListModel
   {
     /// <summary>
     /// Import trophy folders from the given directory

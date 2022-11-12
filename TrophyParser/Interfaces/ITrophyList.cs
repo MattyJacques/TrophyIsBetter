@@ -5,7 +5,7 @@ using static TrophyParser.Enums;
 
 namespace TrophyParser.Interfaces
 {
-  public interface ITrophyList
+  internal interface ITrophyList
   {
     string Icon { get; }
     string Name { get; }

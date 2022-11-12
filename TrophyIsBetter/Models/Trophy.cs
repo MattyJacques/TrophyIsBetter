@@ -3,7 +3,7 @@ using TrophyIsBetter.Interfaces;
 
 namespace TrophyIsBetter.Models
 {
-  public class Trophy : ITrophyModel
+  internal class Trophy : ITrophyModel
   {
     #region Public Properties
 

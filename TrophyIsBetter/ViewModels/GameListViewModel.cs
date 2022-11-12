@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,7 +12,7 @@ using TrophyIsBetter.Models;
 
 namespace TrophyIsBetter.ViewModels
 {
-  public class GameListViewModel : ObservableObject, IPageViewModel
+  internal class GameListViewModel : ObservableObject, IPageViewModel
   {
     #region Private Members
 
@@ -22,14 +21,12 @@ namespace TrophyIsBetter.ViewModels
 
     private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
     private CollectionView _gameCollectionView = null;
-    private SynchronizationContext _uiContext = SynchronizationContext.Current;
-
-    private bool _isOpen = false;
+    private readonly SynchronizationContext _uiContext = SynchronizationContext.Current;
 
     #endregion Private Members
     #region Constructors
 
-    public GameListViewModel(IGameListModel model)
+    internal GameListViewModel(IGameListModel model)
     {
       _model = model;
 
@@ -70,9 +67,22 @@ namespace TrophyIsBetter.ViewModels
     }
 
     /// <summary>
+    /// Is a game selected
+    /// </summary>
+    public bool HasSelected => SelectedGame != null;
+
+    /// <summary>
+    /// The name of the view model
+    /// </summary>
+    public string Name { get => _name; set => _name = value; }
+
+    #endregion Public Properties
+    #region Internal Properties
+
+    /// <summary>
     /// Get/Set the collection view, used for sorting
     /// </summary>
-    public CollectionView GameCollectionView
+    internal CollectionView GameCollectionView
     {
       get
       {
@@ -89,74 +99,12 @@ namespace TrophyIsBetter.ViewModels
     /// Get the selected game from the list
     /// </summary>
     /// 
-    public GameViewModel SelectedGame => (GameViewModel)GameCollectionView.CurrentItem;
+    internal GameViewModel SelectedGame => (GameViewModel)GameCollectionView.CurrentItem;
 
-    /// <summary>
-    /// Is a game selected
-    /// </summary>
-    public bool HasSelected => SelectedGame != null;
-
-    /// <summary>
-    /// The name of the view model
-    /// </summary>
-    public string Name { get => _name; set => _name = value; }
-
-    #endregion Public Properties
+    #endregion Internal Properties
     #region Public Methods
 
-    /// <summary>
-    /// Show dialog to choose a directory to import then fire off importing process
-    /// </summary>
-    public Task Import()
-    {
-      string path = ChoosePath();
-      if (!string.IsNullOrEmpty(path))
-      {
-        return Task.Run(() => ImportDirectory(path));
-      }
-      return Task.CompletedTask;
-    } // Import
-
-    /// <summary>
-    /// Switch page to the single game view
-    /// </summary>
-    public void EditGame()
-    {
-      ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
-        .ChangePageCommand.Execute(SelectedGame);
-    } // EditGame
-
-    /// <summary>
-    /// Encrypt the files and export
-    /// </summary>
-    public void ExportGame()
-    {
-      string path = ChoosePath();
-      if (!string.IsNullOrEmpty(path))
-      {
-        try
-        {
-          SelectedGame.Model.Export(path);
-        }
-        catch (Exception ex)
-        {
-          GC.Collect();
-          Console.WriteLine(ex.StackTrace);
-          MessageBox.Show("Export Failed:" + ex.Message);
-        }
-      }
-    } // ExportGame
-
-    /// <summary>
-    /// Save files and close the directory
-    /// </summary>
-    public void CloseDirectory()
-    {
-      if (_isOpen)
-      {
-        _model.CloseFiles();
-      }
-    } // CloseDirectory
+    
 
     #endregion Public Methods
     #region Private Methods
@@ -168,6 +116,19 @@ namespace TrophyIsBetter.ViewModels
     {
       OnPropertyChanged(nameof(HasSelected));
     } // OnSelectedGameChanged
+
+    /// <summary>
+    /// Show dialog to choose a directory to import then fire off importing process
+    /// </summary>
+    private Task Import()
+    {
+      string path = ChoosePath();
+      if (!string.IsNullOrEmpty(path))
+      {
+        return Task.Run(() => ImportDirectory(path));
+      }
+      return Task.CompletedTask;
+    } // Import
 
     /// <summary>
     /// Choose path to import
@@ -219,9 +180,37 @@ namespace TrophyIsBetter.ViewModels
           _uiContext.Send(x => GameCollection.Add(new GameViewModel(entry)), null);
         }
       }
-
-      _isOpen = true;
     } // LoadGames
+
+    /// <summary>
+    /// Switch page to the single game view
+    /// </summary>
+    private void EditGame()
+    {
+      ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
+        .ChangePageCommand.Execute(SelectedGame);
+    } // EditGame
+
+    /// <summary>
+    /// Encrypt the files and export
+    /// </summary>
+    private void ExportGame()
+    {
+      string path = ChoosePath();
+      if (!string.IsNullOrEmpty(path))
+      {
+        try
+        {
+          SelectedGame.Model.Export(path);
+        }
+        catch (Exception ex)
+        {
+          GC.Collect();
+          Console.WriteLine(ex.StackTrace);
+          MessageBox.Show("Export Failed:" + ex.Message);
+        }
+      }
+    } // ExportGame
 
     #endregion Private Methods
   } // GameListViewModel
