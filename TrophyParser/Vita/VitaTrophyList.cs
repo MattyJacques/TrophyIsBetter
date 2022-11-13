@@ -44,7 +44,6 @@ namespace TrophyParser.Vita
     public override bool IsSynced => _trans.IsSynced;
     public override int TrophyCount => _trop.TrophyCount;
     public override int EarnedCount => _title.EarnedCount;
-    public override string Progress => $"{EarnedCount}/{TrophyCount}";
     public override DateTime? LastTimestamp => _title.LastTimestamp;
     public override DateTime? LastSyncedTimestamp => _title.LastSyncedTimestamp;
 

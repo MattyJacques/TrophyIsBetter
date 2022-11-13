@@ -135,7 +135,7 @@
                             Width="155"/>
 
         <DataGridTextColumn Header="Progress"
-                            Binding="{Binding Progress, Mode=OneWay}"
+                            Binding="{Binding ProgressString, Mode=OneWay}"
                             Width="*" />
       </DataGrid.Columns>
     </DataGrid>

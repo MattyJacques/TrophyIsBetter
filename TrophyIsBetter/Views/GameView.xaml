@@ -45,26 +45,20 @@
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="50"
               Width="60" />
-      <Menu x:Name="Menu">
-        <MenuItem Header="File"
-                  Icon="{materialDesign:PackIcon File}"
-                  Visibility="Collapsed" >
-          <MenuItem Header="_Save"
-                    Icon="{materialDesign:PackIcon ContentSave}" />
-          <Separator/>
-          <MenuItem Header="_Close"
-                    Icon="{materialDesign:PackIcon ExitToApp}" />
-        </MenuItem>
-
-        <MenuItem Header="Advanced"
-                  Icon="{materialDesign:PackIcon Tools}"
-                  Visibility="Collapsed" >
-          <MenuItem Header="_Clear Unsynchronised"
-                    Icon="{materialDesign:PackIcon TrophyBroken}" />
-          <MenuItem Header="_Copy From PSNTrophyLeaders"
-                    Icon="{materialDesign:PackIcon CloudDownload}" />
-        </MenuItem>
-      </Menu>
+      <ProgressBar Maximum="{Binding TrophyCount}"
+                   Value="{Binding EarnedCount, Mode=OneWay}"
+                   DockPanel.Dock="Right"
+                   Width="150"
+                   Height="8"
+                   HorizontalAlignment="Right"
+                   Margin="10,10" />
+      <TextBlock Text="{Binding ProgressString}"
+                 DockPanel.Dock="Right"
+                 VerticalAlignment="Center"
+                 HorizontalAlignment="Right" />
+      <TextBlock Text="Earned: "
+                 VerticalAlignment="Center"
+                 HorizontalAlignment="Right" />
 
     </DockPanel>
 

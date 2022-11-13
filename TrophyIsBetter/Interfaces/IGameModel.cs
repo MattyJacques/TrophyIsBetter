@@ -12,7 +12,10 @@ namespace TrophyIsBetter.Interfaces
     PlatformEnum Platform { get; }
     bool HasPlatinum { get; }
     bool IsSynced { get; }
-    string Progress { get; }
+    int EarnedCount { get; }
+    int TrophyCount { get; }
+    int EarnedExp { get; }
+    int TotalExp { get; }
     DateTime? LastTimestamp { get; }
     DateTime? SyncTime { get; }
     List<ITrophyModel> Trophies { get; }
