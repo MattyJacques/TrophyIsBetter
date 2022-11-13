@@ -7,7 +7,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
-using TrophyIsBetter.Models;
 using TrophyIsBetter.Views;
 using static TrophyParser.Enums;
 
@@ -89,7 +88,15 @@ namespace TrophyIsBetter.ViewModels
 
     public bool IsSynced { get => _model.IsSynced; }
 
-    public string Progress { get => _model.Progress; }
+    public int EarnedCount { get => _model.EarnedCount; }
+
+    public int TrophyCount { get => _model.TrophyCount; }
+
+    public string ProgressString { get => $"{EarnedCount}/{TrophyCount} ({EarnedExp}/{TotalExp})"; }
+
+    public int EarnedExp { get => _model.EarnedExp; }
+
+    public int TotalExp { get => _model.TotalExp; } 
 
     public DateTime? LastTimestamp { get => _model.LastTimestamp; }
 
@@ -139,7 +146,7 @@ namespace TrophyIsBetter.ViewModels
       {
         TrophyCollection.Clear();
 
-        foreach (Trophy trophy in trophies)
+        foreach (ITrophyModel trophy in trophies)
         {
           TrophyCollection.Add(new TrophyViewModel(trophy));
         }
@@ -209,9 +216,7 @@ namespace TrophyIsBetter.ViewModels
 
       trophy.Timestamp = timestamp;
 
-      LockTrophyCommand.NotifyCanExecuteChanged();
-      OnPropertyChanged(nameof(LastTimestamp));
-      OnPropertyChanged(nameof(Progress));
+      NotifyTrophyChanges();
     } // UnlockTrophy
 
     private void CopyFrom()
@@ -227,9 +232,7 @@ namespace TrophyIsBetter.ViewModels
       {
         CopyTimestamps();
 
-        LockTrophyCommand.NotifyCanExecuteChanged();
-        OnPropertyChanged(nameof(LastTimestamp));
-        OnPropertyChanged(nameof(Progress));
+        NotifyTrophyChanges();
       }
     } // CopyFrom
 
@@ -256,10 +259,7 @@ namespace TrophyIsBetter.ViewModels
       SelectedTrophy.Timestamp = null;
       SelectedTrophy.Achieved = false;
 
-      LockTrophyCommand.NotifyCanExecuteChanged();
-      OnPropertyChanged(nameof(LastTimestamp));
-      OnPropertyChanged(nameof(Progress));
-
+      NotifyTrophyChanges();
     } // LockTrophy
 
     private void LockUnsynced()
@@ -272,10 +272,16 @@ namespace TrophyIsBetter.ViewModels
         trophy.Achieved = false;
       }
 
+      NotifyTrophyChanges();
+    } // LockUnsynced
+
+    private void NotifyTrophyChanges()
+    {
       LockTrophyCommand.NotifyCanExecuteChanged();
       OnPropertyChanged(nameof(LastTimestamp));
-      OnPropertyChanged(nameof(Progress));
-    } // LockUnsynced
+      OnPropertyChanged(nameof(EarnedCount));
+      OnPropertyChanged(nameof(ProgressString));
+    } // NotifyTrophyChanges
 
     #endregion Private Methods
 

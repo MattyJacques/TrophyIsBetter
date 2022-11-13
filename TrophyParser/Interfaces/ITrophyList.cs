@@ -15,7 +15,6 @@ namespace TrophyParser.Interfaces
     bool IsSynced { get; }
     int TrophyCount { get; }
     int EarnedCount { get; }
-    string Progress { get; }
     DateTime? LastTimestamp { get; }
     DateTime? LastSyncedTimestamp { get; }
     List<Trophy> Trophies { get; }

@@ -53,7 +53,6 @@ namespace TrophyParser.PS3
     public override bool IsSynced => _trns.IsSynced;
     public override int TrophyCount => _conf.TrophyCount;
     public override int EarnedCount => _usr.EarnedCount;
-    public override string Progress => $"{EarnedCount}/{TrophyCount}";
     public override DateTime? LastTimestamp => _usr.LastTimestamp;
     public override DateTime? LastSyncedTimestamp => _usr.LastSyncedTimestamp;
 

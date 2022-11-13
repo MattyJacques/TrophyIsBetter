@@ -16,6 +16,8 @@ namespace TrophyIsBetter.Models
     private string _path;
     private TrophyList _trophyList;
     private bool _hasChanges = false;
+    private int _earnedExp = 0;
+    private int _totalExp = 0;
 
     #endregion Private Members
     #region Constructors
@@ -32,6 +34,8 @@ namespace TrophyIsBetter.Models
       {
         _trophyList = new VitaTrophyList(_path);
       }
+
+      UpdatePSNExp();
     } // Constructor
 
     #endregion Constructors
@@ -43,7 +47,10 @@ namespace TrophyIsBetter.Models
     public PlatformEnum Platform => _trophyList.Platform;
     public bool HasPlatinum => _trophyList.HasPlatinum;
     public bool IsSynced => _trophyList.IsSynced;
-    public string Progress => _trophyList.Progress;
+    public int EarnedCount => _trophyList.EarnedCount;
+    public int TrophyCount => _trophyList.TrophyCount;
+    public int EarnedExp { get => _earnedExp; set => _earnedExp = value; }
+    public int TotalExp { get => _totalExp; set => _totalExp = value; }
     public DateTime? LastTimestamp => _trophyList.LastTimestamp;
     public DateTime? SyncTime => _trophyList.LastSyncedTimestamp;
     public List<ITrophyModel> Trophies => ConvertTrophyData(_trophyList.Trophies);
@@ -56,19 +63,25 @@ namespace TrophyIsBetter.Models
     public void UnlockTrophy(ITrophyModel trophy, DateTime timestamp)
     {
       _trophyList.UnlockTrophy(trophy.ID, timestamp);
+
       HasUnsavedChanges = true;
+      UpdatePSNExp();
     } // UnlockTrophy
 
     public void ChangeTimestamp(ITrophyModel trophy, DateTime timestamp)
     {
       _trophyList.ChangeTimestamp(trophy.ID, timestamp);
+
       HasUnsavedChanges = true;
+      UpdatePSNExp();
     } // ChangeTimestamp
 
     public void LockTrophy(ITrophyModel trophy)
     {
       _trophyList.LockTrophy(trophy.ID);
+
       HasUnsavedChanges = true;
+      UpdatePSNExp();
     } // LockTrophy
 
     public void Save()
@@ -135,8 +148,8 @@ namespace TrophyIsBetter.Models
 
     private string GetIconPath(int id)
     {
-      string result = null;
-
+      string result;
+      
       if (IsPS3())
       {
         result = Path + @"\TROP" + string.Format("{0:000}", id) + ".PNG";
@@ -148,6 +161,35 @@ namespace TrophyIsBetter.Models
 
       return result;
     } // GetIconPath
+
+    private void UpdatePSNExp()
+    {
+      EarnedExp = 0;
+      TotalExp = 0;
+
+      foreach (ITrophyModel trophy in Trophies)
+      {
+        switch (trophy.Type[0])
+        {
+          case 'P':
+            TotalExp += 180;
+            EarnedExp += (trophy.Achieved) ? 180 : 0;
+            break;
+          case 'G':
+            TotalExp += 90;
+            EarnedExp += (trophy.Achieved) ? 90 : 0;
+            break;
+          case 'S':
+            TotalExp += 30;
+            EarnedExp += (trophy.Achieved) ? 30 : 0;
+            break;
+          case 'B':
+            TotalExp += 15;
+            EarnedExp += (trophy.Achieved) ? 15 : 0;
+            break;
+        }
+      }
+    } // UpdatePSNExp
 
     #endregion Private Methods
   } // GameListEntry

@@ -23,7 +23,6 @@ namespace TrophyParser
     public abstract bool IsSynced { get; }
     public abstract int TrophyCount { get; }
     public abstract int EarnedCount { get; }
-    public abstract string Progress { get; }
     public abstract DateTime? LastTimestamp { get; }
     public abstract DateTime? LastSyncedTimestamp { get; }
 
