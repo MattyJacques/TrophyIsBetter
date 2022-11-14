@@ -9,9 +9,11 @@ namespace TrophyIsBetter.Views
   {
     #region Constructors
 
-    public EditTimestampWindow()
+    public EditTimestampWindow(string title)
     {
       InitializeComponent();
+
+      Title = title;
     } // Constructor
 
     #endregion Constructors

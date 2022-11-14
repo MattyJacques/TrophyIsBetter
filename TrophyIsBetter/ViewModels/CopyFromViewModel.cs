@@ -4,6 +4,8 @@ using System;
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Text.RegularExpressions;
+using TrophyIsBetter.Views;
+using TrophyParser.Models;
 
 namespace TrophyIsBetter.ViewModels
 {
@@ -11,6 +13,8 @@ namespace TrophyIsBetter.ViewModels
   {
     #region Const Members
 
+    private static readonly DateTime MIN_UNIX_TIMESTAMP =
+      new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private static readonly Regex DATE_EARNED_REGEX =
       new Regex("<td class=\"date_earned\">\\s+<span class=\"sort\">\\d+</span>");
 
@@ -25,7 +29,7 @@ namespace TrophyIsBetter.ViewModels
 
     internal CopyFromViewModel(ObservableCollection<TrophyViewModel> trophies)
     {
-      DownloadTimestampsCommand = new RelayCommand(DownloadTimestamps);
+      GetTimestampsCommand = new RelayCommand(GetTimestamps);
 
       TrophyCollection = trophies;
     } // Constructor
@@ -33,7 +37,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Constructors
     #region Public Properties
 
-    public RelayCommand DownloadTimestampsCommand { get; set; }
+    public RelayCommand GetTimestampsCommand { get; set; }
 
     public string CopyUrl { get => _copyUrl; set => SetProperty(ref _copyUrl, value); }
 
@@ -46,26 +50,68 @@ namespace TrophyIsBetter.ViewModels
     #endregion Public Properties
     #region Private Methods
 
-    private void DownloadTimestamps()
+    private void GetTimestamps()
+    {
+      MatchCollection timestamps = DownloadTimestamps();
+      double offset = GetOffset(GetFirstTimestamp(timestamps));
+      
+      CalcTimestamps(offset, timestamps);
+    } // GetTimestamps
+
+    private MatchCollection DownloadTimestamps()
     {
       WebClient client = new WebClient();
       client.Headers.Add("User-Agent: Other");
-      MatchCollection timestamps = DATE_EARNED_REGEX.Matches(client.DownloadString(CopyUrl));
+      return DATE_EARNED_REGEX.Matches(client.DownloadString(CopyUrl));
+    } // DownloadTimestamps
 
+    private DateTime GetFirstTimestamp(MatchCollection matches)
+    {
+      long lowestSeconds = long.MaxValue;
+
+      foreach (Match match in matches)
+      {
+        long seconds = ParseSecondsFromMatch(match);
+
+        if (seconds > 0 && seconds < lowestSeconds)
+          lowestSeconds = seconds;
+      }
+
+      return MIN_UNIX_TIMESTAMP.AddSeconds(lowestSeconds);
+    } // GetFirstTimestamp
+
+    private double GetOffset(DateTime firstRemote)
+    {
+      EditTimestampWindow window = new EditTimestampWindow("Starting Timestamp")
+      {
+        DataContext = new EditTimestampViewModel(firstRemote)
+      };
+      window.ShowDialog();
+
+      return (((EditTimestampViewModel)window.DataContext).Timestamp - firstRemote).TotalSeconds;
+    } // GetStartFromTimestamp
+
+    private void CalcTimestamps(double offset, MatchCollection timestamps)
+    {
       for (int i = 0; i < timestamps.Count; i++)
       {
-        long.TryParse(Regex.Match(timestamps[i].Value, "\\d+").ToString(),out var seconds);
+        long seconds = ParseSecondsFromMatch(timestamps[i]);
 
         if (seconds > 0)
         {
-          DateTime timestamp =
-            new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(seconds);
+          DateTime timestamp = MIN_UNIX_TIMESTAMP.AddSeconds(seconds + offset);
 
           TrophyCollection[i].RemoteTimestamp = timestamp;
           TrophyCollection[i].ShouldCopy = true;
         }
       }
-    } // DownloadTimestamps
+    } // CalcTimestamps
+
+    private long ParseSecondsFromMatch(Match match)
+    {
+      long.TryParse(Regex.Match(match.Value, "\\d+").ToString(), out var seconds);
+      return seconds;
+    } // ParseMatch
 
     #endregion Private Methods
   } // CopyFromViewModel
