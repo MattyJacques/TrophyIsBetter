@@ -59,7 +59,7 @@ namespace TrophyParser.Vita
     {
       get
       {
-        DateTime? result = new DateTime(2008, 1, 1);
+        DateTime? result = null;
         foreach (Timestamp timestamp in _timestamps)
         {
           if (timestamp.IsEarned && timestamp.Time > result)
