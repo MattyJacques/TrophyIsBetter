@@ -8,7 +8,7 @@ namespace TrophyIsBetter.Interfaces
     string Icon { get; }
     string Name { get; }
     string Description { get; }
-    string Type { get; }
+    char Type { get; }
     string Group { get; }
     bool Hidden { get; }
     bool Achieved { get; set; }
