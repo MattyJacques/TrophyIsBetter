@@ -51,7 +51,20 @@ namespace TrophyParser.PS3
 
     internal List<TrophyType> TrophyTypes { get => _types; }
     internal int EarnedCount { get { return _listInfo.AchievedCount; } }
-    internal DateTime LastTimestamp { get { return _listInfo.LastAchievedTrophyTime; } }
+    internal DateTime? LastTimestamp
+    {
+      get
+      {
+        DateTime? timestamp = null;
+
+        if (_listInfo.LastAchievedTrophyTime != DateTime.MinValue)
+        {
+          timestamp = _listInfo.LastAchievedTrophyTime;
+        }
+
+        return timestamp;
+      }
+    }
     internal DateTime LastSyncedTimestamp
     {
       get

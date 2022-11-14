@@ -8,7 +8,6 @@ using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
 using TrophyIsBetter.Views;
-using TrophyParser.Models;
 using static TrophyParser.Enums;
 
 namespace TrophyIsBetter.ViewModels
