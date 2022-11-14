@@ -31,7 +31,7 @@ namespace TrophyIsBetter.ViewModels
       ((ApplicationWindow)Application.Current.MainWindow).Closing += OnCloseSave; ;
 
       ChangeViewToHomeCommand = new RelayCommand(ChangeViewToHome);
-      EditTrophyCommand = new RelayCommand(EditTrophy);
+      EditTrophyCommand = new RelayCommand(EditTrophy, () => CanEdit);
       LockTrophyCommand = new RelayCommand(LockTrophy, () => CanLock);
       LockUnsyncedCommand = new RelayCommand(LockUnsynced);
       CopyFromCommand = new RelayCommand(CopyFrom);
@@ -120,8 +120,16 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Is a game selected ready to be edited
     /// </summary>
-    internal bool CanLock
-      => SelectedTrophy != null && SelectedTrophy.Achieved && !SelectedTrophy.Synced;
+    internal bool CanEdit
+      => SelectedTrophy != null && SelectedTrophy.Type != 'P';
+
+    /// <summary>
+    /// Is a game selected ready to be locked
+    /// </summary>
+    internal bool CanLock => SelectedTrophy != null
+                          && SelectedTrophy.Achieved
+                          && !SelectedTrophy.Synced
+                          && SelectedTrophy.Type != 'P';
 
     internal string Path { get => _model.Path; }
 
