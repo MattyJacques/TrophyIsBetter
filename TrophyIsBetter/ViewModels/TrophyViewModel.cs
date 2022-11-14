@@ -24,7 +24,7 @@ namespace TrophyIsBetter.ViewModels
     public string Icon { get => _model.Icon; }
     public string Name { get => _model.Name; }
     public string Description { get => _model.Description; }
-    public string Type { get => _model.Type; }
+    public char Type { get => _model.Type; }
     public string Group { get => _model.Group; }
     public bool Hidden { get => _model.Hidden; }
     public bool Synced { get => _model.Synced; }

@@ -28,11 +28,6 @@ namespace TrophyIsBetter.Interfaces
     void UnlockTrophy(ITrophyModel trophy, DateTime timestamp);
 
     /// <summary>
-    /// Change the timestamp of a trophy in the game
-    /// </summary>
-    void ChangeTimestamp(ITrophyModel trophy, DateTime timestamp);
-
-    /// <summary>
     /// Lock a trophy in the game
     /// </summary>
     void LockTrophy(ITrophyModel trophy);

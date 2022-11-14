@@ -64,7 +64,7 @@ namespace TrophyParser.Vita
       }
     } // PrintState
 
-    internal void UnlockTrophy(int id, string rank, DateTime time)
+    internal void UnlockTrophy(int id, char rank, DateTime time)
     {
       _timestamps[id].Type = GetTrophyType(rank);
       _timestamps[id].Time = time;
@@ -141,11 +141,11 @@ namespace TrophyParser.Vita
       }
     } // ReadFile
 
-    private byte GetTrophyType(string type)
+    private byte GetTrophyType(char type)
     {
       byte result;
 
-      switch (type[0])
+      switch (type)
       {
         case 'P':
           result = 0x01;

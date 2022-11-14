@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
 using TrophyIsBetter.Views;
+using TrophyParser.Models;
 using static TrophyParser.Enums;
 
 namespace TrophyIsBetter.ViewModels
@@ -194,30 +195,48 @@ namespace TrophyIsBetter.ViewModels
       {
         DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
 
-        UnlockTrophy(SelectedTrophy, timestamp);
+        _model.UnlockTrophy(SelectedTrophy.Model, timestamp);
+
         _lastUsedTimestamp = timestamp;
+        SelectedTrophy.Timestamp = timestamp;
+        SelectedTrophy.Achieved= true;
+
+        CheckPlatinum();
+        NotifyTrophyChanges();
       }
     } // EditTrophy
 
-    /// <summary>
-    /// Unlock trophy
-    /// </summary>
-    private void UnlockTrophy(TrophyViewModel trophy, DateTime timestamp)
+    private void CheckPlatinum()
     {
-      if (trophy.Achieved)
+      if (TrophyCollection[0].Type == 'P')
       {
-        _model.ChangeTimestamp(trophy.Model, timestamp);
-      }
-      else
-      {
-        _model.UnlockTrophy(trophy.Model, timestamp);
-        trophy.Achieved = true;
-      }
+        if (!TrophyCollection.Where(x => x.Group == "Base Game"
+                                      && x.Achieved == false
+                                      && x.Type != 'P').Any())
+        {
+          DateTime timestamp = GetPlatinumTimestamp();
 
-      trophy.Timestamp = timestamp;
+          _model.UnlockTrophy(TrophyCollection[0].Model, timestamp);
+          TrophyCollection[0].Timestamp = timestamp;
+          TrophyCollection[0].Achieved= true;
+        }
+        else if (TrophyCollection[0].Achieved
+              && TrophyCollection.Where(x => x.Group == "Base Game"
+                                          && x.Achieved == false
+                                          && x.Type != 'P').Any())
+        {
+          _model.LockTrophy(TrophyCollection[0].Model);
+          TrophyCollection[0].Timestamp = null;
+          TrophyCollection[0].Achieved= false;
+        }
+      }
+    } // CheckPlatinum
 
-      NotifyTrophyChanges();
-    } // UnlockTrophy
+    private DateTime GetPlatinumTimestamp()
+    {
+      int offset = _model.Platform == PlatformEnum.PS3 ? 1 : 0;
+      return _model.LastTimestamp.Value.AddSeconds(offset);
+    } // GetPlatinumTimestamp
 
     private void CopyFrom()
     {
@@ -245,7 +264,7 @@ namespace TrophyIsBetter.ViewModels
       {
         if (trophy.ShouldCopy && trophy.RemoteTimestamp.HasValue && !trophy.Synced)
         {
-          UnlockTrophy(trophy, trophy.RemoteTimestamp.Value);
+          _model.UnlockTrophy(trophy.Model, trophy.RemoteTimestamp.Value);
 
           trophy.RemoteTimestamp = null;
           trophy.ShouldCopy = false;
@@ -259,6 +278,7 @@ namespace TrophyIsBetter.ViewModels
       SelectedTrophy.Timestamp = null;
       SelectedTrophy.Achieved = false;
 
+      CheckPlatinum();
       NotifyTrophyChanges();
     } // LockTrophy
 

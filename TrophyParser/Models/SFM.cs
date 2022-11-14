@@ -81,7 +81,6 @@ namespace TrophyParser
     private void ParseTrophies(XmlDocument xmlDoc)
     {
       XmlNodeList trophiesXML = xmlDoc?.GetElementsByTagName("trophy");
-      List<Trophy> trophyList = new List<Trophy>();
       if (trophiesXML != null)
       {
         foreach (XmlNode trophy in trophiesXML)
@@ -93,7 +92,7 @@ namespace TrophyParser
           Trophy item = new Trophy(
             id,
             trophy?.Attributes?["hidden"]?.Value,
-            trophy?.Attributes?["ttype"]?.Value,
+            (char)(trophy?.Attributes?["ttype"]?.Value[0]),
             pid,
             trophy?["name"]?.InnerText,
             trophy?["detail"]?.InnerText,

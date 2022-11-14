@@ -60,21 +60,25 @@ namespace TrophyIsBetter.Models
     #endregion Public Properties
     #region Public Methods
 
+    /// <summary>
+    /// Unlock trophy
+    /// </summary>
     public void UnlockTrophy(ITrophyModel trophy, DateTime timestamp)
     {
-      _trophyList.UnlockTrophy(trophy.ID, timestamp);
+      if (trophy.Achieved)
+      {
+        _trophyList.ChangeTimestamp(trophy.ID, timestamp);
+      }
+      else
+      {
+        _trophyList.UnlockTrophy(trophy.ID, timestamp);
+        trophy.Achieved = true;
+      }
 
+      trophy.Timestamp = timestamp;
       HasUnsavedChanges = true;
       UpdatePSNExp();
     } // UnlockTrophy
-
-    public void ChangeTimestamp(ITrophyModel trophy, DateTime timestamp)
-    {
-      _trophyList.ChangeTimestamp(trophy.ID, timestamp);
-
-      HasUnsavedChanges = true;
-      UpdatePSNExp();
-    } // ChangeTimestamp
 
     public void LockTrophy(ITrophyModel trophy)
     {
@@ -169,7 +173,7 @@ namespace TrophyIsBetter.Models
 
       foreach (ITrophyModel trophy in Trophies)
       {
-        switch (trophy.Type[0])
+        switch (trophy.Type)
         {
           case 'P':
             TotalExp += 180;
