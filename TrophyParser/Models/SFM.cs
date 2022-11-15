@@ -23,7 +23,7 @@ namespace TrophyParser
 
     internal string TitleName => _titleName;
     internal string NpCommID => _npCommID;
-    internal bool HasPlatinum => _trophies[0].Rank.Equals("P");
+    internal bool HasPlatinum => _trophies[0].Rank.Equals('P');
     internal int TrophyCount => _trophies.Count;
     internal Trophy this[int index] => _trophies[index];
 
