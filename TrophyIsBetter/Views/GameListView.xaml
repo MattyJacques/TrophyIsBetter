@@ -110,6 +110,9 @@
           <MenuItem Header="Export"
                     Icon="{materialDesign:PackIcon FileExport}"
                     Command="{Binding ExportGameCommand}" />
+          <MenuItem Header="Remove"
+                    Icon="{materialDesign:PackIcon Delete}"
+                    Command="{Binding RemoveGameCommand}" />
         </ContextMenu>
       </DataGrid.ContextMenu>
 
