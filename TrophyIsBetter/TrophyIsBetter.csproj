@@ -96,6 +96,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Extensions\Helpers\StringToImageConverter.cs" />
     <Compile Include="Interfaces\IGameModel.cs" />
     <Compile Include="Interfaces\IPageViewModel.cs" />
     <Compile Include="Interfaces\ITrophyModel.cs" />

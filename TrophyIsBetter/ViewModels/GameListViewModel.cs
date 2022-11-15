@@ -33,6 +33,8 @@ namespace TrophyIsBetter.ViewModels
       ImportCommand = new AsyncRelayCommand(Import);
       EditGameCommand = new RelayCommand(EditGame);
       ExportGameCommand = new RelayCommand(ExportGame);
+      RemoveGameCommand = new RelayCommand(RemoveGame);
+      RemoveAllGamesCommand = new RelayCommand(RemoveAllGames, () => HasGames);
 
       GameCollectionView.CurrentChanged += OnSelectedGameChanged;
 
@@ -58,6 +60,16 @@ namespace TrophyIsBetter.ViewModels
     public RelayCommand ExportGameCommand { get; set; }
 
     /// <summary>
+    /// Remove a game from the game list
+    /// </summary>
+    public RelayCommand RemoveGameCommand { get; set; }
+
+    /// <summary>
+    /// Remove all games from the game list
+    /// </summary>
+    public RelayCommand RemoveAllGamesCommand { get; set; }
+
+    /// <summary>
     /// Get/Set the list of games
     /// </summary>
     public ObservableCollection<GameViewModel> GameCollection
@@ -70,6 +82,11 @@ namespace TrophyIsBetter.ViewModels
     /// Is a game selected
     /// </summary>
     public bool HasSelected => SelectedGame != null;
+
+    /// <summary>
+    /// Is a game selected
+    /// </summary>
+    public bool HasGames => GameCollection.Count > 0;
 
     /// <summary>
     /// The name of the view model
@@ -179,6 +196,8 @@ namespace TrophyIsBetter.ViewModels
         {
           _uiContext.Send(x => GameCollection.Add(new GameViewModel(entry)), null);
         }
+
+        _uiContext.Send(x => OnPropertyChanged(nameof(HasGames)), null);
       }
     } // LoadGames
 
@@ -211,6 +230,42 @@ namespace TrophyIsBetter.ViewModels
         }
       }
     } // ExportGame
+
+    /// <summary>
+    /// Remove a single game from the game list
+    /// </summary>
+    private void RemoveGame()
+    {
+      if (CheckShouldRemove(SelectedGame.Name))
+      {
+        _model.RemoveGame(SelectedGame.Model);
+        GameCollection.Remove(SelectedGame);
+
+        OnPropertyChanged(nameof(HasGames));
+      }
+    } // RemoveGame
+
+    /// <summary>
+    /// Remove all games from game list
+    /// </summary>
+    private void RemoveAllGames()
+    {
+      if (CheckShouldRemove("ALL GAMES"))
+      {
+        foreach (GameViewModel game in GameCollection)
+        {
+          _model.RemoveGame(game.Model);
+        }
+
+        GameCollection.Clear();
+
+        OnPropertyChanged(nameof(HasGames));
+      }
+    } // RemoveAll
+
+    private bool CheckShouldRemove(string gameName)
+      => MessageBox.Show($"Are you sure you want to delete {gameName}?", "Delete?",
+                         MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
 
     #endregion Private Methods
   } // GameListViewModel

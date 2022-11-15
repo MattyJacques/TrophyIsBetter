@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Controls;
 using TrophyIsBetter.Interfaces;
 
 namespace TrophyIsBetter.Models
@@ -29,9 +30,6 @@ namespace TrophyIsBetter.Models
     #endregion
     #region Private Members
 
-    private string _gameDirectory;
-    private string _tempGameDirectory;
-
     private List<Game> _games = new List<Game>();
 
     #endregion Private Members
@@ -47,7 +45,10 @@ namespace TrophyIsBetter.Models
         string path = CopyWithBackup(dir);
         Utility.PfdTool.DecryptTrophyData(path);
 
-        _games.Add(new Game(path));
+        Game game = new Game(path);
+        _games.Add(game);
+
+        Debug.WriteLine($"Imported {dir}");
       }
     } // ImportGames
 
@@ -68,7 +69,10 @@ namespace TrophyIsBetter.Models
 
         foreach (string folder in trophyFolders)
         {
-          _games.Add(new Game(folder));
+          Game game = new Game(folder);
+          _games.Add(game);
+
+          Debug.WriteLine($"Loaded {game.Name}({game.NpCommID})");
         }
       }
 
@@ -76,24 +80,19 @@ namespace TrophyIsBetter.Models
     } // LoadGames
 
     /// <summary>
-    /// Close the files that have been opened
+    /// Remove data from application
     /// </summary>
-    public void CloseFiles()
+    public void RemoveGame(IGameModel game)
     {
-      if (!string.IsNullOrEmpty(_tempGameDirectory))
-      {
-        foreach (Game list in _games)
-        {
-          Utility.PfdTool.EncryptTrophyData(list.Path);
-        }
+      string destination = Path.Combine(game.Platform.ToString(), game.NpCommID);
+      string fullDataPath = Path.Combine(TROPHY_DATA_PATH, destination);
+      string fullBackupPath = Path.Combine(BACKUP_DATA_PATH, destination);
 
-        Utility.File.CopyDirectory(_tempGameDirectory, _gameDirectory, true);
-        Utility.File.DeleteDirectory(_tempGameDirectory);
+      Debug.WriteLine($"Deleting trophy folder for: {game.Name}({game.NpCommID})");
 
-        _gameDirectory = null;
-        _tempGameDirectory = null;
-      }
-    } // CloseFiles
+      Utility.File.DeleteDirectory(fullDataPath);
+      Utility.File.DeleteDirectory(fullBackupPath);
+    } // RemoveGame
 
     #endregion Public Methods
     #region Private Methods
@@ -101,7 +100,7 @@ namespace TrophyIsBetter.Models
     /// <summary>
     /// Get the platform of the trophy folder
     /// </summary>
-    internal static string GetPlatform(string directory)
+    private static string GetPlatform(string directory)
     {
       if (File.Exists(Path.Combine(directory, "TROPCONF.SFM")))
       {
@@ -116,13 +115,15 @@ namespace TrophyIsBetter.Models
     /// <summary>
     /// Get a list of trophy directories from the given path
     /// </summary>
-    internal static IEnumerable<string> GetDirectories(string rootPath)
+    private static IEnumerable<string> GetDirectories(string rootPath)
     {
       var result = from dir
                    in Directory.EnumerateDirectories(rootPath, "*",
                       SearchOption.AllDirectories)
                    where TROPHY_FOLDER_REGEX.IsMatch(dir)
                    select dir;
+
+      Debug.WriteLine($"Found {result.Count()} directories");
 
       if (!result.Any() && TROPHY_FOLDER_REGEX.IsMatch(rootPath))
       {
@@ -138,7 +139,7 @@ namespace TrophyIsBetter.Models
     /// <summary>
     /// Copy the directory the application data directory with a backup
     /// </summary>
-    internal static string CopyWithBackup(string directory)
+    private static string CopyWithBackup(string directory)
     {
       string destination = Path.Combine(GetPlatform(directory), Path.GetFileName(directory));
       string fullDataPath = Path.Combine(TROPHY_DATA_PATH, destination);

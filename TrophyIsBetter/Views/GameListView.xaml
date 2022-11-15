@@ -60,6 +60,22 @@
               Height="auto"
               Width="60"
               HorizontalAlignment="Left" />
+      <Button Content="{materialDesign:PackIcon Delete}"
+              ToolTip="Remove Game"
+              IsEnabled="{Binding HasSelected}"
+              Command="{Binding RemoveGameCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="auto"
+              Width="60"
+              HorizontalAlignment="Left" />
+      <Button Content="{materialDesign:PackIcon DeleteAlert}"
+              ToolTip="Remove all games"
+              IsEnabled="{Binding HasGames}"
+              Command="{Binding RemoveAllGamesCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="auto"
+              Width="60"
+              HorizontalAlignment="Left" />
 
     </DockPanel>
 
@@ -103,8 +119,9 @@
                                 IsReadOnly="True">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
-              <Image Source="{Binding Icon}"
-                     Width="50"/>
+              <Image Source="{Binding Icon,
+                              Converter={StaticResource StringToImageConverter}}"
+                     Width="50" />
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
