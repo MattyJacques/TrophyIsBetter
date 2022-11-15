@@ -186,12 +186,13 @@ namespace TrophyIsBetter.ViewModels
       else
       {
         _model.Reload();
+        LoadTrophies();
       }
     } // Save
 
     private void EditTrophy()
     {
-      EditTimestampWindow window = new EditTimestampWindow
+      EditTimestampWindow window = new EditTimestampWindow("Edit Timestamp")
       {
         DataContext = new EditTimestampViewModel(_lastUsedTimestamp ?? DateTime.Now)
       };
@@ -273,6 +274,7 @@ namespace TrophyIsBetter.ViewModels
         {
           _model.UnlockTrophy(trophy.Model, trophy.RemoteTimestamp.Value);
 
+          trophy.Timestamp = trophy.RemoteTimestamp.Value;
           trophy.RemoteTimestamp = null;
           trophy.ShouldCopy = false;
         }
