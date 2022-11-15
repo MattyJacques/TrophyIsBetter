@@ -1,11 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Windows.Data;
 using TrophyIsBetter.Views;
-using TrophyParser.Models;
 
 namespace TrophyIsBetter.ViewModels
 {
@@ -23,6 +25,7 @@ namespace TrophyIsBetter.ViewModels
 
     private string _copyUrl = "";
     private ObservableCollection<TrophyViewModel> _trophyCollection;
+    private CollectionView _trophyCollectionView;
 
     #endregion Private Members
     #region Constructors
@@ -30,8 +33,11 @@ namespace TrophyIsBetter.ViewModels
     internal CopyFromViewModel(ObservableCollection<TrophyViewModel> trophies)
     {
       GetTimestampsCommand = new RelayCommand(GetTimestamps);
+      UpdateTimestampsCommand = new RelayCommand(UpdateTimestamps);
 
       TrophyCollection = trophies;
+      _trophyCollectionView =
+        (CollectionView)CollectionViewSource.GetDefaultView(TrophyCollection);
     } // Constructor
 
     #endregion Constructors
@@ -39,16 +45,29 @@ namespace TrophyIsBetter.ViewModels
 
     public RelayCommand GetTimestampsCommand { get; set; }
 
+    public RelayCommand UpdateTimestampsCommand { get; set; }
+
     public string CopyUrl { get => _copyUrl; set => SetProperty(ref _copyUrl, value); }
 
-    public ObservableCollection<TrophyViewModel> TrophyCollection
+    public CollectionView TrophyCollectionView { get => _trophyCollectionView; }
+
+    #endregion Public Properties
+    #region Internal Properties
+
+    internal ObservableCollection<TrophyViewModel> TrophyCollection
     {
       get => _trophyCollection;
       private set => SetProperty(ref _trophyCollection, value);
     }
 
-    #endregion Public Properties
+    internal TrophyViewModel SelectedTrophy
+    {
+      get => (TrophyViewModel)TrophyCollectionView.CurrentItem;
+    }
+
+    #endregion Internal Properties
     #region Private Methods
+    #region Initial Timestamp Downloads
 
     private void GetTimestamps()
     {
@@ -88,7 +107,7 @@ namespace TrophyIsBetter.ViewModels
       };
       window.ShowDialog();
 
-      return (((EditTimestampViewModel)window.DataContext).Timestamp - firstRemote).TotalSeconds;
+      return CalcOffset(((EditTimestampViewModel)window.DataContext).Timestamp, firstRemote);
     } // GetStartFromTimestamp
 
     private void CalcTimestamps(double offset, MatchCollection timestamps)
@@ -112,6 +131,43 @@ namespace TrophyIsBetter.ViewModels
       long.TryParse(Regex.Match(match.Value, "\\d+").ToString(), out var seconds);
       return seconds;
     } // ParseMatch
+
+    #endregion Initial Timestamp Downloads
+    #region Edit Timestamps
+
+    private void UpdateTimestamps()
+    {
+      EditTimestampWindow window = new EditTimestampWindow("Edit Timestamp")
+      {
+        DataContext = new EditTimestampViewModel(SelectedTrophy.RemoteTimestamp.Value)
+      };
+
+      bool? result = window.ShowDialog();
+
+      if (result == true)
+      {
+        DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
+
+        var futureTrophies = TrophyCollection.Where(x => x.RemoteTimestamp >= timestamp);
+        double offset = CalcOffset(((EditTimestampViewModel)window.DataContext).Timestamp,
+                                   SelectedTrophy.RemoteTimestamp.Value);
+
+        CalcNewTimestamps(futureTrophies, offset);
+      }
+    } // UpdateTimestamps
+
+    private void CalcNewTimestamps(IEnumerable<TrophyViewModel> futureTrophies, double offset)
+    {
+      foreach (TrophyViewModel trophy in futureTrophies)
+      {
+        trophy.RemoteTimestamp = trophy.RemoteTimestamp.Value.AddSeconds(offset);
+      }
+    } // CalcNewTimestamps
+
+    #endregion Edit Timestamps
+
+    private double CalcOffset(DateTime originalTimestamp, DateTime newTimestamp)
+      => (originalTimestamp - newTimestamp).TotalSeconds;
 
     #endregion Private Methods
   } // CopyFromViewModel

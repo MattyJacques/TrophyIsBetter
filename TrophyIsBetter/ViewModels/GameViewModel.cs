@@ -186,6 +186,7 @@ namespace TrophyIsBetter.ViewModels
       else
       {
         _model.Reload();
+        LoadTrophies();
       }
     } // Save
 
@@ -273,6 +274,7 @@ namespace TrophyIsBetter.ViewModels
         {
           _model.UnlockTrophy(trophy.Model, trophy.RemoteTimestamp.Value);
 
+          trophy.Timestamp = trophy.RemoteTimestamp.Value;
           trophy.RemoteTimestamp = null;
           trophy.ShouldCopy = false;
         }
