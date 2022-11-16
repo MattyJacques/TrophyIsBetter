@@ -76,6 +76,20 @@
               Height="auto"
               Width="60"
               HorizontalAlignment="Left" />
+      <ProgressBar Maximum="{Binding TotalCount}"
+                   Value="{Binding TotalEarnedCount, Mode=OneWay}"
+                   DockPanel.Dock="Right"
+                   Width="150"
+                   Height="8"
+                   HorizontalAlignment="Right"
+                   Margin="10,10" />
+      <TextBlock Text="{Binding ProgressString}"
+                 DockPanel.Dock="Right"
+                 VerticalAlignment="Center"
+                 HorizontalAlignment="Right" />
+      <TextBlock Text="Earned: "
+                 VerticalAlignment="Center"
+                 HorizontalAlignment="Right" />
 
     </DockPanel>
 
