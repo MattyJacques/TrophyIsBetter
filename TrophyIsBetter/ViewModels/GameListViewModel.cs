@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -93,6 +94,22 @@ namespace TrophyIsBetter.ViewModels
     /// </summary>
     public string Name { get => _name; set => _name = value; }
 
+    /// <summary>
+    /// String showing current trophy progress
+    /// </summary>
+    public string ProgressString =>
+      $"{TotalEarnedCount}/{TotalCount} ({TotalEarnedExp}/{TotalExp})";
+
+    /// <summary>
+    /// Total earned trophies
+    /// </summary>
+    public int TotalEarnedCount => GameCollection.Sum(game => game.EarnedCount);
+
+    /// <summary>
+    /// Total amount of trophies in lists
+    /// </summary>
+    public int TotalCount => GameCollection.Sum(game => game.TrophyCount);
+
     #endregion Public Properties
     #region Internal Properties
 
@@ -115,15 +132,19 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Get the selected game from the list
     /// </summary>
-    /// 
     internal GameViewModel SelectedGame => (GameViewModel)GameCollectionView.CurrentItem;
 
+    /// <summary>
+    /// Total amount of earned exp
+    /// </summary>
+    internal int TotalEarnedExp => GameCollection.Sum(game => game.EarnedExp);
+
+    /// <summary>
+    /// Total possible exp
+    /// </summary>
+    internal int TotalExp => GameCollection.Sum(game => game.TotalExp);
+
     #endregion Internal Properties
-    #region Public Methods
-
-    
-
-    #endregion Public Methods
     #region Private Methods
 
     /// <summary>
@@ -197,7 +218,7 @@ namespace TrophyIsBetter.ViewModels
           _uiContext.Send(x => GameCollection.Add(new GameViewModel(entry)), null);
         }
 
-        _uiContext.Send(x => OnPropertyChanged(nameof(HasGames)), null);
+        _uiContext.Send(x => NotifyGameChanges(), null);
       }
     } // LoadGames
 
@@ -241,7 +262,7 @@ namespace TrophyIsBetter.ViewModels
         _model.RemoveGame(SelectedGame.Model);
         GameCollection.Remove(SelectedGame);
 
-        OnPropertyChanged(nameof(HasGames));
+        NotifyGameChanges();
       }
     } // RemoveGame
 
@@ -259,13 +280,19 @@ namespace TrophyIsBetter.ViewModels
 
         GameCollection.Clear();
 
-        OnPropertyChanged(nameof(HasGames));
+        NotifyGameChanges();
       }
     } // RemoveAll
 
     private bool CheckShouldRemove(string gameName)
       => MessageBox.Show($"Are you sure you want to delete {gameName}?", "Delete?",
                          MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
+
+    private void NotifyGameChanges()
+    {
+      OnPropertyChanged(nameof(HasGames));
+      OnPropertyChanged(nameof(ProgressString));
+    } // NotifyChanges
 
     #endregion Private Methods
   } // GameListViewModel
