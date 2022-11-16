@@ -3,6 +3,7 @@
                     xmlns:local="clr-namespace:TrophyIsBetter">
   
   <Style x:Key="DataGridCheckBox" TargetType="CheckBox" BasedOn="{StaticResource MaterialDesignCheckBox}">
-    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="IsHitTestVisible" Value="False" />
   </Style>
 </ResourceDictionary>

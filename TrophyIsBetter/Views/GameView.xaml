@@ -111,12 +111,10 @@
 
         <DataGridCheckBoxColumn Header="Hidden"
                                 Binding="{Binding Hidden, Mode=OneWay}"
-                                IsReadOnly="True"
                                 ElementStyle="{DynamicResource DataGridCheckBox}" />
 
         <DataGridCheckBoxColumn Header="Synced"
                                 Binding="{Binding Synced, Mode=OneWay}"
-                                IsReadOnly="True"
                                 ElementStyle="{DynamicResource DataGridCheckBox}" />
 
         <DataGridTextColumn Header="Timestamp"

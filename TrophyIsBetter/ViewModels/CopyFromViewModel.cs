@@ -137,22 +137,25 @@ namespace TrophyIsBetter.ViewModels
 
     private void UpdateTimestamps()
     {
-      EditTimestampWindow window = new EditTimestampWindow("Edit Timestamp")
+      if (SelectedTrophy.RemoteTimestamp.HasValue)
       {
-        DataContext = new EditTimestampViewModel(SelectedTrophy.RemoteTimestamp.Value)
-      };
+        EditTimestampWindow window = new EditTimestampWindow("Edit Timestamp")
+        {
+          DataContext = new EditTimestampViewModel(SelectedTrophy.RemoteTimestamp.Value)
+        };
 
-      bool? result = window.ShowDialog();
+        bool? result = window.ShowDialog();
 
-      if (result == true)
-      {
-        DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
+        if (result == true)
+        {
+          DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
 
-        var futureTrophies = TrophyCollection.Where(x => x.RemoteTimestamp >= timestamp);
-        double offset = CalcOffset(((EditTimestampViewModel)window.DataContext).Timestamp,
-                                   SelectedTrophy.RemoteTimestamp.Value);
+          var futureTrophies = TrophyCollection.Where(x => x.RemoteTimestamp >= timestamp);
+          double offset = CalcOffset(((EditTimestampViewModel)window.DataContext).Timestamp,
+                                     SelectedTrophy.RemoteTimestamp.Value);
 
-        CalcNewTimestamps(futureTrophies, offset);
+          CalcNewTimestamps(futureTrophies, offset);
+        }
       }
     } // UpdateTimestamps
 
