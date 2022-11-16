@@ -44,7 +44,7 @@ namespace TrophyParser.Vita
     public override string NpCommID => _trop.NpCommID;
     public override PlatformEnum Platform => PlatformEnum.Vita;
     public override bool HasPlatinum => _trop.HasPlatinum;
-    public override bool IsSynced => _trans.IsSynced;
+    public override bool IsSynced => _title.IsSynced;
     public override int TrophyCount => _trop.TrophyCount;
     public override int EarnedCount => _title.EarnedCount;
     public override DateTime? LastTimestamp => _title.LastTimestamp;

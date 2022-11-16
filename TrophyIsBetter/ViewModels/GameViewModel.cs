@@ -270,13 +270,14 @@ namespace TrophyIsBetter.ViewModels
     {
       foreach(TrophyViewModel trophy in TrophyCollection)
       {
-        if (trophy.ShouldCopy && trophy.RemoteTimestamp.HasValue && !trophy.Synced)
+        if (trophy.ShouldCopy && trophy.RemoteTimestamp.HasValue)
         {
           _model.UnlockTrophy(trophy.Model, trophy.RemoteTimestamp.Value);
 
           trophy.Timestamp = trophy.RemoteTimestamp.Value;
           trophy.RemoteTimestamp = null;
           trophy.ShouldCopy = false;
+          trophy.Synced = false;
         }
       }
     } // CopyTimestamps

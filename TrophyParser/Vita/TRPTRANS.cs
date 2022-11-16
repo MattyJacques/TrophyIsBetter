@@ -33,18 +33,14 @@ namespace TrophyParser.Vita
     } // Constructor
 
     #endregion Constructors
-    #region Internal Properties
-
-    internal bool IsSynced => _timestamps.Count == 0;
-
-    #endregion Internal Properties
     #region Private Properties
 
     private byte[] Block
     {
       get
       {
-        var block = _reader.BaseStream.Position == _reader.BaseStream.Length ? null : _reader.ReadBytes(57);
+        var block =
+          _reader.BaseStream.Position == _reader.BaseStream.Length ? null : _reader.ReadBytes(57);
         _reader.BaseStream.Position += 119;
         return block;
       }

@@ -12,7 +12,7 @@ namespace TrophyIsBetter.Interfaces
     string Group { get; }
     bool Hidden { get; }
     bool Achieved { get; set; }
-    bool Synced { get; }
+    bool Synced { get; set; }
     DateTime? Timestamp { get; set; }
     DateTime? RemoteTimestamp { get; set; }
     bool ShouldCopy { get; set; }
