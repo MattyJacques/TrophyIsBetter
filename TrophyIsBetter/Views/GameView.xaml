@@ -12,9 +12,7 @@
              TextOptions.TextFormattingMode="Ideal"
              TextOptions.TextRenderingMode="Auto"
              Background="{DynamicResource MaterialDesignPaper}"
-             FontFamily="{materialDesign:MaterialDesignFont}"
-             Height="750"
-             Width="1250">
+             FontFamily="{materialDesign:MaterialDesignFont}">
 
   <DockPanel x:Name="MainPanel">
 
@@ -24,35 +22,43 @@
                 DockPanel.Dock="Top">
 
       <Button Content="{materialDesign:PackIcon ArrowLeft}"
+              ToolTip="Back"
               Command="{Binding ChangeViewToHomeCommand}"
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="50"
               Width="60" />
       <Button Content="{materialDesign:PackIcon Lock}"
+              ToolTip="Lock trophy"
               Command="{Binding LockTrophyCommand}"
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="50"
               Width="60" />
-      <Menu x:Name="Menu">
-        <MenuItem Header="File"
-                  Icon="{materialDesign:PackIcon File}"
-                  Visibility="Collapsed" >
-          <MenuItem Header="_Save"
-                    Icon="{materialDesign:PackIcon ContentSave}" />
-          <Separator/>
-          <MenuItem Header="_Close"
-                    Icon="{materialDesign:PackIcon ExitToApp}" />
-        </MenuItem>
-
-        <MenuItem Header="Advanced"
-                  Icon="{materialDesign:PackIcon Tools}"
-                  Visibility="Collapsed" >
-          <MenuItem Header="_Clear Unsynchronised"
-                    Icon="{materialDesign:PackIcon TrophyBroken}" />
-          <MenuItem Header="_Copy From PSNTrophyLeaders"
-                    Icon="{materialDesign:PackIcon CloudDownload}" />
-        </MenuItem>
-      </Menu>
+      <Button Content="{materialDesign:PackIcon TrophyBroken}"
+              ToolTip="Lock unsynchronised"
+              Command="{Binding LockUnsyncedCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="50"
+              Width="60" />
+      <Button Content="{materialDesign:PackIcon CloudDownload}"
+              ToolTip="Copy From PSNTL"
+              Command="{Binding CopyFromCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="50"
+              Width="60" />
+      <ProgressBar Maximum="{Binding TrophyCount}"
+                   Value="{Binding EarnedCount, Mode=OneWay}"
+                   DockPanel.Dock="Right"
+                   Width="150"
+                   Height="8"
+                   HorizontalAlignment="Right"
+                   Margin="10,10" />
+      <TextBlock Text="{Binding ProgressString}"
+                 DockPanel.Dock="Right"
+                 VerticalAlignment="Center"
+                 HorizontalAlignment="Right" />
+      <TextBlock Text="Earned: "
+                 VerticalAlignment="Center"
+                 HorizontalAlignment="Right" />
 
     </DockPanel>
 
@@ -88,7 +94,7 @@
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
               <Image Source="{Binding Icon}"
-                     Width="50" />
+                     Width="30" />
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
@@ -105,15 +111,11 @@
 
         <DataGridCheckBoxColumn Header="Hidden"
                                 Binding="{Binding Hidden, Mode=OneWay}"
-                                IsReadOnly="True" />
-
-        <DataGridCheckBoxColumn Header="Achieved"
-                                Binding="{Binding Achieved, Mode=OneWay}"
-                                IsReadOnly="True" />
+                                ElementStyle="{DynamicResource DataGridCheckBox}" />
 
         <DataGridCheckBoxColumn Header="Synced"
                                 Binding="{Binding Synced, Mode=OneWay}"
-                                IsReadOnly="True" />
+                                ElementStyle="{DynamicResource DataGridCheckBox}" />
 
         <DataGridTextColumn Header="Timestamp"
                             Binding="{Binding Timestamp,
@@ -123,7 +125,7 @@
 
         <DataGridTextColumn Header="Group"
                             Binding="{Binding Group, Mode=OneWay}"
-                            Width="100"/>
+                            Width="105"/>
       </DataGrid.Columns>
     </DataGrid>
 

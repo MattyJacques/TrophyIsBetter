@@ -8,7 +8,7 @@ using static TrophyParser.PS3.Structs;
 
 namespace TrophyParser.PS3
 {
-  public class TROPTRNS
+  internal class TROPTRNS
   {
     #region Const Members
 
@@ -31,7 +31,7 @@ namespace TrophyParser.PS3
     #endregion Private Members
     #region Constructors
 
-    public TROPTRNS(string path)
+    internal TROPTRNS(string path)
     {
       _filePath = Utility.File.GetFullPath(path, TROPTRNS_FILE_NAME);
 
@@ -47,14 +47,14 @@ namespace TrophyParser.PS3
     } // Constructor
 
     #endregion Constructors
-    #region Public Properties
+    #region Internal Properties
 
-    public bool IsSynced => _timestamps.Count == 0;
+    internal bool IsSynced => _timestamps.Count == 0;
 
-    #endregion Public Properties
-    #region Public Methods
+    #endregion Internal Properties
+    #region Internal Methods
 
-    public void AddTrophy(int id, int trophyType, DateTime unlockTime)
+    internal void AddTrophy(int id, int trophyType, DateTime unlockTime)
     {
       EarnedInfo timestamp = new EarnedInfo(id, trophyType, unlockTime);
 
@@ -81,7 +81,7 @@ namespace TrophyParser.PS3
       InsertTimestamp(timestamp);
     } // ChangeTimestamp
 
-    public void RemoveTrophy(int id)
+    internal void RemoveTrophy(int id)
     {
       EarnedInfo timestamp = _timestamps.Find(x => x.TrophyID == id);
 
@@ -94,7 +94,7 @@ namespace TrophyParser.PS3
       Debug.WriteLine($"Removed trophy {id} from TROPTRNS");
     } // RemoveTrophy
 
-    public void Save()
+    internal void Save()
     {
       BigEndianBinaryWriter writer =
         new BigEndianBinaryWriter(new FileStream(_filePath, FileMode.Open));
@@ -107,7 +107,7 @@ namespace TrophyParser.PS3
       Debug.WriteLine($"Saved {_listID} TROPTRNS");
     } // Save
 
-    public void PrintState()
+    internal void PrintState()
     {
       Console.WriteLine("\n----- TROPTRNS Data -----");
 
@@ -137,7 +137,7 @@ namespace TrophyParser.PS3
       }
     } // PrintState
 
-    #endregion Public Methods
+    #endregion Internal Methods
     #region Private Methods
     #region File Parsing
 

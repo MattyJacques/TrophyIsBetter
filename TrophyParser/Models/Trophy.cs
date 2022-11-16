@@ -6,14 +6,14 @@ namespace TrophyParser.Models
   {
     public int ID;
     public string Hidden;
-    public string Rank;
+    public char Rank;
     public int Pid;
     public string Name;
     public string Detail;
     public int Gid;
     public Timestamp Timestamp;
 
-    public Trophy(int id, string hidden, string rank, int pid, string name, string detail, int gid)
+    public Trophy(int id, string hidden, char rank, int pid, string name, string detail, int gid)
     {
       ID = id;
       Hidden = hidden;

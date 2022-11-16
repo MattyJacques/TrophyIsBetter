@@ -6,14 +6,14 @@ namespace TrophyParser
   /// <summary>
   /// An extension class for byte witchcraft... by https://github.com/DarkNacho
   /// </summary>
-  public static class Extensions
+  internal static class Extensions
   {
     /// <summary>
     /// Convert an numerical value to byte array of size 4, this probably won't work with a float
     /// </summary>
     /// <param name="value">Value to convert</param>
     /// <returns></returns>
-    public static byte[] ToBytes(this object value)
+    internal static byte[] ToBytes(this object value)
     {
       byte[] temp = BitConverter.GetBytes((uint)value);
       if (BitConverter.IsLittleEndian) Array.Reverse(temp);
@@ -26,7 +26,7 @@ namespace TrophyParser
     /// <param name="data">byte array to convert</param>
     /// <returns></returns>
     /// <exception cref="Exception">If is not possible to convert</exception>
-    /*public static uint ToUint(this byte[] data)
+    /*internal static uint ToUint(this byte[] data)
     {
       if (BitConverter.IsLittleEndian) Array.Reverse(data);
       return data.Length switch
@@ -42,10 +42,10 @@ namespace TrophyParser
     /// Convert a HexString to UInt,
     /// </summary>
     /// <param name="hex">string representation of hex value </param>
-    public static uint ToUInt(this string hex)
+    internal static uint ToUInt(this string hex)
         => Convert.ToUInt32(hex, 16);
 
-    public static uint ToUInt(this object value)
+    internal static uint ToUInt(this object value)
         => Convert.ToUInt32(value);
 
     /// <summary>
@@ -53,14 +53,14 @@ namespace TrophyParser
     /// </summary>
     /// <param name="data">string that represent a data</param>
     /// <param name="b">Base that represent the data string</param>
-    public static uint ToUInt(this string data, int b)
+    internal static uint ToUInt(this string data, int b)
         => Convert.ToUInt32(data, b);
 
     /// <summary>
     /// Convert a HexString to Int,
     /// </summary>
     /// <param name="hex">string representation of hex value </param>
-    public static int ToInt(this string hex)
+    internal static int ToInt(this string hex)
         => Convert.ToInt32(hex, 16);
 
     /// <summary>
@@ -68,7 +68,7 @@ namespace TrophyParser
     /// </summary>
     /// <param name="data">string that represent a data</param>
     /// <param name="b">Base that represent the data string</param>
-    public static int ToInt(this string data, int b)
+    internal static int ToInt(this string data, int b)
         => Convert.ToInt32(data, b);
 
     /// <summary>
@@ -76,7 +76,7 @@ namespace TrophyParser
     /// </summary>
     /// <param name="hex">string with hex representation</param>
     /// <returns></returns>
-    public static byte[] ToBytes(this string hex)
+    internal static byte[] ToBytes(this string hex)
     {
       return Enumerable.Range(0, hex.Length)
           .Where(x => x % 2 == 0)
@@ -89,7 +89,7 @@ namespace TrophyParser
     /// </summary>
     /// <param name="buffer"></param>
     /// <returns></returns>
-    public static string ToHexString(this byte[] buffer)
+    internal static string ToHexString(this byte[] buffer)
     {
       string str = "";
       for (int i = 0; i < buffer.Length; i++)
@@ -105,7 +105,7 @@ namespace TrophyParser
     /// <param name="nMatch">How many times must be found</param>
     /// <returns>Position where it was found</returns>
     /// <exception cref="Exception">If the subset was not found</exception>
-    public static long Search(this byte[] src, byte[] pattern, int nMatch)
+    internal static long Search(this byte[] src, byte[] pattern, int nMatch)
     {
       int found = 0;
       for (long i = 0; i < src.Length - pattern.Length + 1; ++i)

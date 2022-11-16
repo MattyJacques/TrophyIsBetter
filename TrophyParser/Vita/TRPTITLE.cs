@@ -19,13 +19,13 @@ namespace TrophyParser.Vita
     private BinaryReader _reader;
     private BinaryWriter _writer;
     private long pointer = -1;
-    public List<Timestamp> _timestamps = new List<Timestamp>();
+    internal List<Timestamp> _timestamps = new List<Timestamp>();
     private string _path;
 
     #endregion Private Members
     #region Constructors
 
-    public TRPTITLE(string path)
+    internal TRPTITLE(string path)
     {
       _path = Utility.File.GetFullPath(path, TRPTITLE_FILE_NAME);
 
@@ -33,11 +33,13 @@ namespace TrophyParser.Vita
     } // Constructor
 
     #endregion Constructors
-    #region Public Properties
+    #region Internal Properties
 
-    public Timestamp this[int index] => _timestamps[index];
+    internal Timestamp this[int index] => _timestamps[index];
 
-    public int EarnedCount
+    internal bool IsSynced => _timestamps.Where(x => !x.IsSynced).Count() == 0;
+
+    internal int EarnedCount
     {
       get
       {
@@ -55,11 +57,11 @@ namespace TrophyParser.Vita
       }
     } // EarnedCount
 
-    public DateTime? LastTimestamp
+    internal DateTime? LastTimestamp
     {
       get
       {
-        DateTime? result = new DateTime(2008, 1, 1);
+        DateTime? result = DateTime.MinValue;
         foreach (Timestamp timestamp in _timestamps)
         {
           if (timestamp.IsEarned && timestamp.Time > result)
@@ -68,11 +70,11 @@ namespace TrophyParser.Vita
           }
         }
 
-        return result;
+        return result == DateTime.MinValue ? null : result;
       }
     } // LastTimestamp
 
-    public DateTime? LastSyncedTimestamp
+    internal DateTime? LastSyncedTimestamp
     {
       get
       {
@@ -89,7 +91,7 @@ namespace TrophyParser.Vita
       }
     } // LastSyncedTimestamp
 
-    #endregion Public Properties
+    #endregion Internal Properties
     #region Private Properties
 
     private byte[] Block
@@ -119,9 +121,9 @@ namespace TrophyParser.Vita
     } // Block
 
     #endregion Private Properties
-    #region Public Methods
+    #region Internal Methods
 
-    public void PrintState()
+    internal void PrintState()
     {
       Console.WriteLine("\n----- TRPTITLE Data -----");
 
@@ -132,7 +134,7 @@ namespace TrophyParser.Vita
       }
     } // PrintState
 
-    public void UnlockTrophy(int id, DateTime time)
+    internal void UnlockTrophy(int id, DateTime time)
     {
       _timestamps[id].Time = time;
       _timestamps[id].Unknown = 0x50;
@@ -153,7 +155,7 @@ namespace TrophyParser.Vita
       Debug.WriteLine($"Locked trophy {id} in TRPTITLE");
     } // LockTrophy
 
-    public void Save()
+    internal void Save()
     {
       _writer = new BinaryWriter(new FileStream(_path, FileMode.Open));
       _writer.BaseStream.Position = pointer;
@@ -167,12 +169,17 @@ namespace TrophyParser.Vita
 
         data.AddRange(new byte[] { 0, 0, trophy.Unknown, 0, 0, 0, 0, 0 });
 
+        if (!trophy.IsSynced)
+          data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+
         var time = trophy.Time.HasValue ?
           BitConverter.GetBytes(trophy.Time.Value.Ticks / 10) : BitConverter.GetBytes((long)0);
         Array.Reverse(time);
         data.AddRange(time);
 
-        data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        if (trophy.IsSynced)
+          data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+
         Block = data.ToArray();
       }
 
@@ -180,7 +187,7 @@ namespace TrophyParser.Vita
       _writer.Close();
     } // Save
 
-    #endregion Public Methods
+    #endregion Internal Methods
     #region Private Methods
 
     private void ReadFile()
@@ -191,15 +198,7 @@ namespace TrophyParser.Vita
         var block = Block;
         do
         {
-          var time = block.Skip(9).Take(8).ToArray();
-          Array.Reverse(time);
-          ulong t = BitConverter.ToUInt64(time, 0);
-          _timestamps.Add(new Timestamp
-          {
-            Time = new DateTime().AddMilliseconds(t / 1000),
-            Unknown = block[3]
-
-          });
+          _timestamps.Add(GetTimestamp(block));
           block = Block;
         } while (block.Any());
         _reader.Close();
@@ -209,6 +208,33 @@ namespace TrophyParser.Vita
         throw new InvalidFileException("Fail in TRPTITLE.DAT");
       }
     } // ReadFile
+
+    private Timestamp GetTimestamp(byte[] block)
+    {
+      Timestamp timestamp = new Timestamp();
+
+      byte[] time;
+
+      if (block[10] != 0)
+      {
+        timestamp.IsSynced = true;
+        time = block.Skip(9).Take(8).ToArray();
+      }
+      else
+      {
+        time = block.Skip(17).Take(8).ToArray();
+      }
+
+      Array.Reverse(time);
+      ulong t = BitConverter.ToUInt64(time, 0);
+      timestamp.Time = new DateTime().AddMilliseconds(t / 1000);
+      timestamp.Unknown = block[3];
+
+      if (t == 0)
+        timestamp.IsSynced = true;
+
+      return timestamp;
+    } // GetTimestamp
 
     #endregion Private Methods
 

@@ -28,7 +28,10 @@ namespace TrophyParser.Vita
       for (int i = 0; i < _trop.TrophyCount; ++i)
       {
         var trophy = _trop[i];
-        trophy.Timestamp = _title[i];
+        if (DateTime.Compare(_title[i].Time.Value, DateTime.MinValue) > 0)
+        {
+          trophy.Timestamp = _title[i];
+        }
         _trophies.Add(trophy);
       }
     } // Constructor
@@ -41,10 +44,9 @@ namespace TrophyParser.Vita
     public override string NpCommID => _trop.NpCommID;
     public override PlatformEnum Platform => PlatformEnum.Vita;
     public override bool HasPlatinum => _trop.HasPlatinum;
-    public override bool IsSynced => _trans.IsSynced;
+    public override bool IsSynced => _title.IsSynced;
     public override int TrophyCount => _trop.TrophyCount;
     public override int EarnedCount => _title.EarnedCount;
-    public override string Progress => $"{EarnedCount}/{TrophyCount}";
     public override DateTime? LastTimestamp => _title.LastTimestamp;
     public override DateTime? LastSyncedTimestamp => _title.LastSyncedTimestamp;
 

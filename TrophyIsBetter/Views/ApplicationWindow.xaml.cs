@@ -2,14 +2,14 @@
 
 namespace TrophyIsBetter.Views
 {
-    /// <summary>
-    /// Interaction logic for ApplicationWindow.xaml
-    /// </summary>
-    public partial class ApplicationWindow : Window
+  /// <summary>
+  /// Interaction logic for ApplicationWindow.xaml
+  /// </summary>
+  public partial class ApplicationWindow : Window
+  {
+    public ApplicationWindow()
     {
-        public ApplicationWindow()
-        {
-            InitializeComponent();
-        }
+      InitializeComponent();
     }
-}
+  } // ApplicationWindow
+} // TrophyIsBetter.Views

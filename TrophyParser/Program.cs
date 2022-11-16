@@ -33,7 +33,7 @@ namespace TrophyParser
 
         static void Main(string[] args)
         {
-            PrintPS3();
+            //PrintPS3();
             //PrintVita();
         } // Main
     } // Program

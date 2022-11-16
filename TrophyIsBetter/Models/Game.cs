@@ -9,18 +9,20 @@ using static TrophyParser.Enums;
 
 namespace TrophyIsBetter.Models
 {
-  public class Game : IGameModel
+  internal class Game : IGameModel
   {
     #region Private Members
 
     private string _path;
     private TrophyList _trophyList;
     private bool _hasChanges = false;
+    private int _earnedExp = 0;
+    private int _totalExp = 0;
 
     #endregion Private Members
     #region Constructors
 
-    public Game(string path)
+    internal Game(string path)
     {
       _path = path;
 
@@ -32,6 +34,8 @@ namespace TrophyIsBetter.Models
       {
         _trophyList = new VitaTrophyList(_path);
       }
+
+      UpdatePSNExp();
     } // Constructor
 
     #endregion Constructors
@@ -43,32 +47,45 @@ namespace TrophyIsBetter.Models
     public PlatformEnum Platform => _trophyList.Platform;
     public bool HasPlatinum => _trophyList.HasPlatinum;
     public bool IsSynced => _trophyList.IsSynced;
-    public string Progress => _trophyList.Progress;
+    public int EarnedCount => _trophyList.EarnedCount;
+    public int TrophyCount => _trophyList.TrophyCount;
+    public int EarnedExp { get => _earnedExp; set => _earnedExp = value; }
+    public int TotalExp { get => _totalExp; set => _totalExp = value; }
     public DateTime? LastTimestamp => _trophyList.LastTimestamp;
     public DateTime? SyncTime => _trophyList.LastSyncedTimestamp;
-    public List<Trophy> Trophies => ConvertTrophyData(_trophyList.Trophies);
+    public List<ITrophyModel> Trophies => ConvertTrophyData(_trophyList.Trophies);
     public string Path => _path;
     public bool HasUnsavedChanges { get => _hasChanges; set => _hasChanges = value; }
 
     #endregion Public Properties
     #region Public Methods
 
-    public void UnlockTrophy(Trophy trophy, DateTime timestamp)
+    /// <summary>
+    /// Unlock trophy
+    /// </summary>
+    public void UnlockTrophy(ITrophyModel trophy, DateTime timestamp)
     {
-      _trophyList.UnlockTrophy(trophy.ID, timestamp);
+      if (trophy.Achieved)
+      {
+        _trophyList.ChangeTimestamp(trophy.ID, timestamp);
+      }
+      else
+      {
+        _trophyList.UnlockTrophy(trophy.ID, timestamp);
+        trophy.Achieved = true;
+      }
+
+      trophy.Timestamp = timestamp;
       HasUnsavedChanges = true;
+      UpdatePSNExp();
     } // UnlockTrophy
 
-    public void ChangeTimestamp(Trophy trophy, DateTime timestamp)
-    {
-      _trophyList.ChangeTimestamp(trophy.ID, timestamp);
-      HasUnsavedChanges = true;
-    } // ChangeTimestamp
-
-    public void LockTrophy(Trophy trophy)
+    public void LockTrophy(ITrophyModel trophy)
     {
       _trophyList.LockTrophy(trophy.ID);
+
       HasUnsavedChanges = true;
+      UpdatePSNExp();
     } // LockTrophy
 
     public void Save()
@@ -81,7 +98,7 @@ namespace TrophyIsBetter.Models
     {
       string fullExportPath = System.IO.Path.Combine(exportPath, System.IO.Path.GetFileName(Path));
 
-      Utility.File.CopyDirectory(Path, fullExportPath, false);
+      Utility.File.CopyDirectory(Path, fullExportPath, true);
       Utility.PfdTool.EncryptTrophyData(fullExportPath);
     } // Export
 
@@ -107,9 +124,9 @@ namespace TrophyIsBetter.Models
       return File.Exists(System.IO.Path.Combine(Path, "TROPCONF.SFM"));
     } // IsPS3
 
-    private List<Trophy> ConvertTrophyData(List<TrophyParser.Models.Trophy> trophies)
+    private List<ITrophyModel> ConvertTrophyData(List<TrophyParser.Models.Trophy> trophies)
     {
-      List<Trophy> result = new List<Trophy>();
+      List<ITrophyModel> result = new List<ITrophyModel>();
 
       foreach (TrophyParser.Models.Trophy trophy in trophies)
       {
@@ -121,11 +138,10 @@ namespace TrophyIsBetter.Models
           Description = trophy.Detail,
           Type = trophy.Rank,
           Hidden = trophy.Hidden == "yes",
-          Group = trophy.Gid == 0 ? "BaseGame" : $"DLC{trophy.Gid}",
-          Achieved = trophy.Timestamp?.IsEarned != false,
-          Synced = trophy.Timestamp?.IsSynced != false,
-          Timestamp =
-            trophy.Timestamp?.Time != null ? (DateTime)trophy.Timestamp?.Time : DateTime.MinValue
+          Group = trophy.Gid == 0 ? "Base Game" : $"DLC {trophy.Gid}",
+          Achieved = trophy.Timestamp?.IsEarned == true,
+          Synced = trophy.Timestamp?.IsSynced == true || trophy.Timestamp == null,
+          Timestamp = trophy.Timestamp?.Time
         };
 
         result.Add(convertedTrophy);
@@ -136,8 +152,8 @@ namespace TrophyIsBetter.Models
 
     private string GetIconPath(int id)
     {
-      string result = null;
-
+      string result;
+      
       if (IsPS3())
       {
         result = Path + @"\TROP" + string.Format("{0:000}", id) + ".PNG";
@@ -149,6 +165,37 @@ namespace TrophyIsBetter.Models
 
       return result;
     } // GetIconPath
+
+    private void UpdatePSNExp()
+    {
+      EarnedExp = 0;
+      TotalExp = 0;
+
+      foreach (ITrophyModel trophy in Trophies)
+      {
+        switch (trophy.Type)
+        {
+          case 'P':
+            TotalExp += 180;
+            EarnedExp += trophy.Achieved ? 180 : 0;
+            break;
+          case 'G':
+            TotalExp += 90;
+            EarnedExp += trophy.Achieved ? 90 : 0;
+            break;
+          case 'S':
+            TotalExp += 30;
+            EarnedExp += trophy.Achieved ? 30 : 0;
+            break;
+          case 'B':
+            TotalExp += 15;
+            EarnedExp += trophy.Achieved ? 15 : 0;
+            break;
+          default:
+            throw new NotSupportedException($"Unknown trophy grade: {trophy.Type}");
+        }
+      }
+    } // UpdatePSNExp
 
     #endregion Private Methods
   } // GameListEntry

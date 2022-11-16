@@ -1,19 +1,19 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using TrophyIsBetter.Models;
+using TrophyIsBetter.Interfaces;
 
 namespace TrophyIsBetter.ViewModels
 {
-  public class TrophyViewModel : ObservableObject
+  internal class TrophyViewModel : ObservableObject
   {
     #region Private Members
 
-    private readonly Trophy _model;
+    private readonly ITrophyModel _model;
 
     #endregion Private Members
     #region Constructors
 
-    public TrophyViewModel(Trophy model)
+    internal TrophyViewModel(ITrophyModel model)
     {
       _model = model;
     } // Constructor
@@ -21,24 +21,22 @@ namespace TrophyIsBetter.ViewModels
     #endregion Constructors
     #region Public Properties
 
-    public Trophy Model { get => _model; }
     public string Icon { get => _model.Icon; }
     public string Name { get => _model.Name; }
     public string Description { get => _model.Description; }
-    public string Type { get => _model.Type; }
+    public char Type { get => _model.Type; }
     public string Group { get => _model.Group; }
     public bool Hidden { get => _model.Hidden; }
-    public bool Achieved
+    public bool Synced
     {
-      get => _model.Achieved;
+      get => _model.Synced;
       set
       {
-        _model.Achieved = value;
+        _model.Synced = value;
         OnPropertyChanged();
       }
     }
-    public bool Synced { get => _model.Synced; }
-    public DateTime Timestamp
+    public DateTime? Timestamp
     {
       get => _model.Timestamp;
       set
@@ -47,7 +45,31 @@ namespace TrophyIsBetter.ViewModels
         OnPropertyChanged();
       }
     }
+    public DateTime? RemoteTimestamp
+    {
+      get => _model.RemoteTimestamp;
+      set
+      {
+        _model.RemoteTimestamp = value;
+        OnPropertyChanged();
+      }
+    }
+    public bool ShouldCopy
+    {
+      get => _model.ShouldCopy;
+      set
+      {
+        _model.ShouldCopy = value;
+        OnPropertyChanged();
+      }
+    }
 
     #endregion Public Properties
+    #region Internal Properties
+
+    internal ITrophyModel Model { get => _model; }
+    internal bool Achieved { get => _model.Achieved; set => _model.Achieved = value; }
+
+    #endregion Internal Properties
   } // TrophyViewModel
 } // TrophyIsBetter.ViewModels

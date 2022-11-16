@@ -3,6 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
@@ -10,7 +13,7 @@ using TrophyIsBetter.Models;
 
 namespace TrophyIsBetter.ViewModels
 {
-  public class GameListViewModel : ObservableObject, IPageViewModel
+  internal class GameListViewModel : ObservableObject, IPageViewModel
   {
     #region Private Members
 
@@ -19,19 +22,20 @@ namespace TrophyIsBetter.ViewModels
 
     private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
     private CollectionView _gameCollectionView = null;
-
-    private bool _isOpen = false;
+    private readonly SynchronizationContext _uiContext = SynchronizationContext.Current;
 
     #endregion Private Members
     #region Constructors
 
-    public GameListViewModel(IGameListModel model)
+    internal GameListViewModel(IGameListModel model)
     {
       _model = model;
 
-      ImportCommand = new RelayCommand(Import);
+      ImportCommand = new AsyncRelayCommand(Import);
       EditGameCommand = new RelayCommand(EditGame);
       ExportGameCommand = new RelayCommand(ExportGame);
+      RemoveGameCommand = new RelayCommand(RemoveGame);
+      RemoveAllGamesCommand = new RelayCommand(RemoveAllGames, () => HasGames);
 
       GameCollectionView.CurrentChanged += OnSelectedGameChanged;
 
@@ -44,7 +48,7 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Import a single trophy folder or a directory containing multiple
     /// </summary>
-    public RelayCommand ImportCommand { get; set; }
+    public AsyncRelayCommand ImportCommand { get; set; }
 
     /// <summary>
     /// Edit a games trophies
@@ -57,6 +61,16 @@ namespace TrophyIsBetter.ViewModels
     public RelayCommand ExportGameCommand { get; set; }
 
     /// <summary>
+    /// Remove a game from the game list
+    /// </summary>
+    public RelayCommand RemoveGameCommand { get; set; }
+
+    /// <summary>
+    /// Remove all games from the game list
+    /// </summary>
+    public RelayCommand RemoveAllGamesCommand { get; set; }
+
+    /// <summary>
     /// Get/Set the list of games
     /// </summary>
     public ObservableCollection<GameViewModel> GameCollection
@@ -66,9 +80,43 @@ namespace TrophyIsBetter.ViewModels
     }
 
     /// <summary>
+    /// Is a game selected
+    /// </summary>
+    public bool HasSelected => SelectedGame != null;
+
+    /// <summary>
+    /// Is a game selected
+    /// </summary>
+    public bool HasGames => GameCollection.Count > 0;
+
+    /// <summary>
+    /// The name of the view model
+    /// </summary>
+    public string Name { get => _name; set => _name = value; }
+
+    /// <summary>
+    /// String showing current trophy progress
+    /// </summary>
+    public string ProgressString =>
+      $"{TotalEarnedCount}/{TotalCount} ({TotalEarnedExp}/{TotalExp})";
+
+    /// <summary>
+    /// Total earned trophies
+    /// </summary>
+    public int TotalEarnedCount => GameCollection.Sum(game => game.EarnedCount);
+
+    /// <summary>
+    /// Total amount of trophies in lists
+    /// </summary>
+    public int TotalCount => GameCollection.Sum(game => game.TrophyCount);
+
+    #endregion Public Properties
+    #region Internal Properties
+
+    /// <summary>
     /// Get/Set the collection view, used for sorting
     /// </summary>
-    public CollectionView GameCollectionView
+    internal CollectionView GameCollectionView
     {
       get
       {
@@ -84,76 +132,19 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Get the selected game from the list
     /// </summary>
-    /// 
-    public GameViewModel SelectedGame => (GameViewModel)GameCollectionView.CurrentItem;
+    internal GameViewModel SelectedGame => (GameViewModel)GameCollectionView.CurrentItem;
 
     /// <summary>
-    /// Is a game selected
+    /// Total amount of earned exp
     /// </summary>
-    public bool HasSelected => SelectedGame != null;
+    internal int TotalEarnedExp => GameCollection.Sum(game => game.EarnedExp);
 
     /// <summary>
-    /// The name of the view model
+    /// Total possible exp
     /// </summary>
-    public string Name { get => _name; set => _name = value; }
+    internal int TotalExp => GameCollection.Sum(game => game.TotalExp);
 
-    #endregion Public Properties
-    #region Public Methods
-
-    /// <summary>
-    /// Show dialog to choose a directory to import then fire off importing process
-    /// </summary>
-    public void Import()
-    {
-      string path = ChoosePath();
-      if (!string.IsNullOrEmpty(path))
-      {
-        ImportDirectory(path);
-      }
-    } // Import
-
-    /// <summary>
-    /// Switch page to the single game view
-    /// </summary>
-    public void EditGame()
-    {
-      ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
-        .ChangePageCommand.Execute(SelectedGame);
-    } // EditGame
-
-    /// <summary>
-    /// Encrypt the files and export
-    /// </summary>
-    public void ExportGame()
-    {
-      string path = ChoosePath();
-      if (!string.IsNullOrEmpty(path))
-      {
-        try
-        {
-          SelectedGame.Model.Export(path);
-        }
-        catch (Exception ex)
-        {
-          GC.Collect();
-          Console.WriteLine(ex.StackTrace);
-          MessageBox.Show("Export Failed:" + ex.Message);
-        }
-      }
-    } // ExportGame
-
-    /// <summary>
-    /// Save files and close the directory
-    /// </summary>
-    public void CloseDirectory()
-    {
-      if (_isOpen)
-      {
-        _model.CloseFiles();
-      }
-    } // CloseDirectory
-
-    #endregion Public Methods
+    #endregion Internal Properties
     #region Private Methods
 
     /// <summary>
@@ -163,6 +154,19 @@ namespace TrophyIsBetter.ViewModels
     {
       OnPropertyChanged(nameof(HasSelected));
     } // OnSelectedGameChanged
+
+    /// <summary>
+    /// Show dialog to choose a directory to import then fire off importing process
+    /// </summary>
+    private Task Import()
+    {
+      string path = ChoosePath();
+      if (!string.IsNullOrEmpty(path))
+      {
+        return Task.Run(() => ImportDirectory(path));
+      }
+      return Task.CompletedTask;
+    } // Import
 
     /// <summary>
     /// Choose path to import
@@ -207,16 +211,88 @@ namespace TrophyIsBetter.ViewModels
 
       if (games != null)
       {
-        GameCollection.Clear();
+        _uiContext.Send(x => GameCollection.Clear(), null);
 
         foreach (Game entry in games)
         {
-          GameCollection.Add(new GameViewModel(entry));
+          _uiContext.Send(x => GameCollection.Add(new GameViewModel(entry)), null);
+        }
+
+        _uiContext.Send(x => NotifyGameChanges(), null);
+      }
+    } // LoadGames
+
+    /// <summary>
+    /// Switch page to the single game view
+    /// </summary>
+    private void EditGame()
+    {
+      ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
+        .ChangePageCommand.Execute(SelectedGame);
+    } // EditGame
+
+    /// <summary>
+    /// Encrypt the files and export
+    /// </summary>
+    private void ExportGame()
+    {
+      string path = ChoosePath();
+      if (!string.IsNullOrEmpty(path))
+      {
+        try
+        {
+          SelectedGame.Model.Export(path);
+        }
+        catch (Exception ex)
+        {
+          GC.Collect();
+          Console.WriteLine(ex.StackTrace);
+          MessageBox.Show("Export Failed:" + ex.Message);
         }
       }
+    } // ExportGame
 
-      _isOpen = true;
-    } // LoadGames
+    /// <summary>
+    /// Remove a single game from the game list
+    /// </summary>
+    private void RemoveGame()
+    {
+      if (CheckShouldRemove(SelectedGame.Name))
+      {
+        _model.RemoveGame(SelectedGame.Model);
+        GameCollection.Remove(SelectedGame);
+
+        NotifyGameChanges();
+      }
+    } // RemoveGame
+
+    /// <summary>
+    /// Remove all games from game list
+    /// </summary>
+    private void RemoveAllGames()
+    {
+      if (CheckShouldRemove("ALL GAMES"))
+      {
+        foreach (GameViewModel game in GameCollection)
+        {
+          _model.RemoveGame(game.Model);
+        }
+
+        GameCollection.Clear();
+
+        NotifyGameChanges();
+      }
+    } // RemoveAll
+
+    private bool CheckShouldRemove(string gameName)
+      => MessageBox.Show($"Are you sure you want to delete {gameName}?", "Delete?",
+                         MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
+
+    private void NotifyGameChanges()
+    {
+      OnPropertyChanged(nameof(HasGames));
+      OnPropertyChanged(nameof(ProgressString));
+    } // NotifyChanges
 
     #endregion Private Methods
   } // GameListViewModel

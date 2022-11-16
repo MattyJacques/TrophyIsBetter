@@ -1,24 +1,36 @@
 ﻿using System;
-using TrophyIsBetter.Models;
+using System.Collections.Generic;
+using static TrophyParser.Enums;
 
 namespace TrophyIsBetter.Interfaces
 {
-  public interface IGameModel
+  internal interface IGameModel
   {
+    string Icon { get; }
+    string Name { get; }
+    string NpCommID { get; }
+    PlatformEnum Platform { get; }
+    bool HasPlatinum { get; }
+    bool IsSynced { get; }
+    int EarnedCount { get; }
+    int TrophyCount { get; }
+    int EarnedExp { get; }
+    int TotalExp { get; }
+    DateTime? LastTimestamp { get; }
+    DateTime? SyncTime { get; }
+    List<ITrophyModel> Trophies { get; }
+    string Path { get; }
+    bool HasUnsavedChanges { get; }
+
     /// <summary>
     /// Unlock a trophy in the game
     /// </summary>
-    void UnlockTrophy(Trophy trophy, DateTime timestamp);
-
-    /// <summary>
-    /// Change the timestamp of a trophy in the game
-    /// </summary>
-    void ChangeTimestamp(Trophy trophy, DateTime timestamp);
+    void UnlockTrophy(ITrophyModel trophy, DateTime timestamp);
 
     /// <summary>
     /// Lock a trophy in the game
     /// </summary>
-    void LockTrophy(Trophy trophy);
+    void LockTrophy(ITrophyModel trophy);
 
     /// <summary>
     /// Save the game data to file

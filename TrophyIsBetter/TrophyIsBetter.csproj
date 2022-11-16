@@ -36,6 +36,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\platinum_trophy.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommunityToolkit.Mvvm, Version=8.0.0.0, Culture=neutral, PublicKeyToken=4aff67a105548ee2, processorArchitecture=MSIL">
       <HintPath>..\packages\CommunityToolkit.Mvvm.8.0.0\lib\netstandard2.0\CommunityToolkit.Mvvm.dll</HintPath>
@@ -93,15 +96,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Extensions\Helpers\StringToImageConverter.cs" />
     <Compile Include="Interfaces\IGameModel.cs" />
     <Compile Include="Interfaces\IPageViewModel.cs" />
+    <Compile Include="Interfaces\ITrophyModel.cs" />
     <Compile Include="Models\GameList.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
+    <Compile Include="ViewModels\CopyFromViewModel.cs" />
     <Compile Include="ViewModels\EditTimestampViewModel.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="ViewModels\GameListViewModel.cs" />
+    <Page Include="Resources\Dictionaries\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ApplicationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CopyFromWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -112,10 +126,6 @@
     <Page Include="Views\GameListView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="GamesLoadingView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GameView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -129,14 +139,14 @@
     <Compile Include="Views\ApplicationWindow.xaml.cs">
       <DependentUpon>ApplicationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\CopyFromWindow.xaml.cs">
+      <DependentUpon>CopyFromWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EditTimestampWindow.xaml.cs">
       <DependentUpon>EditTimestampWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GameListView.xaml.cs">
       <DependentUpon>GameListView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="GamesLoadingView.xaml.cs">
-      <DependentUpon>GamesLoadingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GameView.xaml.cs">
       <DependentUpon>GameView.xaml</DependentUpon>
@@ -181,6 +191,9 @@
       <Project>{d580937e-62a2-4c30-ac55-7142978a56a7}</Project>
       <Name>Utility</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\platinum_trophy.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

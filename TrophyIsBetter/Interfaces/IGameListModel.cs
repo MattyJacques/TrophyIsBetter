@@ -3,7 +3,7 @@ using TrophyIsBetter.Models;
 
 namespace TrophyIsBetter.Interfaces
 {
-  public interface IGameListModel
+  internal interface IGameListModel
   {
     /// <summary>
     /// Import trophy folders from the given directory
@@ -16,9 +16,9 @@ namespace TrophyIsBetter.Interfaces
     List<Game> LoadGames();
 
     /// <summary>
-    /// Close the files that have been opened
+    /// Remove a game from data
     /// </summary>
-    void CloseFiles();
+    void RemoveGame(IGameModel game);
 
   } // IGameListModel
 } // TrophyIsBetter.Interfaces

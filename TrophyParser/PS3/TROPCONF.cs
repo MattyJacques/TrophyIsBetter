@@ -3,7 +3,7 @@
 namespace TrophyParser.PS3
 {
   // Class to extract general trophy data about the title
-  public class TROPCONF : SFM
+  internal class TROPCONF : SFM
   {
     #region Const Members
 
@@ -13,7 +13,7 @@ namespace TrophyParser.PS3
     #endregion Const Members
     #region Constructors
 
-    public TROPCONF(string path)
+    internal TROPCONF(string path)
     {
       byte[] data = File.ReadAllBytes(Utility.File.GetFullPath(path, TROPCONF_FILE_NAME));
       Parse(data.SubArray(START_BYTE, data.Length - START_BYTE));
