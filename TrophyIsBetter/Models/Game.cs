@@ -139,8 +139,8 @@ namespace TrophyIsBetter.Models
           Type = trophy.Rank,
           Hidden = trophy.Hidden == "yes",
           Group = trophy.Gid == 0 ? "Base Game" : $"DLC {trophy.Gid}",
-          Achieved = trophy.Timestamp?.IsEarned != false,
-          Synced = trophy.Timestamp?.IsSynced != false,
+          Achieved = trophy.Timestamp?.IsEarned == true,
+          Synced = trophy.Timestamp?.IsSynced == true || trophy.Timestamp == null,
           Timestamp = trophy.Timestamp?.Time
         };
 
@@ -177,20 +177,22 @@ namespace TrophyIsBetter.Models
         {
           case 'P':
             TotalExp += 180;
-            EarnedExp += (trophy.Achieved) ? 180 : 0;
+            EarnedExp += trophy.Achieved ? 180 : 0;
             break;
           case 'G':
             TotalExp += 90;
-            EarnedExp += (trophy.Achieved) ? 90 : 0;
+            EarnedExp += trophy.Achieved ? 90 : 0;
             break;
           case 'S':
             TotalExp += 30;
-            EarnedExp += (trophy.Achieved) ? 30 : 0;
+            EarnedExp += trophy.Achieved ? 30 : 0;
             break;
           case 'B':
             TotalExp += 15;
-            EarnedExp += (trophy.Achieved) ? 15 : 0;
+            EarnedExp += trophy.Achieved ? 15 : 0;
             break;
+          default:
+            throw new NotSupportedException($"Unknown trophy grade: {trophy.Type}");
         }
       }
     } // UpdatePSNExp

@@ -37,6 +37,8 @@ namespace TrophyParser.Vita
 
     internal Timestamp this[int index] => _timestamps[index];
 
+    internal bool IsSynced => _timestamps.Where(x => !x.IsSynced).Count() == 0;
+
     internal int EarnedCount
     {
       get
@@ -59,7 +61,7 @@ namespace TrophyParser.Vita
     {
       get
       {
-        DateTime? result = null;
+        DateTime? result = DateTime.MinValue;
         foreach (Timestamp timestamp in _timestamps)
         {
           if (timestamp.IsEarned && timestamp.Time > result)
@@ -68,7 +70,7 @@ namespace TrophyParser.Vita
           }
         }
 
-        return result;
+        return result == DateTime.MinValue ? null : result;
       }
     } // LastTimestamp
 
@@ -191,15 +193,7 @@ namespace TrophyParser.Vita
         var block = Block;
         do
         {
-          var time = block.Skip(9).Take(8).ToArray();
-          Array.Reverse(time);
-          ulong t = BitConverter.ToUInt64(time, 0);
-          _timestamps.Add(new Timestamp
-          {
-            Time = new DateTime().AddMilliseconds(t / 1000),
-            Unknown = block[3]
-
-          });
+          _timestamps.Add(GetTimestamp(block));
           block = Block;
         } while (block.Any());
         _reader.Close();
@@ -209,6 +203,33 @@ namespace TrophyParser.Vita
         throw new InvalidFileException("Fail in TRPTITLE.DAT");
       }
     } // ReadFile
+
+    private Timestamp GetTimestamp(byte[] block)
+    {
+      Timestamp timestamp = new Timestamp();
+
+      byte[] time;
+
+      if (block[10] != 0)
+      {
+        timestamp.IsSynced = true;
+        time = block.Skip(9).Take(8).ToArray();
+      }
+      else
+      {
+        time = block.Skip(17).Take(8).ToArray();
+      }
+
+      Array.Reverse(time);
+      ulong t = BitConverter.ToUInt64(time, 0);
+      timestamp.Time = new DateTime().AddMilliseconds(t / 1000);
+      timestamp.Unknown = block[3];
+
+      if (t == 0)
+        timestamp.IsSynced = true;
+
+      return timestamp;
+    } // GetTimestamp
 
     #endregion Private Methods
 

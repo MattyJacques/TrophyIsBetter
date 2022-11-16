@@ -27,7 +27,15 @@ namespace TrophyIsBetter.ViewModels
     public char Type { get => _model.Type; }
     public string Group { get => _model.Group; }
     public bool Hidden { get => _model.Hidden; }
-    public bool Synced { get => _model.Synced; }
+    public bool Synced
+    {
+      get => _model.Synced;
+      set
+      {
+        _model.Synced = value;
+        OnPropertyChanged();
+      }
+    }
     public DateTime? Timestamp
     {
       get => _model.Timestamp;
