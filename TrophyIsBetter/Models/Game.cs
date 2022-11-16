@@ -98,7 +98,7 @@ namespace TrophyIsBetter.Models
     {
       string fullExportPath = System.IO.Path.Combine(exportPath, System.IO.Path.GetFileName(Path));
 
-      Utility.File.CopyDirectory(Path, fullExportPath, false);
+      Utility.File.CopyDirectory(Path, fullExportPath, true);
       Utility.PfdTool.EncryptTrophyData(fullExportPath);
     } // Export
 
