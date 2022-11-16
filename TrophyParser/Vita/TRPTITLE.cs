@@ -169,12 +169,17 @@ namespace TrophyParser.Vita
 
         data.AddRange(new byte[] { 0, 0, trophy.Unknown, 0, 0, 0, 0, 0 });
 
+        if (!trophy.IsSynced)
+          data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+
         var time = trophy.Time.HasValue ?
           BitConverter.GetBytes(trophy.Time.Value.Ticks / 10) : BitConverter.GetBytes((long)0);
         Array.Reverse(time);
         data.AddRange(time);
 
-        data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        if (trophy.IsSynced)
+          data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+
         Block = data.ToArray();
       }
 
