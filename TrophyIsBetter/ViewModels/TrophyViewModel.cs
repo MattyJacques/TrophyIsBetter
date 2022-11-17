@@ -21,6 +21,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Constructors
     #region Public Properties
 
+    public string Game { get => _model.Game; }
     public string Icon { get => _model.Icon; }
     public string Name { get => _model.Name; }
     public string Description { get => _model.Description; }

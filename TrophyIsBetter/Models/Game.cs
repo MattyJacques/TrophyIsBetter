@@ -132,6 +132,7 @@ namespace TrophyIsBetter.Models
       {
         Trophy convertedTrophy = new Trophy()
         {
+          Game = Name,
           ID = trophy.ID,
           Icon = GetIconPath(trophy.ID),
           Name = trophy.Name,

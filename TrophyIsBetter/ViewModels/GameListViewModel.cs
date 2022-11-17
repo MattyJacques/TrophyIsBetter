@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
 using TrophyIsBetter.Models;
+using TrophyIsBetter.Views;
 
 namespace TrophyIsBetter.ViewModels
 {
@@ -36,6 +37,7 @@ namespace TrophyIsBetter.ViewModels
       ExportGameCommand = new RelayCommand(ExportGame);
       RemoveGameCommand = new RelayCommand(RemoveGame);
       RemoveAllGamesCommand = new RelayCommand(RemoveAllGames, () => HasGames);
+      TrophyListCommand = new RelayCommand(OpenTrophyList);
 
       GameCollectionView.CurrentChanged += OnSelectedGameChanged;
 
@@ -69,6 +71,11 @@ namespace TrophyIsBetter.ViewModels
     /// Remove all games from the game list
     /// </summary>
     public RelayCommand RemoveAllGamesCommand { get; set; }
+
+    /// <summary>
+    /// List all trophies chronologically
+    /// </summary>
+    public RelayCommand TrophyListCommand { get; set; }
 
     /// <summary>
     /// Get/Set the list of games
@@ -283,6 +290,19 @@ namespace TrophyIsBetter.ViewModels
         NotifyGameChanges();
       }
     } // RemoveAll
+
+    /// <summary>
+    /// List all trophies chronologically
+    /// </summary>
+    private void OpenTrophyList()
+    {
+      TrophyListWindow window = new TrophyListWindow()
+      {
+        DataContext = new TrophyListViewModel(GameCollection)
+      };
+
+      window.Show();
+    } // OpenTrophyList
 
     private bool CheckShouldRemove(string gameName)
       => MessageBox.Show($"Are you sure you want to delete {gameName}?", "Delete?",

@@ -1,26 +1,20 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media.Imaging;
 
 namespace TrophyIsBetter.Extensions.Helpers
 {
-  internal class StringToImageConverter : IValueConverter
+  internal class IndexConverter : IValueConverter
   {
     public object Convert(object value,
                           Type targetType,
                           object parameter,
                           CultureInfo culture)
     {
-      var path = (string)value;
-      // load the image, specify CacheOption so the file is not locked
-      var image = new BitmapImage();
-      image.BeginInit();
-      image.CacheOption = BitmapCacheOption.OnLoad;
-      image.UriSource = new Uri(path);
-      image.EndInit();
-
-      return image;
+      ListViewItem item = (ListViewItem)value;
+      ListView listView = ItemsControl.ItemsControlFromItemContainer(item) as ListView;
+      return (listView.ItemContainerGenerator.IndexFromContainer(item) + 1).ToString();
     }
 
     public object ConvertBack(object value,
