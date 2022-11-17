@@ -7,6 +7,7 @@ namespace TrophyIsBetter.Models
   {
     #region Public Properties
 
+    public string Game { get; set; }
     public int ID { get; set; }
     public string Icon { get; set; }
     public string Name { get; set; }
