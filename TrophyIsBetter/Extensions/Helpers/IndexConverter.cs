@@ -14,7 +14,8 @@ namespace TrophyIsBetter.Extensions.Helpers
     {
       ListViewItem item = (ListViewItem)value;
       ListView listView = ItemsControl.ItemsControlFromItemContainer(item) as ListView;
-      return (listView.ItemContainerGenerator.IndexFromContainer(item) + 1).ToString();
+      ItemContainerGenerator generator = listView.ItemContainerGenerator;
+      return (generator.Items.Count - generator.IndexFromContainer(item)).ToString();
     }
 
     public object ConvertBack(object value,
