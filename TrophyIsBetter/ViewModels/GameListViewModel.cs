@@ -296,9 +296,17 @@ namespace TrophyIsBetter.ViewModels
     /// </summary>
     private void OpenTrophyList()
     {
+      ObservableCollection<TrophyViewModel> trophies =
+        new ObservableCollection<TrophyViewModel>();
+
+      foreach (GameViewModel game in GameCollection)
+      {
+        game.TrophyCollection.ToList().ForEach(trophies.Add);
+      }
+
       TrophyListWindow window = new TrophyListWindow()
       {
-        DataContext = new TrophyListViewModel(GameCollection)
+        DataContext = new TrophyListViewModel(trophies)
       };
 
       window.Show();

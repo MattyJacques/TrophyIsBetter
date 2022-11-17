@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
@@ -12,17 +10,15 @@ namespace TrophyIsBetter.ViewModels
   {
     #region Private Members
 
-    private ObservableCollection<TrophyViewModel> _trophyCollection =
-      new ObservableCollection<TrophyViewModel>();
-    private ObservableCollection<GameViewModel> _gameCollection;
+    private ObservableCollection<TrophyViewModel> _trophyCollection;
     private ListCollectionView _trophyCollectionView;
 
     #endregion Private Members
     #region Constructors
 
-    internal TrophyListViewModel(ObservableCollection<GameViewModel> games)
+    internal TrophyListViewModel(ObservableCollection<TrophyViewModel> trophies)
     {
-      GameCollection = games;
+      TrophyCollection = trophies;
 
       _trophyCollectionView = new ListCollectionView(TrophyCollection)
       {
@@ -33,8 +29,6 @@ namespace TrophyIsBetter.ViewModels
         IsLiveSorting = true,
         LiveSortingProperties = { nameof(TrophyViewModel.Timestamp) }
       };
-
-      UpdateTrophies();
     } // Constructor
 
     #endregion Constructors
@@ -51,30 +45,6 @@ namespace TrophyIsBetter.ViewModels
       set => SetProperty(ref _trophyCollection, value);
     }
 
-    internal ObservableCollection<GameViewModel> GameCollection
-    {
-      get => _gameCollection;
-      set => SetProperty(ref _gameCollection, value);
-    }
-
     #endregion Internal Properties
-    #region Private Methods
-
-    private void UpdateTrophies()
-    {
-      TrophyCollection.Clear();
-      foreach (GameViewModel game in GameCollection)
-      {
-        game.TrophyCollection.ToList().ForEach(TrophyCollection.Add);
-      }
-    } // UpdateTrophies
-
-    private void TrophyChanged(object sender, NotifyCollectionChangedEventArgs e)
-    {
-      TrophyCollectionView.Refresh();
-      OnPropertyChanged(nameof(TrophyCollectionView));
-    }
-
-    #endregion
   } // TrophyListViewModel
 } // TrophyIsBetter.ViewModels
