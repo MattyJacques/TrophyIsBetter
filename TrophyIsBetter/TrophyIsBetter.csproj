@@ -96,6 +96,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Extensions\Helpers\IndexConverter.cs" />
     <Compile Include="Extensions\Helpers\StringToImageConverter.cs" />
     <Compile Include="Interfaces\IGameModel.cs" />
     <Compile Include="Interfaces\IPageViewModel.cs" />
@@ -107,6 +108,10 @@
     <Compile Include="ViewModels\EditTimestampViewModel.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="ViewModels\GameListViewModel.cs" />
+    <Compile Include="ViewModels\TrophyListViewModel.cs" />
+    <Compile Include="Views\TrophyListWindow.xaml.cs">
+      <DependentUpon>TrophyListWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="Resources\Dictionaries\Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -152,6 +157,10 @@
       <DependentUpon>GameView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\TrophyListWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interfaces\IGameListModel.cs" />

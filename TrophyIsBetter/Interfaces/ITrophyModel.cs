@@ -4,6 +4,7 @@ namespace TrophyIsBetter.Interfaces
 {
   internal interface ITrophyModel
   {
+    string Game { get; }
     int ID { get; }
     string Icon { get; }
     string Name { get; }

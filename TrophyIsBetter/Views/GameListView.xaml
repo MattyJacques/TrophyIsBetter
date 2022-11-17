@@ -76,6 +76,13 @@
               Height="auto"
               Width="60"
               HorizontalAlignment="Left" />
+      <Button Content="{materialDesign:PackIcon FormatListNumbered}"
+              ToolTip="Chronological trophy list"
+              Command="{Binding TrophyListCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="auto"
+              Width="60"
+              HorizontalAlignment="Left" />
       <ProgressBar Maximum="{Binding TotalCount}"
                    Value="{Binding TotalEarnedCount, Mode=OneWay}"
                    DockPanel.Dock="Right"
