@@ -67,9 +67,11 @@
                           DisplayMemberBinding="{Binding Name}"
                            />
           <GridViewColumn Header="Local Timestamp"
-                          DisplayMemberBinding="{Binding Timestamp}" />
+                          DisplayMemberBinding="{Binding Timestamp,
+                                                 StringFormat='yyyy-MM-dd HH:mm:ss'}" />
           <GridViewColumn Header="Remote Timestamp"
-                          DisplayMemberBinding="{Binding RemoteTimestamp}" />
+                          DisplayMemberBinding="{Binding RemoteTimestamp,
+                                                 StringFormat='yyyy-MM-dd HH:mm:ss'}" />
           <GridViewColumn x:Name="CopyColumn"
                           Header="Copy"
                           Width="95">
