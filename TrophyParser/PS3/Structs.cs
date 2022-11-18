@@ -618,6 +618,7 @@ namespace TrophyParser.PS3
         padding = new byte[16];
         padding2 = new byte[96];
         Time = dt;
+        DoesExist = true;
       }
     } // EarnedInfo
 
