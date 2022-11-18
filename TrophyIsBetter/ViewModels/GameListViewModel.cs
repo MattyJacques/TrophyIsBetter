@@ -25,6 +25,8 @@ namespace TrophyIsBetter.ViewModels
     private CollectionView _gameCollectionView = null;
     private readonly SynchronizationContext _uiContext = SynchronizationContext.Current;
 
+    private bool _hasGames = false;
+
     #endregion Private Members
     #region Constructors
 
@@ -94,7 +96,7 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Is a game selected
     /// </summary>
-    public bool HasGames => GameCollection.Count > 0;
+    public bool HasGames { get => _hasGames; set => SetProperty(ref _hasGames, value); }
 
     /// <summary>
     /// The name of the view model
@@ -318,7 +320,7 @@ namespace TrophyIsBetter.ViewModels
 
     private void NotifyGameChanges()
     {
-      OnPropertyChanged(nameof(HasGames));
+      HasGames = GameCollection.Count > 0;
       OnPropertyChanged(nameof(ProgressString));
     } // NotifyChanges
 
