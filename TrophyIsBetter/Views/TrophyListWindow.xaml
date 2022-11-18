@@ -49,7 +49,7 @@
                           DisplayMemberBinding="{Binding Name}"
                           Width="250" />
           <GridViewColumn Header="Local Timestamp"
-                          DisplayMemberBinding="{Binding Timestamp}" />
+                          DisplayMemberBinding="{Binding Timestamp, StringFormat='yyyy-MM-dd HH:mm:ss'}" />
         </GridView>
       </ListView.View>
     </ListView>
