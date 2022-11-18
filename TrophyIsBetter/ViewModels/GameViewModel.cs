@@ -177,16 +177,18 @@ namespace TrophyIsBetter.ViewModels
     /// </summary>
     private void Save()
     {
-      if (_model.HasUnsavedChanges &&
-          MessageBox.Show($"There are unsaved changes in {Name}, would you like to save?", "Save?",
-          MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+      if (_model.HasUnsavedChanges)
       {
-        _model.Save();
-      }
-      else
-      {
-        _model.Reload();
-        LoadTrophies();
+        if (MessageBox.Show($"There are unsaved changes in {Name}, would you like to save?", "Save?",
+            MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+        {
+          _model.Save();
+        }
+        else
+        {
+          _model.Reload();
+          LoadTrophies();
+        }
       }
     } // Save
 
