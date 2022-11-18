@@ -93,7 +93,8 @@
                                                      Source={x:Reference IconColVisibility}}" >
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
-              <Image Source="{Binding Icon}"
+              <Image Source="{Binding Icon,
+                              Converter={StaticResource StringToImageConverter}}"
                      Width="30" />
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
