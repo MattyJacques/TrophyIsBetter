@@ -222,7 +222,7 @@ namespace TrophyParser.PS3
         info.ID = i + 1;
         info._unknownInt3 = 0;
 
-        //_timestamps[i] = info;
+        _timestamps[i] = info;
         writer.Write(_timestamps[i].StructToBytes());
       }
 
