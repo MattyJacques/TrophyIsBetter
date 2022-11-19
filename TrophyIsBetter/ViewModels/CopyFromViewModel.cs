@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -25,7 +26,7 @@ namespace TrophyIsBetter.ViewModels
 
     private string _copyUrl = "";
     private ObservableCollection<TrophyViewModel> _trophyCollection;
-    private CollectionView _trophyCollectionView;
+    private ListCollectionView _trophyCollectionView;
 
     #endregion Private Members
     #region Constructors
@@ -37,7 +38,10 @@ namespace TrophyIsBetter.ViewModels
 
       TrophyCollection = trophies;
       _trophyCollectionView =
-        (CollectionView)CollectionViewSource.GetDefaultView(TrophyCollection);
+        (ListCollectionView)CollectionViewSource.GetDefaultView(TrophyCollection);
+
+      TrophyCollectionView.SortDescriptions.Add(
+        new SortDescription("RemoteTimestamp", ListSortDirection.Ascending));
     } // Constructor
 
     #endregion Constructors
@@ -49,7 +53,7 @@ namespace TrophyIsBetter.ViewModels
 
     public string CopyUrl { get => _copyUrl; set => SetProperty(ref _copyUrl, value); }
 
-    public CollectionView TrophyCollectionView { get => _trophyCollectionView; }
+    public ListCollectionView TrophyCollectionView { get => _trophyCollectionView; }
 
     #endregion Public Properties
     #region Internal Properties
@@ -75,6 +79,8 @@ namespace TrophyIsBetter.ViewModels
       double offset = GetOffset(GetFirstTimestamp(timestamps));
       
       CalcTimestamps(offset, timestamps);
+
+      TrophyCollectionView.Refresh();
     } // GetTimestamps
 
     private MatchCollection DownloadTimestamps()
