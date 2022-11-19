@@ -196,8 +196,8 @@ namespace TrophyIsBetter.ViewModels
     {
       EditTimestampWindow window = new EditTimestampWindow("Edit Timestamp")
       {
-        DataContext = new EditTimestampViewModel(_lastUsedTimestamp
-                                              ?? SelectedTrophy.Timestamp
+        DataContext = new EditTimestampViewModel(SelectedTrophy.Timestamp
+                                              ?? _lastUsedTimestamp
                                               ?? DateTime.Now)
       };
 
