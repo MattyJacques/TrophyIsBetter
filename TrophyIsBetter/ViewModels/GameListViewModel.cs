@@ -92,14 +92,11 @@ namespace TrophyIsBetter.ViewModels
       get
       {
         // Horrific hack to fix sorting not being applied when view switches
-        return new ListCollectionView(GameCollection)
-        {
-          SortDescriptions =
-          {
-            new SortDescription(nameof(GameViewModel.Name),
-                                ListSortDirection.Ascending)
-          }
-        };
+        // It keeps losing the SortDescriptions
+        _gameCollectionView.SortDescriptions.Add(new SortDescription(nameof(GameViewModel.Name),
+                                                                     ListSortDirection.Ascending));
+
+        return _gameCollectionView;
       }
     }
 
@@ -149,7 +146,7 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Get the selected game from the list
     /// </summary>
-    internal GameViewModel SelectedGame => (GameViewModel)GameCollectionView.CurrentItem;
+    internal GameViewModel SelectedGame => (GameViewModel)_gameCollectionView.CurrentItem;
 
     /// <summary>
     /// Total amount of earned exp
