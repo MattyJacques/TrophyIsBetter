@@ -24,7 +24,8 @@ namespace TrophyIsBetter.ViewModels
         Filter = t => ((TrophyViewModel)t).Timestamp != null,
         IsLiveFiltering = true,
         LiveFilteringProperties = { nameof(TrophyViewModel.Timestamp) },
-        SortDescriptions = { new SortDescription("Timestamp", ListSortDirection.Descending) },
+        SortDescriptions = { new SortDescription(nameof(TrophyViewModel.Timestamp),
+                                                 ListSortDirection.Descending) },
         IsLiveSorting = true,
         LiveSortingProperties = { nameof(TrophyViewModel.Timestamp) }
       };
