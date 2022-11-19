@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace TrophyIsBetter.ViewModels
     private string _name = "Games";
 
     private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
-    private CollectionView _gameCollectionView = null;
+    private ListCollectionView _gameCollectionView = null;
     private readonly SynchronizationContext _uiContext = SynchronizationContext.Current;
 
     private bool _hasGames = false;
@@ -40,6 +41,10 @@ namespace TrophyIsBetter.ViewModels
       RemoveGameCommand = new RelayCommand(RemoveGame);
       RemoveAllGamesCommand = new RelayCommand(RemoveAllGames, () => HasGames);
       TrophyListCommand = new RelayCommand(OpenTrophyList);
+
+      _gameCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(GameCollection);
+      _gameCollectionView.SortDescriptions.Add(new SortDescription(nameof(GameViewModel.Name),
+                                                                   ListSortDirection.Ascending));
 
       GameCollectionView.CurrentChanged += OnSelectedGameChanged;
 
@@ -80,12 +85,22 @@ namespace TrophyIsBetter.ViewModels
     public RelayCommand TrophyListCommand { get; set; }
 
     /// <summary>
-    /// Get/Set the list of games
+    /// Get/Set the collection view, used for sorting
     /// </summary>
-    public ObservableCollection<GameViewModel> GameCollection
+    public ListCollectionView GameCollectionView
     {
-      get => _gameCollection;
-      private set => SetProperty(ref _gameCollection, value);
+      get
+      {
+        // Horrific hack to fix sorting not being applied when view switches
+        return new ListCollectionView(GameCollection)
+        {
+          SortDescriptions =
+          {
+            new SortDescription(nameof(GameViewModel.Name),
+                                ListSortDirection.Ascending)
+          }
+        };
+      }
     }
 
     /// <summary>
@@ -123,19 +138,12 @@ namespace TrophyIsBetter.ViewModels
     #region Internal Properties
 
     /// <summary>
-    /// Get/Set the collection view, used for sorting
+    /// Get/Set the list of games
     /// </summary>
-    internal CollectionView GameCollectionView
+    internal ObservableCollection<GameViewModel> GameCollection
     {
-      get
-      {
-        if (_gameCollectionView == null)
-        {
-          _gameCollectionView = (CollectionView)CollectionViewSource.GetDefaultView(GameCollection);
-        }
-
-        return _gameCollectionView;
-      }
+      get => _gameCollection;
+      private set => SetProperty(ref _gameCollection, value);
     }
 
     /// <summary>

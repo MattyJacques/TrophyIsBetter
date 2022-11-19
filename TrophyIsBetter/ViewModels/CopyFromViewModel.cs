@@ -41,7 +41,7 @@ namespace TrophyIsBetter.ViewModels
         (ListCollectionView)CollectionViewSource.GetDefaultView(TrophyCollection);
 
       TrophyCollectionView.SortDescriptions.Add(
-        new SortDescription("RemoteTimestamp", ListSortDirection.Ascending));
+        new SortDescription(nameof(TrophyViewModel.RemoteTimestamp), ListSortDirection.Ascending));
     } // Constructor
 
     #endregion Constructors
