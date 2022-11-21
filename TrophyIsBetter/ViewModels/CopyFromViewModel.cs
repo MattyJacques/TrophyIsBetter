@@ -156,7 +156,9 @@ namespace TrophyIsBetter.ViewModels
         {
           DateTime timestamp = ((EditTimestampViewModel)window.DataContext).Timestamp;
 
-          var futureTrophies = TrophyCollection.Where(x => x.RemoteTimestamp >= timestamp);
+          var futureTrophies =
+            TrophyCollection.Where(x => x.RemoteTimestamp != null
+                                     && x.RemoteTimestamp >= SelectedTrophy.RemoteTimestamp);
           double offset = CalcOffset(((EditTimestampViewModel)window.DataContext).Timestamp,
                                      SelectedTrophy.RemoteTimestamp.Value);
 
