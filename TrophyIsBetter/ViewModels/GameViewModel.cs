@@ -135,6 +135,11 @@ namespace TrophyIsBetter.ViewModels
     internal IGameModel Model { get => _model; }
 
     #endregion Internal Properties
+    #region Internal Methods
+
+    internal void Export(string exportPath) => _model.Export(exportPath);
+
+    #endregion Internal Methods
     #region Private Methods
 
     private void ChangeViewToHome()

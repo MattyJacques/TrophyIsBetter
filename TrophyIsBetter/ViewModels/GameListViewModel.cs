@@ -38,6 +38,7 @@ namespace TrophyIsBetter.ViewModels
       ImportCommand = new AsyncRelayCommand(Import);
       EditGameCommand = new RelayCommand(EditGame);
       ExportGameCommand = new RelayCommand(ExportGame);
+      ExportAllGamesCommand = new RelayCommand(ExportAllGames);
       RemoveGameCommand = new RelayCommand(RemoveGame);
       RemoveAllGamesCommand = new RelayCommand(RemoveAllGames, () => HasGames);
       TrophyListCommand = new RelayCommand(OpenTrophyList);
@@ -68,6 +69,11 @@ namespace TrophyIsBetter.ViewModels
     /// Encrypt the files and export the game
     /// </summary>
     public RelayCommand ExportGameCommand { get; set; }
+
+    /// <summary>
+    /// Encrypt the files and export all of the games
+    /// </summary>
+    public RelayCommand ExportAllGamesCommand { get; set; }
 
     /// <summary>
     /// Remove a game from the game list
@@ -255,7 +261,31 @@ namespace TrophyIsBetter.ViewModels
       {
         try
         {
-          SelectedGame.Model.Export(path);
+          SelectedGame.Export(path);
+        }
+        catch (Exception ex)
+        {
+          GC.Collect();
+          Console.WriteLine(ex.StackTrace);
+          MessageBox.Show("Export Failed:" + ex.Message);
+        }
+      }
+    } // ExportGame
+
+    /// <summary>
+    /// Encrypt the files and export
+    /// </summary>
+    private void ExportAllGames()
+    {
+      string path = ChoosePath();
+      if (!string.IsNullOrEmpty(path))
+      {
+        try
+        {
+          foreach (GameViewModel game in GameCollection)
+          {
+            game.Export(path);
+          }
         }
         catch (Exception ex)
         {
