@@ -44,6 +44,18 @@ namespace TrophyParser.PS3
       _typeRecords = DataParsing.ParseTypeRecords(_header, reader);
 
       ParseBlocks(reader);
+
+      // There was a bug that made the list info go out of sync. Call fix here
+      // This can be removed in later versions
+      reader.Close();
+      reader =
+        new BigEndianBinaryReader(new FileStream(_filePath, FileMode.Open));
+      ResetListInfo();
+      reader.Close();
+      Save();
+      reader =
+        new BigEndianBinaryReader(new FileStream(_filePath, FileMode.Open));
+      ParseBlocks(reader);
     } // Constructor
 
     #endregion Constructors
@@ -113,7 +125,9 @@ namespace TrophyParser.PS3
 
     internal void ChangeTimestamp(int id, DateTime time)
     {
+      CheckListInfo(_timestamps[id].Time);
       UpdateTimestamp(id, time);
+      UpdateListInfo(time);
     } // ChangeTimestamp
 
     internal void LockTrophy(int id)
@@ -130,7 +144,7 @@ namespace TrophyParser.PS3
 
       ResetTimestamp(timestamp);
       RemoveFromRates(id);
-      ResetListInfo(removedTimestamp);
+      CheckListInfo(removedTimestamp);
 
       Debug.WriteLine($"Locked trophy {id} in TROPUSR");
     } // LockTrophy
@@ -302,10 +316,10 @@ namespace TrophyParser.PS3
       }
     } // UpdateListInfo
 
-    private void ResetListInfo(DateTime timestamp)
+    private void CheckListInfo(DateTime removedStamp)
     {
-      if (DateTime.Compare(CalcDateAdded(timestamp), _listInfo.DateAdded) == 0
-        || DateTime.Compare(timestamp, _listInfo.LastAchievedTrophyTime) == 0)
+      if (DateTime.Compare(CalcDateAdded(removedStamp), _listInfo.DateAdded) == 0
+        || DateTime.Compare(removedStamp, _listInfo.LastAchievedTrophyTime) == 0)
       {
         var orderedTimestamps = _timestamps
           .Where(x => DateTime.Compare(x.Time, DateTime.MinValue) != 0)
@@ -323,6 +337,36 @@ namespace TrophyParser.PS3
           _listInfo.LastUpdated = DateTime.Now;
         }
       }
+    } // CheckListInfo
+
+    private void ResetListInfo()
+    {
+      int earnedCount = 0;
+      _listInfo.LastAchievedTrophyTime = DateTime.MinValue;
+      _listInfo.LastUpdated = DateTime.MinValue;
+      _listInfo.DateAdded = DateTime.MaxValue;
+
+      foreach (Timestamp timestamp in _timestamps)
+      {
+        if (timestamp.IsEarned)
+        {
+          DateTime earnedTime = timestamp.Time;
+          if (earnedTime > _listInfo.LastAchievedTrophyTime)
+          {
+            _listInfo.LastAchievedTrophyTime = earnedTime;
+            _listInfo.LastUpdated = earnedTime;
+          }
+
+          if (_listInfo.DateAdded > earnedTime)
+          {
+            _listInfo.DateAdded = earnedTime.AddHours(-1);
+          }
+
+          earnedCount++;
+        }
+      } // foreach (Timestamp timestamp in _timestamps)
+
+      _listInfo.AchievedCount = earnedCount;
     } // ResetListInfo
 
     private DateTime CalcDateAdded(DateTime timestamp) => timestamp.AddHours(-1);
