@@ -53,9 +53,9 @@
               Width="60"
               HorizontalAlignment="Left" />
       <Button Content="{materialDesign:PackIcon FileExport}"
-              ToolTip="Export Game"
-              IsEnabled="{Binding HasSelected}"
-              Command="{Binding ExportGameCommand}"
+              ToolTip="Export All Games"
+              IsEnabled="{Binding HasGames}"
+              Command="{Binding ExportAllGamesCommand}"
               Style="{DynamicResource MaterialDesignPaperButton}"
               Height="auto"
               Width="60"
@@ -69,7 +69,7 @@
               Width="60"
               HorizontalAlignment="Left" />
       <Button Content="{materialDesign:PackIcon DeleteAlert}"
-              ToolTip="Remove all games"
+              ToolTip="Remove All Games"
               IsEnabled="{Binding HasGames}"
               Command="{Binding RemoveAllGamesCommand}"
               Style="{DynamicResource MaterialDesignPaperButton}"
