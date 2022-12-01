@@ -77,6 +77,7 @@ namespace TrophyParser.PS3
         throw new AlreadySyncedException(timestamp.TrophyID);
 
       _timestamps.RemoveAt(oldIndex);
+      timestamp.Time = time;
 
       InsertTimestamp(timestamp);
     } // ChangeTimestamp
