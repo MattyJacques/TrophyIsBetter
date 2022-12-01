@@ -599,8 +599,10 @@ namespace TrophyParser.PS3
       public override string ToString()
       {
         StringBuilder sb = new StringBuilder();
-        sb.Append("[ID:").Append(ID).Append(", ");
-        sb.Append("GetState:").Append(DoesExist).Append(']');
+        sb.Append("TrophyID: ").Append(TrophyID).Append(", ");
+        sb.Append("Time: ").Append(Time).Append(", ");
+        sb.Append("Earned: ").Append(DoesExist).Append(", ");
+        sb.Append("Synced: ").Append(IsSynced);
         return sb.ToString();
       }
 

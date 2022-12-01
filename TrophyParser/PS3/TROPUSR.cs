@@ -77,6 +77,7 @@ namespace TrophyParser.PS3
         return timestamp;
       }
     }
+
     internal DateTime LastSyncedTimestamp
     {
       get
@@ -359,7 +360,7 @@ namespace TrophyParser.PS3
 
           if (_listInfo.DateAdded > earnedTime)
           {
-            _listInfo.DateAdded = earnedTime.AddHours(-1);
+            _listInfo.DateAdded = CalcDateAdded(earnedTime);
           }
 
           earnedCount++;
