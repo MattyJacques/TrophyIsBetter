@@ -16,7 +16,6 @@ namespace TrophyParser.Interfaces
     int TrophyCount { get; }
     int EarnedCount { get; }
     DateTime? LastTimestamp { get; }
-    DateTime? LastSyncedTimestamp { get; }
     List<Trophy> Trophies { get; }
 
     void UnlockTrophy(int id, DateTime time);

@@ -120,8 +120,6 @@ namespace TrophyIsBetter.ViewModels
 
     public DateTime? LastTimestamp { get => _model.LastTimestamp; }
 
-    public DateTime? SyncTime { get => _model.SyncTime; }
-
     #endregion Public Properties
     #region Internal Properties
 
