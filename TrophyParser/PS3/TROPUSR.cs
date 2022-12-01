@@ -44,18 +44,6 @@ namespace TrophyParser.PS3
       _typeRecords = DataParsing.ParseTypeRecords(_header, reader);
 
       ParseBlocks(reader);
-
-      // There was a bug that made the list info go out of sync. Call fix here
-      // This can be removed in later versions
-      reader.Close();
-      reader =
-        new BigEndianBinaryReader(new FileStream(_filePath, FileMode.Open));
-      ResetListInfo();
-      reader.Close();
-      Save();
-      reader =
-        new BigEndianBinaryReader(new FileStream(_filePath, FileMode.Open));
-      ParseBlocks(reader);
     } // Constructor
 
     #endregion Constructors
@@ -339,36 +327,6 @@ namespace TrophyParser.PS3
         }
       }
     } // CheckListInfo
-
-    private void ResetListInfo()
-    {
-      int earnedCount = 0;
-      _listInfo.LastAchievedTrophyTime = DateTime.MinValue;
-      _listInfo.LastUpdated = DateTime.MinValue;
-      _listInfo.DateAdded = DateTime.MaxValue;
-
-      foreach (Timestamp timestamp in _timestamps)
-      {
-        if (timestamp.IsEarned)
-        {
-          DateTime earnedTime = timestamp.Time;
-          if (earnedTime > _listInfo.LastAchievedTrophyTime)
-          {
-            _listInfo.LastAchievedTrophyTime = earnedTime;
-            _listInfo.LastUpdated = earnedTime;
-          }
-
-          if (_listInfo.DateAdded > earnedTime)
-          {
-            _listInfo.DateAdded = CalcDateAdded(earnedTime);
-          }
-
-          earnedCount++;
-        }
-      } // foreach (Timestamp timestamp in _timestamps)
-
-      _listInfo.AchievedCount = earnedCount;
-    } // ResetListInfo
 
     private DateTime CalcDateAdded(DateTime timestamp) => timestamp.AddHours(-1);
 
