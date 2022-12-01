@@ -24,7 +24,6 @@ namespace TrophyParser
     public abstract int TrophyCount { get; }
     public abstract int EarnedCount { get; }
     public abstract DateTime? LastTimestamp { get; }
-    public abstract DateTime? LastSyncedTimestamp { get; }
 
     #endregion Public Abstract Properties
     #region Public Properties
