@@ -54,7 +54,6 @@ namespace TrophyParser.PS3
     public override int TrophyCount => _conf.TrophyCount;
     public override int EarnedCount => _usr.EarnedCount;
     public override DateTime? LastTimestamp => _usr.LastTimestamp;
-    public override DateTime? LastSyncedTimestamp => _usr.LastSyncedTimestamp;
 
     #endregion Public Properties
     #region Public Methods

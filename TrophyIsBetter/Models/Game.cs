@@ -52,7 +52,6 @@ namespace TrophyIsBetter.Models
     public int EarnedExp { get => _earnedExp; set => _earnedExp = value; }
     public int TotalExp { get => _totalExp; set => _totalExp = value; }
     public DateTime? LastTimestamp => _trophyList.LastTimestamp;
-    public DateTime? SyncTime => _trophyList.LastSyncedTimestamp;
     public List<ITrophyModel> Trophies => ConvertTrophyData(_trophyList.Trophies);
     public string Path => _path;
     public bool HasUnsavedChanges { get => _hasChanges; set => _hasChanges = value; }

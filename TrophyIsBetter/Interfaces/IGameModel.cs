@@ -17,7 +17,6 @@ namespace TrophyIsBetter.Interfaces
     int EarnedExp { get; }
     int TotalExp { get; }
     DateTime? LastTimestamp { get; }
-    DateTime? SyncTime { get; }
     List<ITrophyModel> Trophies { get; }
     string Path { get; }
     bool HasUnsavedChanges { get; }

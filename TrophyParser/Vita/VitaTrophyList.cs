@@ -48,7 +48,6 @@ namespace TrophyParser.Vita
     public override int TrophyCount => _trop.TrophyCount;
     public override int EarnedCount => _title.EarnedCount;
     public override DateTime? LastTimestamp => _title.LastTimestamp;
-    public override DateTime? LastSyncedTimestamp => _title.LastSyncedTimestamp;
 
     #endregion Public Properties
     #region Public Methods
