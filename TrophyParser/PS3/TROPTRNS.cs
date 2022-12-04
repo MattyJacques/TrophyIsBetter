@@ -80,6 +80,8 @@ namespace TrophyParser.PS3
       timestamp.Time = time;
 
       InsertTimestamp(timestamp);
+
+      Debug.WriteLine($"Changed trophy {id} timestamp in TROPTRNS");
     } // ChangeTimestamp
 
     internal void RemoveTrophy(int id)
@@ -258,7 +260,7 @@ namespace TrophyParser.PS3
       }
 
       _timestamps.Insert(insertPoint, timestamp);
-    } // InsertTimestamp()
+    } // InsertTimestamp
 
     #endregion  Private Members
   } // TROPTRNS

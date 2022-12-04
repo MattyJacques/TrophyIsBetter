@@ -56,14 +56,20 @@ namespace TrophyParser.Vita
     {
       Debug.WriteLine($"Unlocking {Name} (Vita) - {_trophies[id].Name} with timestamp: {time}");
 
-      _trans.UnlockTrophy(id, _trophies[id].Rank, time);
-      _title.UnlockTrophy(id, time);
+      int ms = GetRandomMilliseconds(_trophies[id].Rank);
+
+      _trans.UnlockTrophy(id, _trophies[id].Rank, time.AddMilliseconds(ms));
+      _title.UnlockTrophy(id, time.AddMilliseconds(ms));
     } // Unlock Trophy
 
     public override void ChangeTimestamp(int id, DateTime time)
     {
-      _trans.ChangeTimestamp(id, time);
-      _title.ChangeTimestamp(id, time);
+      Debug.WriteLine($"Changing timestamp of {Name} (Vita) - {_trophies[id].Name} to: {time}");
+
+      int ms = GetRandomMilliseconds(_trophies[id].Rank);
+
+      _trans.ChangeTimestamp(id, time.AddMilliseconds(ms));
+      _title.ChangeTimestamp(id, time.AddMilliseconds(ms));
     } // ChaneTimestamp
 
     public override void LockTrophy(int id)
@@ -83,5 +89,14 @@ namespace TrophyParser.Vita
     } // Save
 
     #endregion Public Methods
+    #region Private Methods
+
+    private int GetRandomMilliseconds(char type)
+    {
+      Random rng = new Random();
+      return type == 'P' ? rng.Next(500, 1000) : rng.Next(500);
+    } // GetRandomMilliseconds
+
+    #endregion Private Methods
   } // VitaTrophyList
 } // TrophyParser.Vita
