@@ -97,7 +97,7 @@ namespace TrophyParser
             trophy?["name"]?.InnerText,
             trophy?["detail"]?.InnerText,
             gid
-            );
+          );
 
           _trophies.Add(item);
         }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using TrophyIsBetter.Models;
 
 namespace TrophyIsBetter.Interfaces
 {
@@ -13,7 +12,7 @@ namespace TrophyIsBetter.Interfaces
     /// <summary>
     /// Load all of the games in the application data directory
     /// </summary>
-    List<Game> LoadGames();
+    List<IGameModel> LoadGames();
 
     /// <summary>
     /// Remove a game from data
