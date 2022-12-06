@@ -20,13 +20,15 @@ namespace TrophyIsBetter.ViewModels
     private ObservableCollection<TrophyViewModel> _trophyCollection = new ObservableCollection<TrophyViewModel>();
     private CollectionView _trophyCollectionView;
     private DateTime? _lastUsedTimestamp = null;
+    private IPageViewModel _homeViewModel;
 
     #endregion Private Members
     #region Constructors
 
-    internal GameViewModel(IGameModel entry)
+    internal GameViewModel(IGameModel entry, IPageViewModel listViewModel)
     {
       _model = entry;
+      _homeViewModel = listViewModel;
       ((ApplicationWindow)Application.Current.MainWindow).Closing += OnCloseSave; ;
 
       ChangeViewToHomeCommand = new RelayCommand(ChangeViewToHome);
@@ -47,7 +49,7 @@ namespace TrophyIsBetter.ViewModels
 
     private void CheckPS3Plats()
     {
-      if (TrophyCollection[0].Type == 'P'
+      if (TrophyCollection.Count > 0 && TrophyCollection[0].Type == 'P'
         && TrophyCollection.Where(x => !x.Achieved && x.Group == "Base Game").ToList().Count == 0)
       {
         var trophies = TrophyCollection.Where(x => x.Achieved && x.Group == "Base Game" && x.Type != 'P')
@@ -143,7 +145,8 @@ namespace TrophyIsBetter.ViewModels
     /// <summary>
     /// Is a game selected ready to be locked
     /// </summary>
-    internal bool CanLock => SelectedTrophy != null
+    internal bool CanLock => Platform != PlatformEnum.PS4
+                          && SelectedTrophy != null
                           && SelectedTrophy.Achieved
                           && !SelectedTrophy.Synced
                           && SelectedTrophy.Type != 'P';
@@ -166,7 +169,7 @@ namespace TrophyIsBetter.ViewModels
 
       // Go back to game list
       ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
-        .ChangePageToHomeCommand.Execute(null);
+        .ChangePageCommand.Execute(_homeViewModel);
     } // ChangeViewToHome
 
     private void LoadTrophies()

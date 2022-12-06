@@ -5,7 +5,8 @@
     public enum PlatformEnum
     {
       PS3,
-      Vita
+      Vita,
+      PS4
     } // Platform
   } // Enums
 } // TrophyParser

@@ -32,11 +32,19 @@ namespace TrophyParser.PS3
         var trophyInfo = _usr[i];
         if (trophyInfo.HasValue && trophyInfo.Value.IsEarned)
         {
-          trophy.Timestamp = new Timestamp { Time = trophyInfo.Value.Time, IsSynced = trophyInfo.Value.IsSynced };
+          trophy.Timestamp = new Timestamp
+          {
+            Time = trophyInfo.Value.Time,
+            IsSynced = trophyInfo.Value.IsSynced
+          };
         }
         else
         {
-          trophy.Timestamp = new Timestamp { Time = null, IsSynced = false };
+          trophy.Timestamp = new Timestamp
+          {
+            Time = null,
+            IsSynced = false
+          };
         }
         _trophies.Add(trophy);
       }

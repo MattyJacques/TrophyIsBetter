@@ -6,22 +6,19 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
-using TrophyIsBetter.Models;
 using TrophyIsBetter.Views;
-using TrophyParser.PS4;
 
 namespace TrophyIsBetter.ViewModels
 {
-  internal class GameListViewModel : ObservableObject, IPageViewModel
+  internal class PS4GameListViewModel : ObservableObject, IPageViewModel
   {
     #region Private Members
 
     private readonly IGameListModel _model;
-    private string _name = "Games";
+    private string _name = "PS4 Games";
 
     private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
     private ListCollectionView _gameCollectionView = null;
@@ -32,18 +29,12 @@ namespace TrophyIsBetter.ViewModels
     #endregion Private Members
     #region Constructors
 
-    internal GameListViewModel(IGameListModel model)
+    internal PS4GameListViewModel(IGameListModel model)
     {
       _model = model;
 
-      ImportCommand = new AsyncRelayCommand(Import);
       EditGameCommand = new RelayCommand(EditGame);
-      ExportGameCommand = new RelayCommand(ExportGame);
-      ExportAllGamesCommand = new RelayCommand(ExportAllGames);
-      RemoveGameCommand = new RelayCommand(RemoveGame);
-      RemoveAllGamesCommand = new RelayCommand(RemoveAllGames, () => HasGames);
       TrophyListCommand = new RelayCommand(OpenTrophyList);
-      OpenPS4DBCommand = new RelayCommand(OpenPS4DB);
 
       _gameCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(GameCollection);
       _gameCollectionView.SortDescriptions.Add(new SortDescription(nameof(GameViewModel.Name),
@@ -58,44 +49,14 @@ namespace TrophyIsBetter.ViewModels
     #region Public Properties
 
     /// <summary>
-    /// Import a single trophy folder or a directory containing multiple
-    /// </summary>
-    public AsyncRelayCommand ImportCommand { get; set; }
-
-    /// <summary>
     /// Edit a games trophies
     /// </summary>
     public RelayCommand EditGameCommand { get; set; }
 
     /// <summary>
-    /// Encrypt the files and export the game
-    /// </summary>
-    public RelayCommand ExportGameCommand { get; set; }
-
-    /// <summary>
-    /// Encrypt the files and export all of the games
-    /// </summary>
-    public RelayCommand ExportAllGamesCommand { get; set; }
-
-    /// <summary>
-    /// Remove a game from the game list
-    /// </summary>
-    public RelayCommand RemoveGameCommand { get; set; }
-
-    /// <summary>
-    /// Remove all games from the game list
-    /// </summary>
-    public RelayCommand RemoveAllGamesCommand { get; set; }
-
-    /// <summary>
     /// List all trophies chronologically
     /// </summary>
     public RelayCommand TrophyListCommand { get; set; }
-
-    /// <summary>
-    /// Open a PS4 trophy_db
-    /// </summary>
-    public RelayCommand OpenPS4DBCommand { get; set; }
 
     /// <summary>
     /// Get/Set the collection view, used for sorting
@@ -183,53 +144,6 @@ namespace TrophyIsBetter.ViewModels
     } // OnSelectedGameChanged
 
     /// <summary>
-    /// Show dialog to choose a directory to import then fire off importing process
-    /// </summary>
-    private Task Import()
-    {
-      string path = ChoosePath();
-      if (!string.IsNullOrEmpty(path))
-      {
-        return Task.Run(() => ImportDirectory(path));
-      }
-      return Task.CompletedTask;
-    } // Import
-
-    /// <summary>
-    /// Choose path to import
-    /// </summary>
-    private string ChoosePath()
-    {
-      string path = "";
-
-      System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog();
-      if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-      {
-        path = dialog.SelectedPath;
-      }
-
-      return path;
-    } // ChoosePath
-
-    /// <summary>
-    /// Import trophy folder contained in the given directory
-    /// </summary>
-    private void ImportDirectory(string path)
-    {
-      try
-      {
-        _model.ImportGames(path);
-        LoadGames();
-      }
-      catch (Exception ex)
-      {
-        GC.Collect();
-        Console.WriteLine(ex.StackTrace);
-        MessageBox.Show("Import Failed:" + ex.Message);
-      }
-    } // ImportDirectory
-
-    /// <summary>
     /// Load the folders contained in the game directory
     /// </summary>
     private void LoadGames()
@@ -238,14 +152,14 @@ namespace TrophyIsBetter.ViewModels
 
       if (games != null)
       {
-        _uiContext.Send(x => GameCollection.Clear(), null);
+        GameCollection.Clear();
 
-        foreach (Game entry in games)
+        foreach (IGameModel entry in games)
         {
-          _uiContext.Send(x => GameCollection.Add(new GameViewModel(entry, this)), null);
+          GameCollection.Add(new GameViewModel(entry, this));
         }
 
-        _uiContext.Send(x => NotifyGameChanges(), null);
+        NotifyGameChanges();
       }
     } // LoadGames
 
@@ -257,83 +171,6 @@ namespace TrophyIsBetter.ViewModels
       ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
         .ChangePageCommand.Execute(SelectedGame);
     } // EditGame
-
-    /// <summary>
-    /// Encrypt the files and export
-    /// </summary>
-    private void ExportGame()
-    {
-      string path = ChoosePath();
-      if (!string.IsNullOrEmpty(path))
-      {
-        try
-        {
-          SelectedGame.Export(path);
-        }
-        catch (Exception ex)
-        {
-          GC.Collect();
-          Console.WriteLine(ex.StackTrace);
-          MessageBox.Show("Export Failed:" + ex.Message);
-        }
-      }
-    } // ExportGame
-
-    /// <summary>
-    /// Encrypt the files and export
-    /// </summary>
-    private void ExportAllGames()
-    {
-      string path = ChoosePath();
-      if (!string.IsNullOrEmpty(path))
-      {
-        try
-        {
-          foreach (GameViewModel game in GameCollection)
-          {
-            game.Export(path);
-          }
-        }
-        catch (Exception ex)
-        {
-          GC.Collect();
-          Console.WriteLine(ex.StackTrace);
-          MessageBox.Show("Export Failed:" + ex.Message);
-        }
-      }
-    } // ExportGame
-
-    /// <summary>
-    /// Remove a single game from the game list
-    /// </summary>
-    private void RemoveGame()
-    {
-      if (CheckShouldRemove(SelectedGame.Name))
-      {
-        _model.RemoveGame(SelectedGame.Model);
-        GameCollection.Remove(SelectedGame);
-
-        NotifyGameChanges();
-      }
-    } // RemoveGame
-
-    /// <summary>
-    /// Remove all games from game list
-    /// </summary>
-    private void RemoveAllGames()
-    {
-      if (CheckShouldRemove("ALL GAMES"))
-      {
-        foreach (GameViewModel game in GameCollection)
-        {
-          _model.RemoveGame(game.Model);
-        }
-
-        GameCollection.Clear();
-
-        NotifyGameChanges();
-      }
-    } // RemoveAll
 
     /// <summary>
     /// List all trophies chronologically
@@ -356,43 +193,6 @@ namespace TrophyIsBetter.ViewModels
       window.Show();
     } // OpenTrophyList
 
-    /// <summary>
-    /// Open PS4 trophy_db
-    /// </summary>
-    private void OpenPS4DB()
-    {
-      string path = ChoosePS4DBPath();
-
-      if (path.Length > 0)
-      {
-        PS4GameListViewModel viewModel = new PS4GameListViewModel(new PS4GameList(path));
-        ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
-          .ChangePageCommand.Execute(viewModel);
-      }
-    } // OpenPS4DB
-
-    /// <summary>
-    /// Choose path to PS4 DB
-    /// </summary>
-    private string ChoosePS4DBPath()
-    {
-      string path = "";
-
-      var dialog = new Microsoft.Win32.OpenFileDialog
-      {
-        FileName = "trophy_local",
-        DefaultExt = ".db",
-        Filter = "Database files (.db)|*.db"
-      };
-
-      if (dialog.ShowDialog() == true)
-      {
-        path = dialog.FileName;
-      }
-
-      return path;
-    } // ChoosePS4DBPath
-
     private bool CheckShouldRemove(string gameName)
       => MessageBox.Show($"Are you sure you want to delete {gameName}?", "Delete?",
                          MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
@@ -404,5 +204,5 @@ namespace TrophyIsBetter.ViewModels
     } // NotifyChanges
 
     #endregion Private Methods
-  } // GameListViewModel
+  } // PS4GameListViewModel
 } // TrophyIsBetter.ViewModels
