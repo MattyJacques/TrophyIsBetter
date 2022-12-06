@@ -17,10 +17,11 @@ namespace TrophyParser.Vita
     #region Private Members
 
     private BinaryReader _reader;
-    private BinaryWriter _writer;
     private const int _pointer = 0x377;
     private List<Timestamp> _timestamps = new List<Timestamp>();
     private string _path;
+    private int _trophyCount = 0;
+    private int _earnedCount = 0;
 
     #endregion Private Members
     #region Constructors
@@ -62,50 +63,72 @@ namespace TrophyParser.Vita
 
     internal void UnlockTrophy(int id, char rank, DateTime time)
     {
-      _timestamps[id].Type = GetTrophyType(rank);
-      _timestamps[id].Time = time;
-      _timestamps[id].Unknown = 0x50;
+      Timestamp timestamp = new Timestamp
+      {
+        TrophyID = id,
+        Time = time,
+        Unknown = 32,
+        Type = GetTrophyType(rank),
+      };
+
+      _earnedCount++;
+
+      InsertTimestamp(timestamp);
 
       Debug.WriteLine($"Unlocked trophy {id} in TRPTRANS");
     } // UnlockTrophy
 
-    internal void ChangeTimestamp(int id, DateTime time) => _timestamps[id].Time = time;
+    internal void ChangeTimestamp(int id, DateTime time)
+    {
+      int oldIndex = _timestamps.FindIndex(x => x.TrophyID == id);
+
+      if (oldIndex == -1)
+        throw new TrophyNotFound(id);
+
+      Timestamp timestamp = _timestamps[oldIndex];
+
+      if (timestamp.IsSynced)
+        throw new AlreadySyncedException(timestamp.TrophyID);
+
+      _timestamps.RemoveAt(oldIndex);
+      timestamp.Time = time;
+
+      InsertTimestamp(timestamp);
+
+      Debug.WriteLine($"Changed trophy {id} timestamp in TRPTRNS");
+    } // ChangeTimestamp
 
     internal void LockTrophy(int id)
     {
-      _timestamps[id].Type = 0x00;
-      _timestamps[id].Time = null;
+      Timestamp timestamp = _timestamps.Find(x => x.TrophyID == id);
+
+      if (timestamp.IsSynced)
+        throw new AlreadySyncedException(timestamp.TrophyID);
+
+      _timestamps.Remove(timestamp);
+      _earnedCount--;
 
       Debug.WriteLine($"Locked trophy {id} in TRPTRANS");
     } // LockTrophy
 
     internal void Save()
     {
-      _writer = new BinaryWriter(new FileStream(_path, FileMode.Open));
-      _writer.BaseStream.Position = _pointer;
+      BinaryWriter writer = new BinaryWriter(new FileStream(_path, FileMode.Open));
+      writer.BaseStream.Position = _pointer;
 
-      foreach (Timestamp trophy in _timestamps)
+      foreach (Timestamp timestamp in _timestamps)
       {
-
-        _writer.Write((byte)(trophy.IsEarned ? 0x02 : 0x00));
-
-        byte[] time = trophy.Time.HasValue ?
-          BitConverter.GetBytes(trophy.Time.Value.Ticks / 10) : BitConverter.GetBytes((long)0);
-        Array.Reverse(time);
-        _writer.BaseStream.Position += 31;
-        _writer.Write(trophy.Type);
-
-        _writer.BaseStream.Position += 2;
-        _writer.Write(trophy.Unknown);
-
-        _writer.BaseStream.Position += 5;
-        _writer.Write(time);
-
-        _writer.Write(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
-        _writer.BaseStream.Position += 119;
+        SaveTimestamp(writer, timestamp);
       }
-      _writer.Flush();
-      _writer.Close();
+
+      Timestamp emptyTimestamp = new Timestamp();
+      for (int i = 0; i < _trophyCount - _earnedCount; i++)
+      {
+        SaveTimestamp(writer, emptyTimestamp);
+      }
+      
+      writer.Flush();
+      writer.Close();
     } // Save
 
     #endregion Internal Methods
@@ -120,14 +143,24 @@ namespace TrophyParser.Vita
         for (int i = 0; i < count; ++i)
         {
           var block = Block;
-          var time = block.Skip(41).Take(8).ToArray();
-          Array.Reverse(time);
-          ulong t = BitConverter.ToUInt64(time, 0);
-          _timestamps.Add(new Timestamp
+
+          if (block[0] != 0)
           {
-            Time = new DateTime().AddMilliseconds(t / 1000),
-            Unknown = block[35]
-          });
+            var time = block.Skip(41).Take(8).ToArray();
+            Array.Reverse(time);
+            ulong t = BitConverter.ToUInt64(time, 0);
+            _timestamps.Add(new Timestamp
+            {
+              Time = new DateTime().AddMilliseconds(t / 1000),
+              Unknown = block[35],
+              Type = block[32],
+              TrophyID = block[28]
+            });
+
+            _earnedCount++;
+          }
+
+          _trophyCount++;
         }
         _reader.Close();
       }
@@ -136,6 +169,47 @@ namespace TrophyParser.Vita
         throw new Exception("Fail in TRPTRANS.DAT");
       }
     } // ReadFile
+
+    private void SaveTimestamp(BinaryWriter writer, Timestamp timestamp)
+    {
+      writer.Write((byte)(timestamp.IsEarned ? 0x02 : 0x00));
+
+      writer.BaseStream.Position += 27;
+      writer.Write(timestamp.TrophyID);
+
+      writer.Write(timestamp.Type);
+
+      writer.BaseStream.Position += 2;
+      writer.Write(timestamp.Unknown);
+
+      byte[] time = timestamp.Time.HasValue ?
+        BitConverter.GetBytes(timestamp.Time.Value.Ticks / 10) : BitConverter.GetBytes((long)0);
+      Array.Reverse(time);
+      writer.BaseStream.Position += 5;
+      writer.Write(time);
+      writer.Write(time);
+      writer.BaseStream.Position += 119;
+    } // SaveTimestamp
+
+    private void InsertTimestamp(Timestamp timestamp)
+    {
+      int insertPoint;
+
+      for (insertPoint = 0; insertPoint < _timestamps.Count; insertPoint++)
+      {
+        if (DateTime.Compare(_timestamps[insertPoint].Time.Value, timestamp.Time.Value) > 0)
+        {
+          if (_timestamps[insertPoint].IsSynced)
+          {
+            throw new SyncTimeException(_timestamps[insertPoint].Time.Value);
+          }
+
+          break;
+        }
+      }
+
+      _timestamps.Insert(insertPoint, timestamp);
+    } // InsertTimestamp
 
     private byte GetTrophyType(char type)
     {
