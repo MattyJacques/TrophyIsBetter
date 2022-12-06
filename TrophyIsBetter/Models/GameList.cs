@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Controls;
 using TrophyIsBetter.Interfaces;
 
 namespace TrophyIsBetter.Models
@@ -30,7 +29,7 @@ namespace TrophyIsBetter.Models
     #endregion
     #region Private Members
 
-    private List<Game> _games = new List<Game>();
+    private List<IGameModel> _games = new List<IGameModel>();
 
     #endregion Private Members
     #region Public Methods
@@ -55,7 +54,7 @@ namespace TrophyIsBetter.Models
     /// <summary>
     /// Load all of the games in the application data directory
     /// </summary>
-    public List<Game> LoadGames()
+    public List<IGameModel> LoadGames()
     {
       if (Directory.Exists(TROPHY_DATA_PATH))
       {

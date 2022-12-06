@@ -103,12 +103,18 @@
     <Compile Include="Interfaces\ITrophyModel.cs" />
     <Compile Include="Models\GameList.cs" />
     <Compile Include="Models\Game.cs" />
+    <Compile Include="Models\PS4Game.cs" />
+    <Compile Include="Models\PS4GameList.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
     <Compile Include="ViewModels\CopyFromViewModel.cs" />
     <Compile Include="ViewModels\EditTimestampViewModel.cs" />
+    <Compile Include="ViewModels\PS4GameListViewModel.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="ViewModels\GameListViewModel.cs" />
     <Compile Include="ViewModels\TrophyListViewModel.cs" />
+    <Compile Include="Views\PS4GameListView.xaml.cs">
+      <DependentUpon>PS4GameListView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TrophyListWindow.xaml.cs">
       <DependentUpon>TrophyListWindow.xaml</DependentUpon>
     </Compile>
@@ -127,6 +133,10 @@
     <Page Include="Views\EditTimestampWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PS4GameListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\GameListView.xaml">
       <Generator>MSBuild:Compile</Generator>

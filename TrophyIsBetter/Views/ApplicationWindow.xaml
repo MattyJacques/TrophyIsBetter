@@ -28,6 +28,9 @@
     <DataTemplate DataType="{x:Type viewModels:GameViewModel}">
       <views:GameView />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:PS4GameListViewModel}">
+      <views:PS4GameListView />
+    </DataTemplate>
   </Window.Resources>
 
   <!--#endregion Resources-->
