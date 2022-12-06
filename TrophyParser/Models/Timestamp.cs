@@ -5,6 +5,7 @@ namespace TrophyParser.Models
 {
   public class Timestamp
   {
+    public int TrophyID = 0;
     public bool IsEarned { get => Time.HasValue && Time.Value.CompareTo(DateTime.MinValue) != 0; }
     public DateTime? Time;
     public bool IsSynced;
@@ -14,8 +15,9 @@ namespace TrophyParser.Models
     public override string ToString()
     {
       StringBuilder sb = new StringBuilder();
-      sb.Append("Earned: ").AppendLine(IsEarned ? "YES" : "NO");
-      sb.Append("Sync: ").AppendLine(IsSynced ? "YES" : "NO");
+      sb.AppendLine($"Trophy ID: {TrophyID} ");
+      sb.AppendLine($"Earned: {IsEarned} ");
+      sb.AppendLine($"Synced: {IsSynced} ");
       sb.AppendLine(Time.HasValue ? Time.ToString() : "");
       return sb.ToString();
     } // ToString

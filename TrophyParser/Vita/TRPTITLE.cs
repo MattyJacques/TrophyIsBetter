@@ -137,7 +137,8 @@ namespace TrophyParser.Vita
     internal void UnlockTrophy(int id, DateTime time)
     {
       _timestamps[id].Time = time;
-      _timestamps[id].Unknown = 0x50;
+      _timestamps[id].Unknown = 32;
+      _timestamps[id].IsSynced = false;
 
       Debug.WriteLine($"Unlocked trophy {id} in TRPTITLE");
     } // UnlockTrophy
@@ -169,16 +170,11 @@ namespace TrophyParser.Vita
 
         data.AddRange(new byte[] { 0, 0, trophy.Unknown, 0, 0, 0, 0, 0 });
 
-        if (!trophy.IsSynced)
-          data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
-
         var time = trophy.Time.HasValue ?
           BitConverter.GetBytes(trophy.Time.Value.Ticks / 10) : BitConverter.GetBytes((long)0);
         Array.Reverse(time);
         data.AddRange(time);
-
-        if (trophy.IsSynced)
-          data.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+        data.AddRange(time);
 
         Block = data.ToArray();
       }
@@ -213,25 +209,11 @@ namespace TrophyParser.Vita
     {
       Timestamp timestamp = new Timestamp();
 
-      byte[] time;
-
-      if (block[10] != 0)
-      {
-        timestamp.IsSynced = true;
-        time = block.Skip(9).Take(8).ToArray();
-      }
-      else
-      {
-        time = block.Skip(17).Take(8).ToArray();
-      }
-
+      byte[] time = block.Skip(9).Take(8).ToArray();
       Array.Reverse(time);
       ulong t = BitConverter.ToUInt64(time, 0);
       timestamp.Time = new DateTime().AddMilliseconds(t / 1000);
       timestamp.Unknown = block[3];
-
-      if (t == 0)
-        timestamp.IsSynced = true;
 
       return timestamp;
     } // GetTimestamp
