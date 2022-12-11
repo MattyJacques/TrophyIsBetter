@@ -1,10 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Security.Cryptography;
 using TrophyParser.Models;
-using TrophyParser.Vita;
 
 namespace TrophyParser.PS4
 {

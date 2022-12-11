@@ -19,6 +19,13 @@
 
     <DockPanel x:Name="ToolBarPanel"
                DockPanel.Dock="Top">
+      <Button Content="{materialDesign:PackIcon Plus}"
+              ToolTip="Import Game(s)"
+              Command="{Binding ImportCommand}"
+              Style="{StaticResource MaterialDesignPaperButton}"
+              Height="50"
+              Width="60"
+              HorizontalAlignment="Left" />
       <Button Content="{materialDesign:PackIcon Pencil}"
               ToolTip="Edit Game"
               IsEnabled="{Binding HasSelected}"
@@ -79,6 +86,9 @@
           <MenuItem Header="Edit"
                     Icon="{materialDesign:PackIcon Pencil}"
                     Command="{Binding EditGameCommand}" />
+          <MenuItem Header="Remove"
+                    Icon="{materialDesign:PackIcon Delete}"
+                    Command="{Binding RemoveGameCommand}" />
         </ContextMenu>
       </DataGrid.ContextMenu>
 

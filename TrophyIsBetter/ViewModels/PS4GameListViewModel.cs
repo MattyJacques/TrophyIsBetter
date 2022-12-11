@@ -5,11 +5,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
+using TrophyIsBetter.Models;
 using TrophyIsBetter.Views;
+using TrophyParser.PS4;
 
 namespace TrophyIsBetter.ViewModels
 {
@@ -22,7 +25,6 @@ namespace TrophyIsBetter.ViewModels
 
     private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
     private ListCollectionView _gameCollectionView = null;
-    private readonly SynchronizationContext _uiContext = SynchronizationContext.Current;
 
     private bool _hasGames = false;
 
@@ -33,7 +35,9 @@ namespace TrophyIsBetter.ViewModels
     {
       _model = model;
 
+      ImportCommand = new RelayCommand(Import);
       EditGameCommand = new RelayCommand(EditGame);
+      RemoveGameCommand = new RelayCommand(RemoveGame);
       TrophyListCommand = new RelayCommand(OpenTrophyList);
 
       _gameCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(GameCollection);
@@ -49,9 +53,19 @@ namespace TrophyIsBetter.ViewModels
     #region Public Properties
 
     /// <summary>
+    /// Import a single trophy folder or a directory containing multiple
+    /// </summary>
+    public RelayCommand ImportCommand { get; set; }
+
+    /// <summary>
     /// Edit a games trophies
     /// </summary>
     public RelayCommand EditGameCommand { get; set; }
+
+    /// <summary>
+    /// Remove a game from the game list
+    /// </summary>
+    public RelayCommand RemoveGameCommand { get; set; }
 
     /// <summary>
     /// List all trophies chronologically
@@ -164,6 +178,58 @@ namespace TrophyIsBetter.ViewModels
     } // LoadGames
 
     /// <summary>
+    /// Import fake trophy list
+    /// </summary>
+    private void Import()
+    {
+      PS4TrophyList trophyList = new PS4TrophyList();
+      PS4Game game = new PS4Game(trophyList);
+      GameViewModel gameViewModel = new GameViewModel(game, this);
+
+      ObservableCollection<TrophyViewModel> trophyCollection = new ObservableCollection<TrophyViewModel>();
+      for (int i = 0; i < 200; i++)
+      {
+        trophyCollection.Add(new TrophyViewModel(new Trophy()));
+      }
+
+      CopyFromWindow window = new CopyFromWindow
+      {
+        DataContext = new CopyFromViewModel(trophyCollection)
+      };
+
+      bool? result = window.ShowDialog();
+
+      if (result == true)
+      {
+        GameCollection.Add(gameViewModel);
+        foreach (TrophyViewModel trophy in trophyCollection)
+        {
+          if (trophy.ShouldCopy && trophy.RemoteTimestamp.HasValue)
+          {
+            trophy.Timestamp = trophy.RemoteTimestamp.Value;
+            trophy.RemoteTimestamp = null;
+            trophy.ShouldCopy = false;
+            trophy.Synced = false;
+          }
+        }
+
+        var emptyList = trophyCollection.Where(x => !x.Timestamp.HasValue).ToList();
+        for (int i = 0; i < emptyList.Count(); i++)
+        {
+          trophyCollection.Remove(emptyList[i]);
+        }
+
+        try
+        {
+          game.Name = trophyCollection[0].Game;
+        } catch { }
+
+        gameViewModel.TrophyCollection = trophyCollection;
+        NotifyGameChanges();
+      }
+    } // Import
+
+    /// <summary>
     /// Switch page to the single game view
     /// </summary>
     private void EditGame()
@@ -171,6 +237,19 @@ namespace TrophyIsBetter.ViewModels
       ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
         .ChangePageCommand.Execute(SelectedGame);
     } // EditGame
+
+    /// <summary>
+    /// Remove a single game from the game list
+    /// </summary>
+    private void RemoveGame()
+    {
+      if (CheckShouldRemove(SelectedGame.Name))
+      {
+        GameCollection.Remove(SelectedGame);
+
+        NotifyGameChanges();
+      }
+    } // RemoveGame
 
     /// <summary>
     /// List all trophies chronologically

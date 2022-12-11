@@ -17,6 +17,10 @@ namespace TrophyParser.PS4
     private int _trophyCount;
     private int _earnedCount;
 
+    public PS4TrophyList()
+    {
+    }
+
     #endregion Private Members
     #region Constructors
 
@@ -43,7 +47,7 @@ namespace TrophyParser.PS4
     #endregion Constructors
     #region Public Properties
     public override string Icon => throw new NotSupportedException();
-    public override string Name => _name;
+    public override string Name { get => _name; set => _name = value; }
     public override string NpCommID => _npCommID;
     public override PlatformEnum Platform => PlatformEnum.PS4;
     public override bool HasPlatinum => _hasPlatinum;
@@ -78,7 +82,8 @@ namespace TrophyParser.PS4
       DateTime timeLastUpdateUc = timeLastUnlocked.AddMilliseconds(rng.Next(1, 100));
 
       PS4TrophyDB db = new PS4TrophyDB(_dbPath);
-      db.ChangeTimestamp(NpCommID, id, timeUnlockedUc, timeLastUnlocked, timeLastUpdateUc);
+      if (_dbPath != null)
+        db.ChangeTimestamp(NpCommID, id, timeUnlockedUc, timeLastUnlocked, timeLastUpdateUc);
     } // ChangeTimestamp
 
     public override void LockTrophy(int id) => throw new NotSupportedException();

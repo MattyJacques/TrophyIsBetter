@@ -54,7 +54,7 @@ namespace TrophyParser.PS3
     #region Public Properties
 
     public override string Icon => $"{_path}\\ICON0.PNG";
-    public override string Name => _conf.TitleName;
+    public override string Name { get => _conf.TitleName; set => Name = value; }
     public override string NpCommID => _conf.NpCommID;
     public override PlatformEnum Platform => PlatformEnum.PS3;
     public override bool HasPlatinum => _conf.HasPlatinum;

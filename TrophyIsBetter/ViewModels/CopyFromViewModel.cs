@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Views;
 
@@ -20,11 +21,14 @@ namespace TrophyIsBetter.ViewModels
       new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private static readonly Regex DATE_EARNED_REGEX =
       new Regex("<td class=\"date_earned\">\\s+<span class=\"sort\">\\d+</span>");
+    private static readonly Regex GAME_TITLE_REGEX =
+      new Regex("<div title=\"[^\"]+\">");
 
     #endregion Const Members
     #region Private Members
 
     private string _copyUrl = "";
+    private string _gameName = "";
     private ObservableCollection<TrophyViewModel> _trophyCollection;
     private ListCollectionView _trophyCollectionView;
 
@@ -76,18 +80,36 @@ namespace TrophyIsBetter.ViewModels
     private void GetTimestamps()
     {
       MatchCollection timestamps = DownloadTimestamps();
-      double offset = GetOffset(GetFirstTimestamp(timestamps));
-      
-      CalcTimestamps(offset, timestamps);
+      if (timestamps.Count > 0)
+      {
+        double offset = GetOffset(GetFirstTimestamp(timestamps));
 
-      TrophyCollectionView.Refresh();
+        CalcTimestamps(offset, timestamps);
+
+        TrophyCollectionView.Refresh();
+      }
     } // GetTimestamps
 
     private MatchCollection DownloadTimestamps()
     {
       WebClient client = new WebClient();
       client.Headers.Add("User-Agent: Other");
-      return DATE_EARNED_REGEX.Matches(client.DownloadString(CopyUrl));
+      MatchCollection collection = null;
+      try
+      {
+        var response = client.DownloadString(CopyUrl);
+        var matches = GAME_TITLE_REGEX.Matches(response);
+        _gameName = ParseNameFromMatch(matches[0]).Trim('"');
+        collection = DATE_EARNED_REGEX.Matches(response);
+      } catch
+      {
+        MessageBox.Show("Request failed");
+      }
+
+      if (_gameName == null || _gameName.Length == 0)
+        MessageBox.Show("Game name is empty");
+
+      return collection ?? DATE_EARNED_REGEX.Matches("");
     } // DownloadTimestamps
 
     private DateTime GetFirstTimestamp(MatchCollection matches)
@@ -126,6 +148,15 @@ namespace TrophyIsBetter.ViewModels
         {
           DateTime timestamp = MIN_UNIX_TIMESTAMP.AddSeconds(seconds + offset);
 
+          try
+          {
+            if (TrophyCollection[i].Game == null)
+              TrophyCollection[i].Game = _gameName;
+          }
+          catch
+          {
+            MessageBox.Show("Failed to set game name");
+          }
           TrophyCollection[i].RemoteTimestamp = timestamp;
           TrophyCollection[i].ShouldCopy = true;
         }
@@ -136,7 +167,12 @@ namespace TrophyIsBetter.ViewModels
     {
       long.TryParse(Regex.Match(match.Value, "\\d+").ToString(), out var seconds);
       return seconds;
-    } // ParseMatch
+    } // ParseSecondsFromMatch
+
+    private string ParseNameFromMatch(Match match)
+    {
+      return Regex.Match(match.Value, "\"[^\"]+\"").ToString();
+    } // ParseNameFromMatch
 
     #endregion Initial Timestamp Downloads
     #region Edit Timestamps

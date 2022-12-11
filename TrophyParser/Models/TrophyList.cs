@@ -16,7 +16,7 @@ namespace TrophyParser
     #region Public Abstract Properties
 
     public abstract string Icon { get; }
-    public abstract string Name { get; }
+    public abstract string Name { get; set; }
     public abstract string NpCommID { get; }
     public abstract PlatformEnum Platform { get; }
     public abstract bool HasPlatinum { get; }

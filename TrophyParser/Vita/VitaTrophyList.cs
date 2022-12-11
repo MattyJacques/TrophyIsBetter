@@ -40,7 +40,7 @@ namespace TrophyParser.Vita
     #region Public Properties
 
     public override string Icon => $"{_path}\\ICON0.PNG";
-    public override string Name => _trop.TitleName;
+    public override string Name { get => _trop.TitleName; set => Name = value; }
     public override string NpCommID => _trop.NpCommID;
     public override PlatformEnum Platform => PlatformEnum.Vita;
     public override bool HasPlatinum => _trop.HasPlatinum;

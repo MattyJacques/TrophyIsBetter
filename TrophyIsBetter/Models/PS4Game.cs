@@ -15,6 +15,7 @@ namespace TrophyIsBetter.Models
     private bool _hasChanges = false;
     private int _earnedExp = 0;
     private int _totalExp = 0;
+    private List<ITrophyModel> _trophies = null;
 
     #endregion Private Members
     #region Constructors
@@ -28,7 +29,7 @@ namespace TrophyIsBetter.Models
     #region Public Properties
 
     public string Icon => throw new NotSupportedException();
-    public string Name => _trophyList.Name;
+    public string Name { get => _trophyList.Name; set => _trophyList.Name = value; }
     public string NpCommID => _trophyList.NpCommID;
     public PlatformEnum Platform => PlatformEnum.PS4;
     public bool HasPlatinum => _trophyList.HasPlatinum;
@@ -38,7 +39,7 @@ namespace TrophyIsBetter.Models
     public int EarnedExp { get => _earnedExp; set => _earnedExp = value; }
     public int TotalExp { get => _totalExp; set => _totalExp = value; }
     public DateTime? LastTimestamp => _trophyList.LastTimestamp;
-    public List<ITrophyModel> Trophies => ConvertTrophyData(_trophyList.Trophies);
+    public List<ITrophyModel> Trophies { get => _trophies ?? ConvertTrophyData(_trophyList.Trophies); set => _trophies = value; } 
     public string Path => throw new NotSupportedException();
     public bool HasUnsavedChanges { get => _hasChanges; set => _hasChanges = value; }
 
