@@ -13,12 +13,17 @@ namespace TrophyIsBetter.Extensions.Helpers
                           CultureInfo culture)
     {
       var path = (string)value;
-      // load the image, specify CacheOption so the file is not locked
-      var image = new BitmapImage();
-      image.BeginInit();
-      image.CacheOption = BitmapCacheOption.OnLoad;
-      image.UriSource = new Uri(path);
-      image.EndInit();
+      BitmapImage image = null;
+
+      if (path != null && path.Length > 0)
+      {
+        // load the image, specify CacheOption so the file is not locked
+        image = new BitmapImage();
+        image.BeginInit();
+        image.CacheOption = BitmapCacheOption.OnLoad;
+        image.UriSource = new Uri(path);
+        image.EndInit();
+      }
 
       return image;
     }
