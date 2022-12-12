@@ -43,27 +43,7 @@ namespace TrophyIsBetter.ViewModels
       TrophyCollectionView.CurrentChanged += OnSelectedTrophyChanged;
 
       LoadTrophies();
-
-      CheckPS3Plats();
     } // Constructor
-
-    private void CheckPS3Plats()
-    {
-      if (TrophyCollection.Count > 0 && TrophyCollection[0].Type == 'P'
-        && TrophyCollection.Where(x => !x.Achieved && x.Group == "Base Game").ToList().Count == 0)
-      {
-        var trophies = TrophyCollection.Where(x => x.Achieved && x.Group == "Base Game" && x.Type != 'P')
-                                     .OrderBy(x => x.Timestamp.Value);
-        var trophy = TrophyCollection.Where(x => x.Achieved && x.Group == "Base Game" && x.Type != 'P')
-                                     .OrderBy(x => x.Timestamp.Value)
-                                     .Last();
-        if (TrophyCollection[0].Timestamp.HasValue && TrophyCollection[0].Timestamp.Value != trophy.Timestamp.Value.AddSeconds(1))
-        {
-          MessageBox.Show($"{Name} platinum mismatch");
-        }
-      }
-
-    } // CheckPS3Plats
 
     #endregion Constructors
     #region Public Properties
