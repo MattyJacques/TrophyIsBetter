@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using TrophyIsBetter.Interfaces;
@@ -20,7 +18,7 @@ namespace TrophyIsBetter.ViewModels
   {
     #region Private Members
 
-    private readonly IGameListModel _model;
+    private readonly PS4GameList _model;
     private string _name = "PS4 Games";
 
     private ObservableCollection<GameViewModel> _gameCollection = new ObservableCollection<GameViewModel>();
@@ -31,7 +29,7 @@ namespace TrophyIsBetter.ViewModels
     #endregion Private Members
     #region Constructors
 
-    internal PS4GameListViewModel(IGameListModel model)
+    internal PS4GameListViewModel(PS4GameList model)
     {
       _model = model;
 
@@ -202,14 +200,20 @@ namespace TrophyIsBetter.ViewModels
       if (result == true)
       {
         GameCollection.Add(gameViewModel);
-        foreach (TrophyViewModel trophy in trophyCollection)
+
+        for (int i = 0; i < trophyCollection.Count; i++)
         {
+          TrophyViewModel trophy = trophyCollection[i];
+
           if (trophy.ShouldCopy && trophy.RemoteTimestamp.HasValue)
           {
             trophy.Timestamp = trophy.RemoteTimestamp.Value;
             trophy.RemoteTimestamp = null;
             trophy.ShouldCopy = false;
             trophy.Synced = false;
+
+            trophyList.Trophies.Add(new TrophyParser.Models.Trophy(i, "no", 'B', 1, "", "", 0));
+            trophyList.Trophies.Last().Timestamp = new TrophyParser.Models.Timestamp { Time = trophy.Timestamp, IsSynced = false };
           }
         }
 
@@ -225,7 +229,15 @@ namespace TrophyIsBetter.ViewModels
         } catch { }
 
         gameViewModel.TrophyCollection = trophyCollection;
-        NotifyGameChanges();
+
+        if (_model.ImportGame(trophyList))
+        {
+          NotifyGameChanges();
+        }
+        else
+        {
+          GameCollection.Remove(gameViewModel);
+        }
       }
     } // Import
 
@@ -244,8 +256,15 @@ namespace TrophyIsBetter.ViewModels
     private void RemoveGame()
     {
       if (CheckShouldRemove(SelectedGame.Name))
-      {
-        GameCollection.Remove(SelectedGame);
+      {        
+        if (!_model.RemoveGame(SelectedGame.Model))
+        {
+          MessageBox.Show($"Failed to remove {SelectedGame.Name}");
+        }
+        else
+        {
+          GameCollection.Remove(SelectedGame);
+        }
 
         NotifyGameChanges();
       }

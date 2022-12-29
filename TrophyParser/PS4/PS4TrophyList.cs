@@ -1,7 +1,6 @@
 ﻿using System;
 using TrophyParser.Models;
 using static TrophyParser.Enums;
-using static TrophyParser.PS3.Structs;
 
 namespace TrophyParser.PS4
 {

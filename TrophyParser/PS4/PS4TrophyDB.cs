@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using TrophyParser.Models;
+using TrophyParser.Vita;
 
 namespace TrophyParser.PS4
 {
@@ -50,12 +51,32 @@ namespace TrophyParser.PS4
       return games;
     } // GetGames
 
+    public bool ImportGame(PS4TrophyList trophyList)
+    {
+      bool result =
+        ExecuteNonQuery($@"INSERT INTO tbl_trophy_title (user_id, revision, trophy_title_id, status, conf_file_revision, data_file_revision, trop_info_revision, net_trans_file_revision, title, platinum_num, trophy_num, unlocked_trophy_num, time_last_unlocked) 
+                           VALUES (1, 1, '{trophyList.Name}', 0, 1, 1, 1, 1, '{trophyList.Name}', 1, {trophyList.Trophies.Count}, {trophyList.Trophies.Count}, '{trophyList.LastTimestamp:yyyy-MM-ddTHH:mm:ss}.00Z')");
+
+      foreach (Trophy trophy in trophyList.Trophies)
+      {
+        result &= ExecuteNonQuery($@"INSERT INTO tbl_trophy_flag (title_id, revision, trophy_title_id, trophyid, time_unlocked, hidden, grade, title, description, groupid) 
+                                     VALUES (1, 1, '{trophyList.Name}', {trophy.ID}, '{trophy.Timestamp.Time:yyyy-MM-ddTHH:mm:ss}.00Z', 0, 1, '', '', -1)");
+      }
+
+      return result;
+    } // ImportGame
+
+    public bool RemoveGame(string npCommID)
+    {
+      return ExecuteNonQuery($"DELETE FROM tbl_trophy_title WHERE trophy_title_id = '{npCommID}'");
+    } // RemoveGame
+
     public List<Trophy> GetTrophies(string npCommID)
     {
       List<Trophy> trophies = new List<Trophy>();
 
       SqliteDataReader reader =
-        ExecuteQuery("SELECT * FROM tbl_trophy_flag WHERE trophy_title_id = '" + npCommID + "'");
+        ExecuteQuery($"SELECT * FROM tbl_trophy_flag WHERE trophy_title_id = '{npCommID}'");
       while (reader.Read())
       {
         Trophy trophy = new Trophy(
@@ -84,28 +105,29 @@ namespace TrophyParser.PS4
       return trophies;
     } // GetTrophies
 
-    public void ChangeTimestamp(string npCommID,
+    public bool ChangeTimestamp(string npCommID,
                                 int id,
                                 DateTime timeUnlocked,
                                 DateTime timeLastUnlocked,
                                 DateTime timeLastUpdate)
     {
-      string timeuc = timeUnlocked.ToString("yyyy-MM-ddTHH:mm:ss.ff");
-      ExecuteNonQuery($@"UPDATE tbl_trophy_flag
+      bool result = ExecuteNonQuery($@"UPDATE tbl_trophy_flag
         SET time_unlocked = '{timeUnlocked:yyyy-MM-ddTHH:mm:ss}.00Z',
             time_unlocked_uc = '{timeUnlocked:yyyy-MM-ddTHH:mm:ss.ff}Z'
         WHERE trophy_title_id = '{npCommID}' AND trophyid = {id}");
 
-      ExecuteNonQuery($@"UPDATE tbl_trophy_title
+      result &= ExecuteNonQuery($@"UPDATE tbl_trophy_title
         SET time_last_unlocked = '{timeLastUnlocked:yyyy-MM-ddTHH:mm:ss}.00Z',
             time_last_update = '{timeLastUpdate:yyyy-MM-ddTHH:mm:ss}.00Z',
             time_last_update_uc = '{timeLastUpdate:yyyy-MM-ddTHH:mm:ss.ff}Z'
         WHERE trophy_title_id = '{npCommID}'");
 
-      ExecuteNonQuery($@"UPDATE tbl_trophy_title_entry
+      result &= ExecuteNonQuery($@"UPDATE tbl_trophy_title_entry
         SET time_last_update = '{timeLastUpdate:yyyy-MM-ddTHH:mm:ss}.00Z',
             time_last_update_uc = '{timeLastUpdate:yyyy-MM-ddTHH:mm:ss.ff}Z'
         WHERE trophy_title_id = '{npCommID}'");
+
+      return result;
     } // ChangeTimestamp
 
     #endregion Public Methods

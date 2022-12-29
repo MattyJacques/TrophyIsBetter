@@ -17,7 +17,7 @@ namespace TrophyIsBetter.Interfaces
     /// <summary>
     /// Remove a game from data
     /// </summary>
-    void RemoveGame(IGameModel game);
+    bool RemoveGame(IGameModel game);
 
   } // IGameListModel
 } // TrophyIsBetter.Interfaces

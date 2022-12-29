@@ -81,7 +81,7 @@ namespace TrophyIsBetter.Models
     /// <summary>
     /// Remove data from application
     /// </summary>
-    public void RemoveGame(IGameModel game)
+    public bool RemoveGame(IGameModel game)
     {
       string destination = Path.Combine(game.Platform.ToString(), game.NpCommID);
       string fullDataPath = Path.Combine(TROPHY_DATA_PATH, destination);
@@ -91,6 +91,8 @@ namespace TrophyIsBetter.Models
 
       Utility.File.DeleteDirectory(fullDataPath);
       Utility.File.DeleteDirectory(fullBackupPath);
+
+      return !Directory.Exists(fullDataPath) && !Directory.Exists(fullBackupPath);
     } // RemoveGame
 
     #endregion Public Methods

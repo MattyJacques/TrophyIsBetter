@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows.Controls;
 using TrophyIsBetter.Interfaces;
 using TrophyParser.PS4;
 
@@ -11,7 +10,6 @@ namespace TrophyIsBetter.Models
   {
     #region Private Members
 
-    private string _path;
     private PS4TrophyDB _trophyDB;
     private List<IGameModel> _games = new List<IGameModel>();
 
@@ -20,7 +18,6 @@ namespace TrophyIsBetter.Models
 
     public PS4GameList(string path)
     {
-      _path = path;
       _trophyDB = new PS4TrophyDB(path);
     } // Constructor
 
@@ -28,15 +25,17 @@ namespace TrophyIsBetter.Models
     #region Public Methods
 
     public void ImportGames(string pathToGames) => throw new NotSupportedException();
-    public void RemoveGame(IGameModel game) => throw new NotSupportedException();
+
+    public bool ImportGame(PS4TrophyList game) => _trophyDB.ImportGame(game);
+
+    public bool RemoveGame(IGameModel game) => _trophyDB.RemoveGame(game.NpCommID);
 
     /// <summary>
     /// Load all of the games in the application data directory
     /// </summary>
     public List<IGameModel> LoadGames()
     {
-      PS4TrophyDB trophyDB = new PS4TrophyDB(_path);
-      var result = trophyDB.GetGames();
+      var result = _trophyDB.GetGames();
 
       _games.Clear();
 
