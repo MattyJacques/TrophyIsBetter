@@ -23,7 +23,7 @@ namespace TrophyIsBetter.ViewModels
 
     public string Game { get => _model.Game; set => _model.Game = value; }
     public string Icon { get => _model.Icon; }
-    public string Name { get => _model.Name; }
+    public string Name { get => _model.Name; set => _model.Name = value; }
     public string Description { get => _model.Description; }
     public char Type { get => _model.Type; }
     public string Group { get => _model.Group; }

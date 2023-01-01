@@ -35,6 +35,7 @@ namespace TrophyIsBetter.ViewModels
 
       ImportCommand = new RelayCommand(Import);
       EditGameCommand = new RelayCommand(EditGame);
+      MoveGameCommand = new RelayCommand(MoveGame);
       RemoveGameCommand = new RelayCommand(RemoveGame);
       TrophyListCommand = new RelayCommand(OpenTrophyList);
 
@@ -59,6 +60,11 @@ namespace TrophyIsBetter.ViewModels
     /// Edit a games trophies
     /// </summary>
     public RelayCommand EditGameCommand { get; set; }
+
+    /// <summary>
+    /// Edit a games trophies
+    /// </summary>
+    public RelayCommand MoveGameCommand { get; set; }
 
     /// <summary>
     /// Remove a game from the game list
@@ -212,7 +218,7 @@ namespace TrophyIsBetter.ViewModels
             trophy.ShouldCopy = false;
             trophy.Synced = false;
 
-            trophyList.Trophies.Add(new TrophyParser.Models.Trophy(i, "no", 'B', 1, "", "", 0));
+            trophyList.Trophies.Add(new TrophyParser.Models.Trophy(i, "no", 'B', 1, trophy.Name, "", 0));
             trophyList.Trophies.Last().Timestamp = new TrophyParser.Models.Timestamp { Time = trophy.Timestamp, IsSynced = false };
           }
         }
@@ -249,6 +255,47 @@ namespace TrophyIsBetter.ViewModels
       ((ApplicationViewModel)Application.Current.MainWindow.DataContext)
         .ChangePageCommand.Execute(SelectedGame);
     } // EditGame
+
+    private void MoveGame()
+    {
+      DateTime earliestFinish = new DateTime(2021, 04, 27);
+
+      List<TrophyViewModel> gameTrophies = SelectedGame.TrophyCollection.OrderBy(x => x.Timestamp).ToList();
+      List<TrophyViewModel> allTrophies = new List<TrophyViewModel>();
+
+      foreach (GameViewModel game in GameCollection)
+      {
+        if (game.Name != SelectedGame.Name)// && game.TrophyCollection.OrderBy(x => x.Timestamp).Last().Timestamp.Value < earliestFinish)
+          game.TrophyCollection.ToList().ForEach(allTrophies.Add);
+      }
+
+      TimeSpan dateDifference = gameTrophies.Last().Timestamp.Value - earliestFinish;
+      List<string> possibleDates = new List<string>();
+
+      for (int i = 0; i <= dateDifference.Days; i++)
+      {
+        bool hasClash = false;
+
+        foreach (TrophyViewModel trophy in gameTrophies)
+        {
+          int index = allTrophies.FindIndex(f => f.Timestamp.Value.ToShortDateString() == trophy.Timestamp.Value.AddDays(i * -1).ToShortDateString());
+
+          if (index >= 0)
+          {
+            hasClash = true;
+            break;
+          }
+        }
+
+        if (!hasClash)
+        {
+          possibleDates.Add($"{gameTrophies.First().Timestamp.Value.AddDays(i * -1).ToShortDateString()} - {gameTrophies.Last().Timestamp.Value.AddDays(i * -1).ToShortDateString()}");
+        }
+      }
+
+      MessageBox.Show(string.Join("\n", possibleDates));
+
+    } // MoveGame
 
     /// <summary>
     /// Remove a single game from the game list

@@ -22,13 +22,16 @@ namespace TrophyIsBetter.ViewModels
     private static readonly Regex DATE_EARNED_REGEX =
       new Regex("<td class=\"date_earned\">\\s+<span class=\"sort\">\\d+</span>");
     private static readonly Regex GAME_TITLE_REGEX =
-      new Regex("<div title=\"[^\"]+\">");
+      new Regex("><div title=\".*");
+    private static readonly Regex TROPHY_TITLE_REGEX =
+      new Regex(" title=\"View details for .*\">");
 
     #endregion Const Members
     #region Private Members
 
     private string _copyUrl = "";
     private string _gameName = "";
+    private List<string> _trophyTitles = new List<string>();
     private ObservableCollection<TrophyViewModel> _trophyCollection;
     private ListCollectionView _trophyCollectionView;
 
@@ -94,22 +97,29 @@ namespace TrophyIsBetter.ViewModels
     {
       WebClient client = new WebClient();
       client.Headers.Add("User-Agent: Other");
-      MatchCollection collection = null;
+      MatchCollection timestampCollection = null;
+      MatchCollection trophyCollection = null;
       try
       {
         var response = client.DownloadString(CopyUrl);
         var matches = GAME_TITLE_REGEX.Matches(response);
+        timestampCollection = DATE_EARNED_REGEX.Matches(response);
+        trophyCollection = TROPHY_TITLE_REGEX.Matches(response);
         _gameName = ParseNameFromMatch(matches[0]).Trim('"');
-        collection = DATE_EARNED_REGEX.Matches(response);
       } catch
       {
         MessageBox.Show("Request failed");
       }
 
+      foreach (Match match in trophyCollection)
+      {
+        _trophyTitles.Add(ParseTrophyFromMatch(match));
+      }
+
       if (_gameName == null || _gameName.Length == 0)
         MessageBox.Show("Game name is empty");
 
-      return collection ?? DATE_EARNED_REGEX.Matches("");
+      return timestampCollection ?? DATE_EARNED_REGEX.Matches("");
     } // DownloadTimestamps
 
     private DateTime GetFirstTimestamp(MatchCollection matches)
@@ -152,6 +162,9 @@ namespace TrophyIsBetter.ViewModels
           {
             if (TrophyCollection[i].Game == null)
               TrophyCollection[i].Game = _gameName;
+
+            if (TrophyCollection[i].Name == null)
+              TrophyCollection[i].Name = _trophyTitles[i];
           }
           catch
           {
@@ -173,6 +186,11 @@ namespace TrophyIsBetter.ViewModels
     {
       return Regex.Match(match.Value, "\"[^\"]+\"").ToString();
     } // ParseNameFromMatch
+
+    private string ParseTrophyFromMatch(Match match)
+    {
+      return match.ToString().Remove(match.Length - 2).Remove(0, 25);
+    } // ParseTrophyFromMatch
 
     #endregion Initial Timestamp Downloads
     #region Edit Timestamps

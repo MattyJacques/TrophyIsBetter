@@ -7,7 +7,7 @@ namespace TrophyIsBetter.Interfaces
     string Game { get; set; }
     int ID { get; }
     string Icon { get; }
-    string Name { get; }
+    string Name { get; set; }
     string Description { get; }
     char Type { get; }
     string Group { get; }

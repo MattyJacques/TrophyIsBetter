@@ -34,6 +34,14 @@
               Height="50"
               Width="60"
               HorizontalAlignment="Left" />
+      <Button Content="{materialDesign:PackIcon Calculator}"
+              ToolTip="Move Game"
+              IsEnabled="{Binding HasSelected}"
+              Command="{Binding MoveGameCommand}"
+              Style="{DynamicResource MaterialDesignPaperButton}"
+              Height="50"
+              Width="60"
+              HorizontalAlignment="Left" />
       <Button Content="{materialDesign:PackIcon FormatListNumbered}"
               ToolTip="Chronological trophy list"
               Command="{Binding TrophyListCommand}"
@@ -86,6 +94,9 @@
           <MenuItem Header="Edit"
                     Icon="{materialDesign:PackIcon Pencil}"
                     Command="{Binding EditGameCommand}" />
+          <MenuItem Header="Move"
+                    Icon="{materialDesign:PackIcon Calculator}"
+                    Command="{Binding MoveGameCommand}" />
           <MenuItem Header="Remove"
                     Icon="{materialDesign:PackIcon Delete}"
                     Command="{Binding RemoveGameCommand}" />

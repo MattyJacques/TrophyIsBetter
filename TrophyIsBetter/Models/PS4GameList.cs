@@ -28,7 +28,7 @@ namespace TrophyIsBetter.Models
 
     public bool ImportGame(PS4TrophyList game) => _trophyDB.ImportGame(game);
 
-    public bool RemoveGame(IGameModel game) => _trophyDB.RemoveGame(game.NpCommID);
+    public bool RemoveGame(IGameModel game) => _trophyDB.RemoveGame(game.NpCommID ?? game.Name);
 
     /// <summary>
     /// Load all of the games in the application data directory
