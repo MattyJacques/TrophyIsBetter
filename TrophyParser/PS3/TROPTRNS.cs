@@ -44,6 +44,9 @@ namespace TrophyParser.PS3
       ParseAccountInfo(reader);
       ParseListInfo(reader);
       ParseTrophyInfo(reader);
+
+      _syncedCount = 0;
+      _earnedCount = 0;
     } // Constructor
 
     #endregion Constructors
@@ -88,8 +91,8 @@ namespace TrophyParser.PS3
     {
       EarnedInfo timestamp = _timestamps.Find(x => x.TrophyID == id);
 
-      if (timestamp.IsSynced)
-        throw new AlreadySyncedException(timestamp.TrophyID);
+      //if (timestamp.IsSynced)
+      //  throw new AlreadySyncedException(timestamp.TrophyID);
 
       _timestamps.Remove(timestamp);
       _earnedCount--;

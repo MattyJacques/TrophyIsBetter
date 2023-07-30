@@ -311,6 +311,10 @@ namespace TrophyParser.PS3
         {
           return _id.ChangeEndian();
         }
+        set
+        {
+          _id = value.ChangeEndian();
+        }
       }
 
       /// byte[4]

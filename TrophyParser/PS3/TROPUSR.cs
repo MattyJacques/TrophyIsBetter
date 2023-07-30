@@ -44,6 +44,17 @@ namespace TrophyParser.PS3
       _typeRecords = DataParsing.ParseTypeRecords(_header, reader);
 
       ParseBlocks(reader);
+
+      foreach(Timestamp stamp  in _timestamps)
+      {
+        if (stamp.IsEarned)
+        {
+          LockTrophy(stamp.ID);
+        }
+      }
+
+      _listInfo.AchievedCount = 0;
+      _achievedStats.EarnedCount = 0;
     } // Constructor
 
     #endregion Constructors
@@ -59,7 +70,7 @@ namespace TrophyParser.PS3
 
         if (_listInfo.LastAchievedTrophyTime != DateTime.MinValue)
         {
-          timestamp = _listInfo.LastAchievedTrophyTime;
+          timestamp = _listInfo.LastUpdated;
         }
 
         return timestamp;
@@ -123,13 +134,22 @@ namespace TrophyParser.PS3
     {
       Timestamp timestamp = _timestamps[id];
       
-      if (timestamp.SyncState == (int)TrophySyncState.Synced)
-        throw new AlreadySyncedException(timestamp.ID);
+      //if (timestamp.SyncState == (int)TrophySyncState.Synced)
+      //  throw new AlreadySyncedException(timestamp.ID);
       
       if (!timestamp.IsEarned)
         throw new AlreadyLockedException(timestamp.ID);
 
       DateTime removedTimestamp = timestamp.Time;
+
+      /*if (timestamp.IsEarned)
+      {
+        _listInfo.AchievedCount--;
+        _achievedStats.EarnedCount--;
+
+        timestamp = _timestamps[0];
+        timestamp.ID = id;
+      }*/
 
       ResetTimestamp(timestamp);
       RemoveFromRates(id);
@@ -276,7 +296,7 @@ namespace TrophyParser.PS3
         timestamp.IsEarned = false;
       }
       
-      timestamp.SyncState = 0;
+      timestamp.SyncState = (int)TrophySyncState.NotSynced;
     } // ResetTimestamp
 
     private void UpdateRates(int id)

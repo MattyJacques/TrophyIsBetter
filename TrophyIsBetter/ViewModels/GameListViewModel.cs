@@ -46,8 +46,8 @@ namespace TrophyIsBetter.ViewModels
       OpenPS4DBCommand = new RelayCommand(OpenPS4DB);
 
       _gameCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(GameCollection);
-      _gameCollectionView.SortDescriptions.Add(new SortDescription(nameof(GameViewModel.Name),
-                                                                   ListSortDirection.Ascending));
+      _gameCollectionView.SortDescriptions.Add(new SortDescription(nameof(GameViewModel.LastTimestamp),
+                                                                   ListSortDirection.Descending));
 
       GameCollectionView.CurrentChanged += OnSelectedGameChanged;
 
@@ -106,8 +106,8 @@ namespace TrophyIsBetter.ViewModels
       {
         // Horrific hack to fix sorting not being applied when view switches
         // It keeps losing the SortDescriptions
-        _gameCollectionView.SortDescriptions.Add(new SortDescription(nameof(GameViewModel.Name),
-                                                                     ListSortDirection.Ascending));
+        _gameCollectionView.SortDescriptions.Add(new SortDescription(nameof(GameViewModel.LastTimestamp),
+                                                                     ListSortDirection.Descending));
 
         return _gameCollectionView;
       }
