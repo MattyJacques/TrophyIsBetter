@@ -44,6 +44,8 @@ namespace TrophyParser.PS3
       _typeRecords = DataParsing.ParseTypeRecords(_header, reader);
 
       ParseBlocks(reader);
+
+      ResetListInfo();
     } // Constructor
 
     #endregion Constructors
@@ -325,6 +327,28 @@ namespace TrophyParser.PS3
           _listInfo.LastAchievedTrophyTime = DateTime.MinValue;
           _listInfo.LastUpdated = DateTime.Now;
         }
+      }
+    } // CheckListInfo
+
+    private void ResetListInfo()
+    {
+      DateTime earliest = DateTime.MaxValue;
+      DateTime latest = DateTime.MinValue;
+
+      var orderedTimestamps = _timestamps
+        .Where(x => DateTime.Compare(x.Time, DateTime.MinValue) != 0)
+        .OrderBy(p => p.Time);
+
+      if (orderedTimestamps.Any())
+      {
+        _listInfo.LastAchievedTrophyTime = orderedTimestamps.Last().Time;
+        _listInfo.DateAdded = CalcDateAdded(orderedTimestamps.First().Time);
+        _listInfo.LastUpdated = orderedTimestamps.Last().Time;
+      }
+      else
+      {
+        _listInfo.LastAchievedTrophyTime = DateTime.MinValue;
+        _listInfo.LastUpdated = DateTime.Now;
       }
     } // CheckListInfo
 
